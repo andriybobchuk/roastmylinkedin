@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Profile Audit for Developers</title>
+<style>
+  /* Bare minimum for readability. No design. */
+  body { max-width: 640px; margin: 0 auto; padding: 16px; font-family: system-ui, sans-serif; line-height: 1.5; }
+  input, select, button { font-size: 16px; padding: 8px; margin: 4px 0; width: 100%; box-sizing: border-box; }
+  button { cursor: pointer; }
+  .checklist-item { border-top: 1px solid #ccc; padding: 12px 0; }
+  progress { width: 100%; height: 20px; }
+  hr { margin: 24px 0; }
+  .hidden { display: none; }
+  .status-good::before { content: "[OK] "; }
+  .status-warn::before { content: "[!] "; }
+  .status-bad::before { content: "[X] "; }
+
+  /* Functional (not decorative) styles for the wireframe: */
+  .score-big { font-size: 64px; font-weight: bold; line-height: 1; }
+  .score-bar { width: 100%; height: 24px; border: 1px solid #000; position: relative; margin: 8px 0; }
+  .score-fill { height: 100%; background: #000; }
+  .score-marker { position: absolute; top: -4px; width: 2px; height: 32px; background: #000; }
+  .score-marker-label { position: absolute; top: 34px; font-size: 11px; white-space: nowrap; transform: translateX(-50%); }
+  .preview-card { border: 2px dashed #000; padding: 12px; margin: 12px 0; }
+  .blurred { filter: blur(5px); user-select: none; }
+  .lock-cta { border: 2px solid #000; padding: 16px; margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- SECTION 1: LANDING                           -->
+<!-- ============================================ -->
+<section id="section-landing">
+  <h1>Your LinkedIn is costing you interviews.</h1>
+  <p>Recruiters spend 6 seconds on your profile before deciding. We score it against what dev recruiters actually search for &mdash; and rewrite the parts that matter, copy-paste ready.</p>
+  <p><strong>Built for programmers.</strong> Not a generic resume tool.</p>
+
+  <hr>
+
+  <label for="linkedin-url"><strong>Your LinkedIn username</strong></label>
+  <p><small>linkedin.com/in/<strong>______</strong> &larr; just this part</small></p>
+  <input type="text" id="linkedin-url" placeholder="jankowalski" autocomplete="off" autocapitalize="off" spellcheck="false">
+
+  <button onclick="startAnalysis()" id="analyze-btn">Get my free score &rarr;</button>
+
+  <p><small>Free. No signup. Takes 5 seconds. (Full URL also works.)</small></p>
+
+  <hr>
+  <p><small>Scored 12,847 developer profiles this month.</small></p>
+  <p><small>&ldquo;Went from 2 recruiter DMs a week to 14. Got 3 offers in 6 weeks.&rdquo; &mdash; Backend dev, Berlin</small></p>
+  <p><small>&ldquo;Score jumped from 41 to 82 in one weekend. Interviews doubled.&rdquo; &mdash; Full-stack, remote</small></p>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 2: ANALYZING                         -->
+<!-- ============================================ -->
+<section id="section-analyzing" class="hidden">
+  <h2>Scoring your profile...</h2>
+  <p id="analysis-status">Fetching profile data...</p>
+  <progress id="analysis-progress" value="0" max="100"></progress>
+  <p><small><span id="analysis-percent">0</span>% complete</small></p>
+
+  <hr>
+  <p><strong>Live score:</strong> <span id="live-score" style="font-size:28px;font-weight:bold;">0</span> / 100</p>
+  <p><small>Findings so far:</small></p>
+  <div id="live-findings"></div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 3: RESULTS                           -->
+<!-- ============================================ -->
+<section id="section-results" class="hidden">
+  <p><small>Your audit is ready.</small></p>
+  <h2>Your Profile Score</h2>
+
+  <p><span class="score-big" id="user-score">47</span> <span style="font-size:24px;">/ 100</span></p>
+
+  <div class="score-bar">
+    <div class="score-fill" id="score-fill" style="width: 47%;"></div>
+    <div class="score-marker" style="left: 84%;">
+      <div class="score-marker-label">Top offers: 84</div>
+    </div>
+  </div>
+  <div style="height: 48px;"></div>
+
+  <p><strong>You rank in the bottom 34%</strong> of developer profiles we've scored this month.</p>
+  <p><small>Devs who landed offers average <strong>84/100</strong>. The gap is closable &mdash; the fixes below cover 90% of it.</small></p>
+
+  <hr>
+  <h3>Summary</h3>
+  <p>Your <strong>profile picture and custom URL</strong> are working for you &mdash; strong baseline. Your <strong>headline (generic), About section (thin), and keyword density (missing 7 recruiter-search terms)</strong> are the three biggest drags &mdash; closing these alone lifts your score to ~68. Advanced findings below cover the rest of the gap.</p>
+
+  <hr>
+  <h3>Free findings (3 quick wins)</h3>
+
+  <div class="checklist-item">
+    <p class="status-bad"><strong>Your headline is generic.</strong></p>
+    <p><small>Current: &ldquo;Software Engineer&rdquo;. Recruiters search for stack + specialization. Add your primary tech to appear in search.</small></p>
+    <p><small><em>Impact if fixed: +14 points.</em></small></p>
+  </div>
+
+  <div class="checklist-item">
+    <p class="status-warn"><strong>About section is under 400 characters.</strong></p>
+    <p><small>Profiles with 1000+ char About sections get 3.2x more profile views. Yours is well below that threshold.</small></p>
+    <p><small><em>Impact if fixed: +11 points.</em></small></p>
+  </div>
+
+  <div class="checklist-item">
+    <p class="status-bad"><strong>Missing 7 high-signal keywords for your role.</strong></p>
+    <p><small>Missing: &ldquo;microservices&rdquo;, &ldquo;system design&rdquo;, &ldquo;API design&rdquo;, +4 more. These are top-25 recruiter search terms.</small></p>
+    <p><small><em>Impact if fixed: +9 points.</em></small></p>
+  </div>
+
+  <hr>
+  <h3>Your rewritten profile (copy-paste ready)</h3>
+  <p><small>We generated the exact copy for you. Preview below:</small></p>
+
+  <div class="preview-card">
+    <p><small><strong>Your new headline</strong></small></p>
+    <p class="blurred">Senior Backend Engineer &middot; Go, Kubernetes, distributed systems &middot; scaled X to Y at Z &middot; open to remote</p>
+    <p><small>[LOCKED &mdash; unlock to reveal]</small></p>
+  </div>
+
+  <div class="preview-card">
+    <p><small><strong>Your new About section</strong> (rewritten, 1200 chars)</small></p>
+    <p class="blurred">Backend engineer with 6 years shipping distributed systems at scale. At Acme I led the migration from monolith to microservices, cutting P95 latency from 800ms to 120ms and enabling the team to ship 4x more releases per quarter. Prior to that at Foo I built the event-processing pipeline handling 40M events/day at 99.99% uptime. I care about API design that developers actually enjoy using, observability that catches issues before customers do, and code review that raises the floor for the whole team...</p>
+    <p><small>[LOCKED &mdash; unlock to reveal]</small></p>
+  </div>
+
+  <div class="preview-card">
+    <p><small><strong>Your top 3 experience bullets, rewritten</strong> (quantified, STAR-format)</small></p>
+    <p class="blurred">&bull; Led migration of authentication service from monolith to microservices, reducing P95 latency 85% (800ms &rarr; 120ms) and enabling 4x release velocity across 12-engineer team</p>
+    <p class="blurred">&bull; Designed and shipped event-processing pipeline handling 40M events/day at 99.99% uptime, replacing legacy system that failed weekly</p>
+    <p class="blurred">&bull; Owned end-to-end redesign of billing API used by 8 downstream teams, reducing support tickets 62% in first quarter after launch</p>
+    <p><small>[LOCKED &mdash; unlock to reveal]</small></p>
+  </div>
+
+  <p><small>Plus: skills-section optimization, post/activity strategy for your role, and recommendation request templates.</small></p>
+
+  <hr>
+
+  <div class="lock-cta">
+    <p><strong>Unlock your rewritten profile &mdash; 79 z&#322; one-time</strong></p>
+    <p><small>The average developer job search takes 4.2 months. Every week you're not optimized is a week of salary you're not earning yet. 79 z&#322; pays for itself in the first hour of a job you actually want.</small></p>
+    <p><small><strong>What you get:</strong> your rewritten headline, About section, top 5 experience bullets, skills section, and 30-day access to re-run the score as you make changes. Delivered in 5 minutes.</small></p>
+    <button onclick="clickPaywall()"><strong>Unlock now &mdash; 79 z&#322; &rarr;</strong></button>
+    <p><small>One-time payment. No subscription. No recurring anything.</small></p>
+    <p><small><strong>30-day money-back guarantee:</strong> if you don't get more recruiter messages within 30 days, full refund. No questions.</small></p>
+  </div>
+
+  <hr>
+  <button onclick="show('section-landing'); resetState();" style="margin-top:16px;">Score another profile</button>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 4: WAITLIST (paywall click)          -->
+<!-- ============================================ -->
+<section id="section-waitlist" class="hidden">
+  <h2>Delivery temporarily paused</h2>
+  <p>We hit our capacity for new orders this week &mdash; the rewrite pipeline is running behind. Leave your email and we'll open your delivery slot within 48 hours.</p>
+  <p><small><strong>Early-list bonus:</strong> 39 z&#322; instead of 79 z&#322; &mdash; locked in when your slot opens.</small></p>
+
+  <label for="waitlist-email"><strong>Your email</strong></label>
+  <input type="email" id="waitlist-email" placeholder="you@example.com">
+
+  <label for="waitlist-role"><strong>What role are you targeting?</strong> <small>(optional &mdash; helps us prioritize your rewrite)</small></label>
+  <select id="waitlist-role">
+    <option value="">Skip</option>
+    <option>Frontend Engineer</option>
+    <option>Backend Engineer</option>
+    <option>Full-stack Engineer</option>
+    <option>Mobile Engineer</option>
+    <option>DevOps / Platform / SRE</option>
+    <option>Data Engineer</option>
+    <option>ML / AI Engineer</option>
+    <option>Engineering Manager / Tech Lead</option>
+    <option>Other</option>
+  </select>
+
+  <button onclick="submitWaitlist()">Save my slot at 39 z&#322;</button>
+
+  <hr>
+  <button onclick="show('section-results')" style="margin-top:8px;">&larr; Back to my free score</button>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 5: THANK YOU                         -->
+<!-- ============================================ -->
+<section id="section-thanks" class="hidden">
+  <h2>Your slot is saved.</h2>
+  <p>We'll email <strong id="thanks-email"></strong> within 48 hours with your 39 z&#322; checkout link.</p>
+  <p>In the meantime, start on the 3 free fixes above &mdash; they alone move most people from ~47 to ~65.</p>
+
+  <hr>
+  <button onclick="show('section-landing'); resetState();">Done</button>
+</section>
+
+<script>
+// ============================================
+// STATE + NAVIGATION
+// ============================================
+const state = {
+  linkedinUsername: '',
+  linkedinUrl: '',
+  role: '',
+  email: '',
+  finalScore: 47
+};
+
+const SECTIONS = ['section-landing', 'section-analyzing', 'section-results', 'section-waitlist', 'section-thanks'];
+
+function show(id) {
+  SECTIONS.forEach(s => document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  window.scrollTo(0, 0);
+  logEvent('view_' + id);
+}
+
+function resetState() {
+  state.linkedinUsername = '';
+  state.linkedinUrl = '';
+  state.role = '';
+  document.getElementById('linkedin-url').value = '';
+  document.getElementById('waitlist-email').value = '';
+  document.getElementById('waitlist-role').value = '';
+  document.getElementById('live-findings').innerHTML = '';
+  document.getElementById('live-score').textContent = '0';
+}
+
+// Accepts either a bare username ("jankowalski") or a full LinkedIn URL
+// in any of the common forms. Returns { username, url } or null if unparseable.
+function parseLinkedInInput(raw) {
+  let s = raw.trim();
+  if (!s) return null;
+
+  // If it looks like a URL/path, try to pull the username after /in/
+  const match = s.match(/linkedin\.com\/in\/([^/?#\s]+)/i);
+  if (match) {
+    s = match[1];
+  }
+
+  // Strip any leading @ people sometimes add
+  s = s.replace(/^@/, '');
+
+  // Real LinkedIn usernames: letters, numbers, hyphens, underscores. 3-100 chars.
+  if (!/^[a-zA-Z0-9_-]{3,100}$/.test(s)) return null;
+
+  return {
+    username: s,
+    url: 'https://linkedin.com/in/' + s
+  };
+}
+
+// ============================================
+// EVENT LOG (replace with real analytics)
+// ============================================
+function logEvent(name, data = {}) {
+  console.log('[event]', name, data);
+  // TODO: pipe to PostHog / Plausible / GA4
+}
+
+// ============================================
+// FLOW HANDLERS
+// ============================================
+function startAnalysis() {
+  const raw = document.getElementById('linkedin-url').value;
+  const parsed = parseLinkedInInput(raw);
+  if (!parsed) {
+    alert("That doesn't look like a valid LinkedIn username. Try just the part after linkedin.com/in/ &mdash; e.g. jankowalski");
+    return;
+  }
+  state.linkedinUsername = parsed.username;
+  state.linkedinUrl = parsed.url;
+  logEvent('url_submitted', { username: parsed.username, url: parsed.url, rawInput: raw.trim() });
+  show('section-analyzing');
+  runFakeAnalysis();
+}
+
+// ============================================
+// FAKE PROGRESSIVE ANALYSIS
+// Each step advances progress AND live score.
+// Final score lands around 47/100 to create the gap.
+// ============================================
+const ANALYSIS_STEPS = [
+  { pct: 8,   score: 0,  status: 'Fetching profile data...',           finding: null },
+  { pct: 16,  score: 5,  status: 'Checking profile completeness...',   finding: { level: 'good', text: 'Profile picture is set. Solid baseline.' } },
+  { pct: 24,  score: 8,  status: 'Reading your headline...',           finding: { level: 'bad',  text: 'Headline is generic &mdash; missing stack keywords.' } },
+  { pct: 34,  score: 15, status: 'Analyzing About section...',         finding: { level: 'warn', text: 'About section is under 400 characters (recommended: 1000+).' } },
+  { pct: 46,  score: 22, status: 'Scanning experience bullets...',     finding: { level: 'warn', text: 'Most experience bullets lack quantified impact.' } },
+  { pct: 58,  score: 30, status: 'Checking keyword density...',        finding: { level: 'bad',  text: 'Missing 7 high-signal keywords for your role.' } },
+  { pct: 70,  score: 36, status: 'Reviewing skills endorsements...',   finding: { level: 'warn', text: 'Skills section missing endorsement milestones.' } },
+  { pct: 82,  score: 41, status: 'Auditing recent activity...',        finding: { level: 'warn', text: 'Activity signal is weak &mdash; posting cadence below the median.' } },
+  { pct: 90,  score: 44, status: 'Checking recommendations...',        finding: { level: 'bad',  text: 'Recommendations count is below the median for your role.' } },
+  { pct: 96,  score: 46, status: 'Comparing to peers who landed offers...', finding: { level: 'good', text: 'Custom LinkedIn URL is set. Good move.' } },
+  { pct: 100, score: 47, status: 'Done.',                              finding: null }
+];
+
+function runFakeAnalysis() {
+  const findingsDiv = document.getElementById('live-findings');
+  const progressBar = document.getElementById('analysis-progress');
+  const percentSpan = document.getElementById('analysis-percent');
+  const statusP = document.getElementById('analysis-status');
+  const liveScore = document.getElementById('live-score');
+  findingsDiv.innerHTML = '';
+  liveScore.textContent = '0';
+
+  let i = 0;
+  function tick() {
+    if (i >= ANALYSIS_STEPS.length) {
+      setTimeout(() => {
+        document.getElementById('user-score').textContent = state.finalScore;
+        document.getElementById('score-fill').style.width = state.finalScore + '%';
+        show('section-results');
+      }, 500);
+      return;
+    }
+    const step = ANALYSIS_STEPS[i];
+    progressBar.value = step.pct;
+    percentSpan.textContent = step.pct;
+    statusP.textContent = step.status;
+    liveScore.textContent = step.score;
+    if (step.finding) {
+      const div = document.createElement('div');
+      div.className = 'checklist-item';
+      div.innerHTML = '<p class="status-' + step.finding.level + '">' + step.finding.text + '</p>';
+      findingsDiv.appendChild(div);
+    }
+    i++;
+    setTimeout(tick, 500);
+  }
+  tick();
+}
+
+// ============================================
+// PAYWALL + WAITLIST
+// ============================================
+function clickPaywall() {
+  logEvent('paywall_clicked', {
+    score: state.finalScore,
+    offer: 'onetime_79pln'
+  });
+  show('section-waitlist');
+}
+
+function submitWaitlist() {
+  const email = document.getElementById('waitlist-email').value.trim();
+  const role = document.getElementById('waitlist-role').value;
+  if (!email || !email.includes('@')) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+  state.email = email;
+  state.role = role;
+  logEvent('waitlist_submitted', {
+    email,
+    role: role || null,
+    score: state.finalScore,
+    offer: 'onetime_39pln_earlylist'
+  });
+  // TODO: POST to backend / Airtable / ConvertKit
+  document.getElementById('thanks-email').textContent = email;
+  show('section-thanks');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+# Netlify config for Roast My LinkedIn.
+#
+# Deploy: drag-and-drop this folder at https://app.netlify.com/drop
+# OR connect a Git repo — Netlify auto-detects this file.
+#
+# Env vars to set in Netlify UI (Site → Settings → Environment variables):
+#   APIFY_TOKEN
+#   GEMINI_API_KEY   (or ANTHROPIC_API_KEY if you switch to paid Claude)
+# Optional:
+#   GEMINI_MODEL     (default gemini-2.5-flash)
+#   CLAUDE_MODEL     (default claude-sonnet-4-6)
+
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Route /analyze to the serverless function without exposing the /.netlify path
+[[redirects]]
+  from = "/analyze"
+  to = "/.netlify/functions/analyze"
+  status = 200
+  force = true
+
+# SPA-style fallback isn't needed — every route has its own file. But this catches
+# typos and returns index.html so users don't see raw 404 pages.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404

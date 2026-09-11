@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roast My LinkedIn — a brutally honest audit for engineers</title>
+<style>
+  :root {
+    --bg: #E85D45;
+    --bg-dark: #C7452F;
+    --bg-deep: #A93A28;
+    --ink: #141414;
+    --amber: #FFC93A;       /* the "spice" — third accent */
+    --amber-hot: #FFB300;
+    --fg: #FFFFFF;
+    --fg-dim: rgba(255, 255, 255, 0.72);
+    --fg-faint: rgba(255, 255, 255, 0.45);
+    --fg-ghost: rgba(255, 255, 255, 0.22);
+    --input-bg: rgba(255, 255, 255, 0.12);
+    --input-bg-focus: rgba(255, 255, 255, 0.22);
+    --ease: cubic-bezier(0.85, 0, 0.15, 1);
+    --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Helvetica Neue", "Poppins", Arial, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, ui-serif, Georgia, serif;
+    --mono: ui-monospace, "SF Mono", "Menlo", "JetBrains Mono", "Consolas", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01", "cv01", "kern";
+    letter-spacing: -0.01em;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--amber); color: var(--ink); }
+
+  /* ================================================== */
+  /* TOP BAR                                            */
+  /* ================================================== */
+  .topbar {
+    padding: 22px 22px 8px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; flex-wrap: wrap;
+    position: relative; z-index: 30;
+  }
+  .brand-logo {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--fg);
+    padding: 11px 14px 10px;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    transform: rotate(-2.5deg);
+    transform-origin: left center;
+    box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.22);
+    white-space: nowrap;
+    user-select: none;
+  }
+  .brand-logo .brand-li { color: var(--bg); }
+  @media (min-width: 640px) {
+    .brand-logo { font-size: 18px; padding: 12px 16px 11px; }
+  }
+
+  .prod-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer; user-select: none;
+  }
+  .prod-toggle .status { color: var(--fg-dim); min-width: 66px; text-align: right; }
+  .prod-toggle.on .status { color: var(--fg); }
+  .prod-toggle .switch {
+    position: relative;
+    width: 40px; height: 20px;
+    background: transparent;
+    border: 2px solid var(--fg);
+    display: inline-block; flex-shrink: 0;
+  }
+  .prod-toggle .switch::after {
+    content: "";
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 12px; height: 12px;
+    background: var(--fg);
+    transition: left 0.15s ease;
+  }
+  .prod-toggle.on .switch::after { left: 22px; }
+
+  /* ================================================== */
+  /* STAGES (form / loading / error / waitlist / thanks) */
+  /* ================================================== */
+  .stage {
+    min-height: calc(100vh - 260px);
+    min-height: calc(100dvh - 260px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 24px 60px;
+    text-align: center;
+  }
+
+  /* ------- Hero ------- */
+  .hero-headline {
+    font-weight: 800;
+    font-size: clamp(44px, 9.5vw, 96px);
+    line-height: 1.02; letter-spacing: -0.035em;
+    max-width: 18ch;
+    margin: 0 auto 22px;
+  }
+  .hero-headline .line { display: block; }
+  .rotator-line {
+    display: block;
+    margin-top: 6px;
+    color: var(--amber);
+    min-height: 1.05em;   /* reserve space to prevent jump */
+  }
+  .rotator {
+    display: inline;
+    font-weight: 900;
+    color: var(--amber);
+  }
+  .rotator-cursor {
+    display: inline-block;
+    color: var(--amber);
+    font-weight: 300;
+    margin-left: 2px;
+    animation: blinkCursor 0.9s steps(2, end) infinite;
+  }
+  @keyframes blinkCursor {
+    0%, 60% { opacity: 1; }
+    60.1%, 100% { opacity: 0; }
+  }
+
+  .hero-sub {
+    font-weight: 500;
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--fg-dim);
+    max-width: 44ch; margin: 0 auto 40px; line-height: 1.4;
+  }
+
+  .form-row {
+    display: flex; gap: 8px;
+    width: 100%; max-width: 520px;
+    margin: 0 auto;
+  }
+  .form-row input {
+    flex: 1;
+    background: var(--input-bg);
+    border: none; color: var(--fg);
+    font-family: inherit; font-size: 17px; font-weight: 500;
+    padding: 18px 20px; border-radius: 0;
+    outline: none; min-width: 0;
+  }
+  .form-row input::placeholder { color: var(--fg-faint); }
+  .form-row input:focus { background: var(--input-bg-focus); }
+  .form-row button {
+    background: var(--fg); color: var(--bg-dark);
+    border: none; padding: 18px 28px;
+    font-family: inherit; font-size: 17px; font-weight: 700;
+    letter-spacing: -0.01em; cursor: pointer; white-space: nowrap;
+  }
+  .form-row button:hover { background: var(--amber); color: var(--ink); }
+  .form-row button:disabled { opacity: 0.5; cursor: wait; }
+  @media (max-width: 480px) {
+    .form-row { flex-direction: column; }
+    .form-row button { width: 100%; }
+  }
+  .find-helper { margin-top: 12px; display: flex; justify-content: center; }
+  .find-helper a {
+    color: var(--fg-dim); text-decoration: none;
+    font-size: 13px; font-weight: 500;
+    border-bottom: 1px solid var(--fg-faint);
+    padding-bottom: 2px;
+  }
+  .find-helper a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+  .find-helper a::after { content: " ↗"; }
+
+  /* ------- Loading ------- */
+  .loading-wrap { width: 100%; max-width: 560px; position: relative; }
+  .progress-track {
+    width: 100%; height: 2px;
+    background: var(--fg-ghost);
+    margin-bottom: 44px;
+    position: relative; overflow: hidden;
+  }
+  .progress-fill {
+    position: absolute; inset: 0 auto 0 0;
+    background: var(--amber);
+    width: 0%;
+    transition: width 0.4s linear;
+  }
+  .loading-headline {
+    font-weight: 800;
+    font-size: clamp(40px, 8vw, 72px);
+    line-height: 1.05; letter-spacing: -0.03em;
+    margin-bottom: 20px; text-align: center;
+  }
+  .loading-sub {
+    font-weight: 500;
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--fg-dim);
+    min-height: 32px; text-align: center;
+  }
+  .dot::after {
+    content: "";
+    display: inline-block; width: 24px; text-align: left;
+    animation: dotsAnim 1.2s steps(4, end) infinite;
+  }
+  @keyframes dotsAnim {
+    0% { content: ""; } 25% { content: "."; }
+    50% { content: ".."; } 75% { content: "..."; }
+    100% { content: ""; }
+  }
+  .loading-stats {
+    margin-top: 40px;
+    display: flex; justify-content: center; gap: 32px;
+    font-family: var(--mono);
+    font-size: 12px; letter-spacing: 0.08em;
+    color: var(--fg-dim); text-transform: uppercase;
+  }
+  .loading-stats .stat .n {
+    display: block;
+    font-family: var(--sans);
+    font-weight: 800; font-size: 28px;
+    color: var(--fg); line-height: 1;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .skip-btn {
+    position: absolute;
+    right: 0; bottom: -50px;
+    background: transparent;
+    color: var(--fg-dim);
+    border: 1px solid var(--fg-faint);
+    padding: 8px 14px;
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer;
+  }
+  .skip-btn:hover { color: var(--amber); border-color: var(--amber); }
+  .mock-badge {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.35); color: var(--fg);
+    padding: 6px 12px;
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; font-weight: 700;
+    z-index: 15;
+  }
+
+  /* ------- Error ------- */
+  .error-headline {
+    font-weight: 800;
+    font-size: clamp(36px, 7vw, 60px);
+    line-height: 1.05; letter-spacing: -0.03em;
+    margin-bottom: 20px;
+  }
+  .error-msg {
+    font-weight: 500; font-size: 17px; color: var(--fg-dim);
+    max-width: 44ch; margin: 0 auto 36px; line-height: 1.4;
+  }
+  .plain-btn {
+    background: var(--fg); color: var(--bg-dark);
+    border: none; padding: 18px 32px;
+    font-family: inherit; font-size: 17px; font-weight: 700;
+    cursor: pointer; letter-spacing: -0.01em;
+  }
+  .plain-btn:hover { background: var(--amber); color: var(--ink); }
+
+  /* ================================================== */
+  /* REPORT — vertical pager                            */
+  /* ================================================== */
+  #section-report {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 5;
+    overflow: hidden;
+  }
+  #section-report.hidden { display: none; }
+
+  .pager-topbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    z-index: 12;
+    padding: 20px 22px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; pointer-events: none;
+  }
+  .pager-topbar > * { pointer-events: auto; }
+  .pager-back {
+    background: transparent;
+    border: 1px solid var(--fg-faint);
+    color: var(--fg-dim);
+    padding: 8px 14px;
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: pointer;
+  }
+  .pager-back:hover { color: var(--amber); border-color: var(--amber); }
+  .pager-mock {
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--amber);
+  }
+
+  .pager {
+    position: absolute;
+    inset: 0;
+  }
+  .page {
+    position: absolute;
+    inset: 0;
+    padding: 60px 24px 70px;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(60px) scale(0.98);
+    transition: opacity 700ms var(--ease), transform 700ms var(--ease);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .page.current {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+  .page.past {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.98);
+  }
+  .page.invert {
+    background: var(--fg);
+    color: var(--ink);
+  }
+  .page > .page-inner {
+    max-width: 780px;
+    width: 100%;
+    margin: 0 auto;
+    animation-fill-mode: both;
+  }
+
+  .page-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    color: var(--amber);
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .page-num .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .page-num .lbl { color: var(--fg-dim); }
+  .page.invert .page-num .lbl { color: rgba(20,20,20,0.55); }
+  .page.invert .page-num .num { color: var(--bg-dark); }
+
+  /* Content animation on page.current */
+  .page.current .anim {
+    animation: fadeUp 800ms var(--ease-out) both;
+  }
+  .page.current .anim.d-1 { animation-delay: 180ms; }
+  .page.current .anim.d-2 { animation-delay: 340ms; }
+  .page.current .anim.d-3 { animation-delay: 500ms; }
+  .page.current .anim.d-4 { animation-delay: 660ms; }
+  .page.current .anim.d-5 { animation-delay: 820ms; }
+  .page.current .anim.slam { animation: slam 900ms var(--ease-out) both; }
+  .page.current .anim.slam-tilt { animation: slamTilt 900ms var(--ease-out) both; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slam {
+    0% { opacity: 0; transform: scale(0.85); }
+    70% { opacity: 1; transform: scale(1.03); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes slamTilt {
+    0% { opacity: 0; transform: scale(0.75) rotate(-6deg); }
+    70% { opacity: 1; transform: scale(1.05) rotate(-2deg); }
+    100% { opacity: 1; transform: scale(1) rotate(-1.5deg); }
+  }
+
+  /* Progress dots — right side */
+  .pager-dots {
+    position: absolute;
+    right: 18px; top: 50%;
+    transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 10px;
+    z-index: 15;
+  }
+  .pager-dots .dot {
+    width: 8px; height: 8px;
+    background: var(--fg-ghost);
+    cursor: pointer;
+    transition: background 200ms;
+  }
+  .pager-dots .dot:hover { background: var(--fg-dim); }
+  .pager-dots .dot.active { background: var(--amber); width: 8px; height: 16px; }
+  @media (max-width: 520px) {
+    .pager-dots { display: none; }
+  }
+
+  /* Bottom next indicator */
+  .pager-next {
+    position: absolute;
+    bottom: 22px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 12;
+    background: transparent;
+    color: var(--fg-dim);
+    border: none;
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    cursor: pointer;
+    padding: 8px 14px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .pager-next .arrow { font-size: 14px; animation: bounce 1.8s ease-in-out infinite; }
+  .pager-next:hover { color: var(--amber); }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+  }
+  .page.invert ~ .pager-next { color: rgba(20,20,20,0.55); }
+  .page.invert ~ .pager-next:hover { color: var(--bg-dark); }
+
+  /* ================================================== */
+  /* PAGE-SPECIFIC LAYOUTS                              */
+  /* ================================================== */
+
+  /* --- Page: subject --- */
+  .p-subject { text-align: center; }
+  .subject-avatar {
+    width: 128px; height: 128px;
+    border-radius: 50%;
+    background: var(--fg-ghost);
+    overflow: hidden;
+    margin: 0 auto 26px;
+    border: 3px solid var(--fg);
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.16);
+  }
+  .subject-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .subject-name {
+    font-weight: 800;
+    font-size: clamp(38px, 7vw, 68px);
+    line-height: 1.02; letter-spacing: -0.035em;
+    margin-bottom: 12px;
+  }
+  .subject-headline {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--fg-dim);
+    line-height: 1.4;
+    max-width: 44ch; margin: 0 auto 26px;
+  }
+  .subject-stats {
+    display: inline-flex; flex-wrap: wrap;
+    gap: 8px 16px;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  .subject-stats .stat-item { display: inline-flex; align-items: center; gap: 8px; }
+  .subject-stats .stat-item::before {
+    content: "·"; color: var(--amber); margin-right: 4px;
+  }
+  .subject-stats .stat-item:first-child::before { display: none; }
+
+  /* --- Page: score --- */
+  .p-score { text-align: center; justify-content: center; }
+  .p-score .page-num { color: var(--amber-hot); justify-content: center; }
+  .score-huge {
+    font-weight: 800;
+    font-size: clamp(180px, 42vw, 380px);
+    line-height: 0.82;
+    letter-spacing: -0.06em;
+    font-variant-numeric: tabular-nums lining-nums;
+    color: var(--bg-dark);
+    display: inline-block;
+  }
+  .score-outof-big {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-top: 12px;
+    color: var(--bg-dark);
+  }
+  .score-role {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(18px, 2.4vw, 22px);
+    color: var(--bg-dark); opacity: 0.7;
+    margin-top: 22px;
+  }
+
+  /* --- Page: rank --- */
+  .p-rank { text-align: center; }
+  .rank-badge-huge {
+    display: inline-block;
+    background: var(--amber);
+    color: var(--ink);
+    padding: 16px 24px 14px;
+    font-weight: 900;
+    font-size: clamp(56px, 12vw, 96px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 32px;
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.16);
+    transform-origin: center;
+  }
+  .rank-body {
+    font-family: var(--serif);
+    font-size: clamp(18px, 2.4vw, 22px);
+    line-height: 1.5;
+    max-width: 40ch; margin: 0 auto;
+    color: var(--fg-dim);
+  }
+
+  /* --- Page: read (editorial) --- */
+  .p-read { text-align: center; justify-content: center; }
+  .read-quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(22px, 3.6vw, 34px);
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    max-width: 28ch;
+    margin: 0 auto;
+    position: relative;
+    color: var(--ink);
+  }
+  .read-quote::before {
+    content: '"';
+    display: block;
+    font-family: var(--serif);
+    font-style: normal;
+    font-size: clamp(96px, 18vw, 180px);
+    line-height: 0.3;
+    color: var(--amber);
+    margin-bottom: 40px;
+    opacity: 0.9;
+  }
+  .read-signature {
+    margin-top: 42px;
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: rgba(20,20,20,0.55);
+  }
+
+  /* --- Page: wins --- */
+  .page-h {
+    font-weight: 800;
+    font-size: clamp(32px, 5.5vw, 54px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    max-width: 22ch;
+    margin-bottom: 34px;
+  }
+  .wins-list { display: flex; flex-direction: column; gap: 32px; }
+  .win {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 20px;
+  }
+  .win-num {
+    font-family: var(--mono);
+    font-weight: 800;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--amber);
+  }
+  .win-title {
+    font-weight: 800; font-size: clamp(20px, 2.6vw, 26px);
+    line-height: 1.22; letter-spacing: -0.015em;
+    margin-bottom: 8px;
+  }
+  .win-body {
+    font-weight: 500; font-size: 15px;
+    color: var(--fg-dim); line-height: 1.5;
+    max-width: 55ch;
+  }
+
+  /* --- Page: worst --- */
+  .worst-card {
+    background: var(--fg);
+    color: var(--bg-dark);
+    padding: 32px 26px 28px;
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.18);
+    margin-top: 12px;
+    max-width: 620px;
+    position: relative;
+  }
+  .worst-card::before {
+    content: "🌶️";
+    position: absolute;
+    top: -16px; right: -12px;
+    font-size: 40px;
+    transform: rotate(15deg);
+  }
+  .worst-tag {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--amber);
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 800;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 5px 10px;
+    margin-bottom: 20px;
+  }
+  .worst-title {
+    font-weight: 800;
+    font-size: clamp(24px, 3.8vw, 34px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+    color: var(--bg-dark);
+    max-width: 20ch;
+  }
+  .worst-body {
+    font-weight: 500;
+    font-size: 16px;
+    color: rgba(199,69,47,0.85);
+    line-height: 1.5;
+    max-width: 52ch;
+  }
+  .worst-cost {
+    margin-top: 24px;
+    font-family: var(--mono);
+    font-size: 12px; font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bg-dark);
+    display: inline-block;
+    border-top: 2px solid var(--bg-dark);
+    padding-top: 12px;
+  }
+
+  /* --- Page: cuts --- */
+  .cuts-list { display: flex; flex-direction: column; gap: 6px; }
+  .cut {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--fg-ghost);
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    gap: 10px 16px;
+    align-items: baseline;
+  }
+  .cut .c-glyph {
+    font-family: var(--mono);
+    font-weight: 800; font-size: 18px;
+    color: var(--amber);
+  }
+  .cut .c-title {
+    font-weight: 700; font-size: 18px;
+    line-height: 1.3;
+  }
+  .cut .c-cost {
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--fg-dim);
+    white-space: nowrap;
+    align-self: start;
+  }
+  .cut .c-body {
+    grid-column: 2 / -1;
+    font-weight: 500; font-size: 14px;
+    color: var(--fg-dim); line-height: 1.5;
+    margin-top: 3px;
+  }
+
+  /* --- Page: rewrites --- */
+  .rw-label {
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 800;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--fg-dim);
+  }
+  .rw-old {
+    padding: 12px 0;
+    color: var(--fg-faint);
+    font-family: var(--mono);
+    font-size: 13px; font-weight: 500;
+    text-decoration: line-through;
+    text-decoration-color: var(--fg-faint);
+    text-decoration-thickness: 1.5px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    max-width: 60ch;
+  }
+  .rw-card {
+    background: var(--fg);
+    color: var(--bg-dark);
+    padding: 28px 24px;
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.18);
+    font-weight: 600;
+    font-size: clamp(17px, 2.4vw, 22px);
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    border-left: 4px solid var(--amber);
+  }
+  .rw-card.tilt-l { transform: rotate(-0.5deg); }
+  .rw-card.tilt-r { transform: rotate(0.5deg); }
+  .rw-note {
+    margin-top: 20px;
+    font-family: var(--mono);
+    font-size: 12px; font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--fg-dim);
+    max-width: 52ch; line-height: 1.5;
+  }
+  .rw-bullets {
+    background: var(--fg);
+    color: var(--bg-dark);
+    padding: 20px 24px 12px;
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.18);
+    border-left: 4px solid var(--amber);
+  }
+  .rw-bullet {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    padding: 16px 0;
+    border-top: 1px solid rgba(199,69,47,0.18);
+    align-items: start;
+  }
+  .rw-bullet:first-child { border-top: none; padding-top: 6px; }
+  .rw-bullet .rb-text {
+    font-weight: 500; font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+  }
+  .copy-btn {
+    background: var(--ink); color: var(--amber);
+    border: none;
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .copy-btn:hover { background: var(--bg-dark); color: var(--fg); }
+  .copy-btn.copied { background: #1e6b3a; color: var(--fg); }
+  .copy-btn.hero-copy {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 14px 22px;
+    font-size: 12px;
+  }
+
+  /* --- Page: math (value) --- */
+  .p-math .math-hero {
+    display: flex; gap: 40px; align-items: center;
+    margin-top: 10px; flex-wrap: wrap;
+  }
+  .math-col { flex: 1 1 200px; }
+  .math-lbl {
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 800;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-bottom: 12px;
+  }
+  .math-num {
+    font-weight: 900;
+    font-size: clamp(64px, 12vw, 112px);
+    line-height: 0.9; letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+  }
+  .math-num.gain { color: var(--amber); }
+  .math-cap {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--fg-dim);
+    margin-top: 8px;
+    max-width: 32ch;
+    line-height: 1.4;
+  }
+  .math-arrow {
+    font-size: 40px; font-weight: 800;
+    color: var(--amber);
+    align-self: center;
+    display: none;
+  }
+  @media (min-width: 640px) { .math-arrow { display: block; } }
+  .math-summary {
+    margin-top: 36px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.6vw, 26px);
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    max-width: 32ch;
+  }
+  .math-summary strong { font-style: normal; font-weight: 800; color: var(--amber); }
+
+  /* --- Page: pricing --- */
+  .p-pricing { text-align: center; }
+  .p-pricing .page-h {
+    max-width: 22ch;
+    margin-left: auto; margin-right: auto;
+    text-align: center;
+  }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-top: 20px;
+    text-align: left;
+  }
+  @media (min-width: 720px) {
+    .pricing-grid { grid-template-columns: 1fr 1.2fr; align-items: stretch; }
+  }
+  .tier {
+    padding: 26px 22px 22px;
+    background: rgba(0,0,0,0.14);
+    border: 1px solid var(--fg-ghost);
+    position: relative;
+    display: flex; flex-direction: column;
+  }
+  .tier.best {
+    background: var(--fg); color: var(--ink);
+    border-color: var(--amber);
+    transform: rotate(-0.6deg);
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.18);
+    z-index: 2;
+    padding-top: 34px;
+  }
+  .tier.best .t-name, .tier.best .t-price, .tier.best .t-list li { color: var(--ink); }
+  .tier.best .t-tag { color: var(--bg-dark); }
+  .tier .t-badge {
+    position: absolute; top: -12px; left: 20px;
+    background: var(--amber); color: var(--ink);
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 800;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 6px 10px;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.16);
+  }
+  .tier .t-name {
+    font-weight: 800; font-size: 22px;
+    letter-spacing: -0.015em; line-height: 1;
+  }
+  .tier .t-tag {
+    font-weight: 500; font-size: 14px;
+    color: var(--fg-dim); margin-top: 6px;
+    line-height: 1.4;
+  }
+  .tier .t-price {
+    font-weight: 900; font-size: 48px;
+    letter-spacing: -0.03em; line-height: 1;
+    margin: 22px 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .tier .t-price .u {
+    font-size: 16px; font-weight: 700;
+    color: var(--fg-dim); margin-left: 4px;
+  }
+  .tier.best .t-price .u { color: var(--bg-dark); }
+  .tier .t-once {
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 700;
+    color: var(--fg-dim); letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .tier.best .t-once { color: var(--bg-dark); }
+  .tier .t-hero {
+    font-weight: 600; font-size: 14px;
+    background: rgba(255,255,255,0.08);
+    padding: 12px 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--amber);
+  }
+  .tier.best .t-hero {
+    background: rgba(255, 201, 58, 0.16);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .tier .t-list {
+    list-style: none;
+    padding: 0; margin: 0 0 22px;
+    display: flex; flex-direction: column;
+    gap: 12px;
+    font-size: 15px; font-weight: 500;
+    line-height: 1.4;
+    flex: 1;
+  }
+  .tier .t-list li { display: flex; gap: 8px; }
+  .tier .t-list li::before {
+    content: "▸"; color: var(--amber); font-weight: 800; flex-shrink: 0;
+  }
+  .tier .t-cta {
+    background: var(--fg); color: var(--ink);
+    border: none; padding: 14px 20px;
+    font-family: inherit; font-weight: 800; font-size: 15px;
+    cursor: pointer; letter-spacing: -0.01em;
+    text-transform: none;
+    margin-top: auto;
+  }
+  .tier.best .t-cta { background: var(--ink); color: var(--amber); }
+  .tier .t-cta:hover { background: var(--amber); color: var(--ink); }
+  .tier.best .t-cta:hover { background: var(--bg-dark); color: var(--fg); }
+  .tier .t-cta:disabled { opacity: 0.5; cursor: default; }
+
+  /* ================================================== */
+  /* WAITLIST + THANKS                                  */
+  /* ================================================== */
+  .waitlist-headline {
+    font-weight: 800;
+    font-size: clamp(38px, 7vw, 64px);
+    line-height: 1.05; letter-spacing: -0.03em;
+    margin-bottom: 16px;
+    max-width: 18ch;
+  }
+  .waitlist-sub {
+    font-weight: 500; font-size: 17px; color: var(--fg-dim);
+    max-width: 44ch; margin: 0 auto 32px; line-height: 1.45;
+  }
+  .waitlist-form {
+    display: flex; gap: 8px;
+    width: 100%; max-width: 480px; margin: 0 auto;
+  }
+  .waitlist-form input {
+    flex: 1;
+    background: var(--input-bg); border: none;
+    color: var(--fg); font-family: inherit;
+    font-size: 17px; font-weight: 500;
+    padding: 18px 20px; border-radius: 0; outline: none;
+    min-width: 0;
+  }
+  .waitlist-form input::placeholder { color: var(--fg-faint); }
+  .waitlist-form input:focus { background: var(--input-bg-focus); }
+  .waitlist-form button {
+    background: var(--amber); color: var(--ink);
+    border: none; padding: 18px 28px;
+    font-family: inherit; font-size: 17px; font-weight: 800;
+    cursor: pointer; white-space: nowrap;
+  }
+  @media (max-width: 480px) {
+    .waitlist-form { flex-direction: column; }
+    .waitlist-form button { width: 100%; }
+  }
+  .waitlist-note {
+    margin-top: 20px;
+    font-weight: 500; font-size: 13px;
+    color: var(--fg-faint);
+    max-width: 44ch; margin-left: auto; margin-right: auto;
+  }
+  .back-link {
+    margin-top: 40px;
+    display: inline-block;
+    color: var(--fg-dim); text-decoration: none;
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid var(--fg-faint);
+    padding-bottom: 2px; cursor: pointer;
+  }
+  .back-link:hover { color: var(--amber); border-color: var(--amber); }
+
+  /* ================================================== */
+  /* FOOTER                                             */
+  /* ================================================== */
+  .site-footer {
+    padding: 40px 24px 32px;
+    text-align: center;
+    color: var(--fg-dim);
+    font-size: 12px; line-height: 1.6;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .site-footer .footer-links {
+    display: flex; justify-content: center; gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    font-weight: 600; font-size: 13px;
+  }
+  .site-footer .footer-links a {
+    color: var(--fg-dim); text-decoration: none;
+    border-bottom: 1px solid var(--fg-faint);
+    padding-bottom: 2px;
+  }
+  .site-footer .footer-links a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+  .site-footer .disclaimer {
+    font-size: 11px; color: var(--fg-faint);
+    max-width: 44ch; margin: 0 auto;
+    letter-spacing: 0.02em;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- TOP BAR (only visible outside report)        -->
+<!-- ============================================ -->
+<header class="topbar" id="topbar">
+  <div class="brand-logo">RoastMy<span class="brand-li">LinkedIn</span></div>
+  <label class="prod-toggle" id="prod-toggle" onclick="togglePROD(event)">
+    <span class="switch"></span>
+    <span class="status" id="prod-status">PROD OFF</span>
+  </label>
+</header>
+
+<!-- ============================================ -->
+<!-- FORM                                         -->
+<!-- ============================================ -->
+<section id="section-form" class="stage">
+  <h1 class="hero-headline">
+    <span class="line">Your LinkedIn is</span>
+    <span class="rotator-line">
+      <span class="rotator" id="rotator">Boring</span><span id="rotator-emoji"> 😴</span><span class="rotator-cursor" aria-hidden="true">|</span>
+    </span>
+  </h1>
+  <p class="hero-sub">A harsh roast of your LinkedIn profile, free, 30 sec, no signup.</p>
+
+  <form onsubmit="return submitAudit(event)" style="width:100%;">
+    <div class="form-row">
+      <input type="text" id="username" placeholder="LinkedIn username or URL" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button type="submit" id="submit-btn">Roast it →</button>
+    </div>
+    <div class="find-helper">
+      <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noopener noreferrer">Copy my LinkedIn Link</a>
+    </div>
+  </form>
+</section>
+
+<!-- ============================================ -->
+<!-- LOADING                                      -->
+<!-- ============================================ -->
+<section id="section-loading" class="stage hidden">
+  <div class="loading-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <h1 class="loading-headline" id="loading-headline">Reading it<span class="dot"></span></h1>
+    <p class="loading-sub" id="loading-sub">Fetching your public LinkedIn data.</p>
+    <div class="loading-stats">
+      <div class="stat"><span class="n" id="stat-signals">0</span>signals read</div>
+      <div class="stat"><span class="n" id="stat-elapsed">0</span>seconds</div>
+    </div>
+    <button class="skip-btn hidden" id="skip-btn" onclick="skipLoading()">skip →</button>
+  </div>
+</section>
+
+<div id="mock-badge" class="mock-badge hidden">Simulated · toggle PROD to run real</div>
+
+<!-- ============================================ -->
+<!-- ERROR                                        -->
+<!-- ============================================ -->
+<section id="section-error" class="stage hidden">
+  <h1 class="error-headline">That didn't work.</h1>
+  <p class="error-msg" id="error-text">—</p>
+  <button class="plain-btn" onclick="reset()">Try again</button>
+</section>
+
+<!-- ============================================ -->
+<!-- REPORT — VERTICAL PAGER                      -->
+<!-- ============================================ -->
+<section id="section-report" class="hidden">
+
+  <!-- Pager top bar -->
+  <div class="pager-topbar">
+    <button class="pager-back" onclick="reset()">← Back</button>
+    <div class="pager-mock hidden" id="pager-mock-lbl">MOCK MODE</div>
+  </div>
+
+  <div class="pager" id="pager">
+
+    <!-- 01 · Subject -->
+    <div class="page p-subject current" data-page="0">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">01</span><span class="lbl">THE SUBJECT</span></div>
+        <div class="subject-avatar anim d-1" id="r-avatar"></div>
+        <h2 class="subject-name anim d-2" id="r-name">—</h2>
+        <p class="subject-headline anim d-3" id="r-headline">—</p>
+        <div class="subject-stats anim d-4" id="r-stats"></div>
+      </div>
+    </div>
+
+    <!-- 02 · Verdict -->
+    <div class="page p-score invert" data-page="1">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">02</span><span class="lbl">THE VERDICT</span></div>
+        <div class="score-huge anim slam" id="r-score">0</div>
+        <div class="score-outof-big anim d-1">out of 100</div>
+        <div class="score-role anim d-2" id="r-role-line">as an engineer</div>
+      </div>
+    </div>
+
+    <!-- 03 · Rank -->
+    <div class="page p-rank" data-page="2">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">03</span><span class="lbl">THE RANK</span></div>
+        <div class="rank-badge-huge anim slam-tilt" id="r-percentile">—</div>
+        <p class="rank-body anim d-2" id="r-reason">—</p>
+      </div>
+    </div>
+
+    <!-- 04 · Read -->
+    <div class="page p-read invert" data-page="3">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">04</span><span class="lbl">THE READ</span></div>
+        <div class="read-quote anim d-1" id="r-summary">—</div>
+        <div class="read-signature anim d-3">— The Roast · 2026</div>
+      </div>
+    </div>
+
+    <!-- 05 · Wins -->
+    <div class="page" data-page="4" id="page-wins">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">05</span><span class="lbl">WHAT SAVES YOU</span></div>
+        <h2 class="page-h anim d-1">You've got these going for you.</h2>
+        <div class="wins-list" id="r-wins"></div>
+      </div>
+    </div>
+
+    <!-- 06 · Worst -->
+    <div class="page" data-page="5" id="page-worst">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">06</span><span class="lbl">RED FLAG</span></div>
+        <h2 class="page-h anim d-1">Your biggest problem.</h2>
+        <div class="worst-card anim d-2">
+          <div class="worst-tag" id="r-worst-tag">—</div>
+          <div class="worst-title" id="r-worst-title">—</div>
+          <p class="worst-body" id="r-worst-body">—</p>
+          <div class="worst-cost" id="r-worst-cost">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 · Cuts -->
+    <div class="page" data-page="6" id="page-cuts">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">07</span><span class="lbl">SMALLER CUTS</span></div>
+        <h2 class="page-h anim d-1">And these smaller ones.</h2>
+        <div class="cuts-list anim d-2" id="r-cuts"></div>
+      </div>
+    </div>
+
+    <!-- 08 · Fix Headline -->
+    <div class="page" data-page="7" id="page-rw-headline">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">08</span><span class="lbl">FIX 01 · HEADLINE</span></div>
+        <h2 class="page-h anim d-1">Paste this instead.</h2>
+        <div class="rw-label anim d-1">Before</div>
+        <div class="rw-old anim d-2" id="r-old-headline">—</div>
+        <div class="rw-label anim d-2">After</div>
+        <div class="rw-card tilt-l anim slam"><span id="r-rw-headline">—</span></div>
+        <button class="copy-btn hero-copy anim d-4" onclick="copyText(this, 'rw-headline')">Copy headline</button>
+        <p class="rw-note anim d-5">Leads with your current company. Names your differentiators. Drops the acronym soup.</p>
+      </div>
+    </div>
+
+    <!-- 09 · Fix About -->
+    <div class="page" data-page="8" id="page-rw-about">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">09</span><span class="lbl">FIX 02 · ABOUT</span></div>
+        <h2 class="page-h anim d-1">Rewrite your About like this.</h2>
+        <div class="rw-card tilt-r anim slam"><span id="r-rw-about">—</span></div>
+        <button class="copy-btn hero-copy anim d-3" onclick="copyText(this, 'rw-about')">Copy About</button>
+        <p class="rw-note anim d-4">No "passionate about." Leads with your strongest signals. Recruiters read this in 10 seconds — make them count.</p>
+      </div>
+    </div>
+
+    <!-- 10 · Fix Bullets -->
+    <div class="page" data-page="9" id="page-rw-bullets">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">10</span><span class="lbl">FIX 03 · BULLETS</span></div>
+        <h2 class="page-h anim d-1">Rewrite your bullets like this.</h2>
+        <div class="rw-bullets anim slam" id="r-rw-bullets"></div>
+        <p class="rw-note anim d-3">STAR format. Quantified. Uses your real projects and numbers — not made-up ones.</p>
+      </div>
+    </div>
+
+    <!-- 11 · Math -->
+    <div class="page p-math" data-page="10">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">11</span><span class="lbl">WHAT'S YOURS TO GAIN</span></div>
+        <h2 class="page-h anim d-1">The gap you can close in a week.</h2>
+        <div class="math-hero">
+          <div class="math-col anim d-2">
+            <div class="math-lbl">You now</div>
+            <div class="math-num" id="math-now">84</div>
+            <div class="math-cap" id="math-now-cap">top 15%, decent inbound</div>
+          </div>
+          <div class="math-arrow anim d-3">→</div>
+          <div class="math-col anim d-3">
+            <div class="math-lbl">You after The Recipe</div>
+            <div class="math-num gain" id="math-after">92+</div>
+            <div class="math-cap">top 5%, "recruiter magnet"</div>
+          </div>
+        </div>
+        <p class="math-summary anim d-5">
+          Every week you're not optimized is <strong>~800 zł</strong> in salary you're delaying. The Recipe pays for itself in the first two hours of a job you actually want.
+        </p>
+      </div>
+    </div>
+
+    <!-- 12 · Pricing -->
+    <div class="page p-pricing" data-page="11">
+      <div class="page-inner">
+        <div class="page-num anim" style="justify-content: center;"><span class="num">12</span><span class="lbl">PICK YOUR TEMPERATURE</span></div>
+        <h2 class="page-h anim d-1">You've got the fix. Want the whole kit?</h2>
+
+        <div class="pricing-grid">
+          <div class="tier anim d-2">
+            <div class="t-name">The Roast</div>
+            <div class="t-tag">You just got this. Nice.</div>
+            <div class="t-price">Free</div>
+            <div class="t-once">One-time · already yours</div>
+            <ul class="t-list">
+              <li>Score, verdict, and top findings</li>
+              <li>Rewritten headline</li>
+              <li>Rewritten About paragraph</li>
+              <li>Top 3 rewritten experience bullets</li>
+            </ul>
+            <button class="t-cta" disabled>You have this</button>
+          </div>
+
+          <div class="tier best anim slam-tilt">
+            <div class="t-badge">🌶️ Best Value</div>
+            <div class="t-name">The Recipe</div>
+            <div class="t-tag">Everything you need to actually fix it.</div>
+            <div class="t-price">79<span class="u">zł</span></div>
+            <div class="t-once">One-time · no subscription · lifetime access</div>
+            <div class="t-hero">Recipe holders average +8 points in a week. That's the threshold where inbound recruiter DMs 3×.</div>
+            <ul class="t-list">
+              <li>Every experience bullet rewritten in STAR format</li>
+              <li>Featured section strategy — 5 post drafts to pin</li>
+              <li>Recommendation-request templates that get replies</li>
+              <li>Skills gap analysis for your target role</li>
+              <li>Downloadable PDF report for your files or coach</li>
+              <li>Unlimited re-audits until you hit 90+</li>
+              <li>30-day interviews-or-refund guarantee</li>
+            </ul>
+            <button class="t-cta" onclick="clickTier('recipe', 79)">Get The Recipe →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Progress dots -->
+  <div class="pager-dots" id="pager-dots"></div>
+
+  <!-- Next indicator -->
+  <button class="pager-next" id="pager-next" onclick="nextPage()">
+    <span class="lbl">Continue</span>
+    <span class="arrow">↓</span>
+  </button>
+
+</section>
+
+<!-- ============================================ -->
+<!-- WAITLIST                                      -->
+<!-- ============================================ -->
+<section id="section-waitlist" class="stage hidden">
+  <h1 class="waitlist-headline"><span id="wl-tier">The Recipe</span> isn't open yet.</h1>
+  <p class="waitlist-sub">We're finishing the paid tier. Drop your email and we'll open your slot in 48 hours — early list locks in <s style="opacity:0.6;">79 zł</s> at <strong style="color: var(--amber);">39 zł</strong> for life.</p>
+  <form onsubmit="return submitWaitlist(event)" class="waitlist-form">
+    <input type="email" id="wl-email" placeholder="you@example.com" required>
+    <button type="submit">Save my spot</button>
+  </form>
+  <p class="waitlist-note">You'll get one email when it opens. Nothing else.</p>
+  <a class="back-link" onclick="show('section-report'); return false;">← Back to my report</a>
+</section>
+
+<section id="section-thanks" class="stage hidden">
+  <h1 class="waitlist-headline">You're on the list.</h1>
+  <p class="waitlist-sub">We'll email <strong id="th-email"></strong> when your slot opens with the early-list discount code locked in.</p>
+  <a class="back-link" onclick="show('section-report'); return false;">← Back to my report</a>
+</section>
+
+<!-- ============================================ -->
+<!-- FOOTER (hidden on report)                    -->
+<!-- ============================================ -->
+<footer class="site-footer" id="site-footer">
+  <div class="footer-links">
+    <a href="/terms">Terms</a>
+    <a href="/privacy">Privacy</a>
+    <a href="mailto:hello@roastmylinkedin.net">Contact</a>
+  </div>
+  <div class="disclaimer">Not affiliated with LinkedIn.</div>
+</footer>
+
+<script>
+// ================================================
+// HERO ROTATOR — two-line, emoji per word, amber
+// ================================================
+const ROTATOR_WORDS = [
+  { word: 'Boring',      emoji: ' 😴' },
+  { word: 'Cringe',      emoji: ' 💀' },
+  { word: 'Mediocre',    emoji: ' 🥱' },
+  { word: 'Generic',     emoji: ' 🗑️' },
+  { word: 'Forgettable', emoji: ' 💭' },
+  { word: 'Basic',       emoji: ' 🍞' },
+];
+(function heroRotator() {
+  const wEl = document.getElementById('rotator');
+  const eEl = document.getElementById('rotator-emoji');
+  if (!wEl || !eEl) return;
+  let idx = 0, ch = 0, mode = 'typeWord';
+  const TYPE = 80, DEL = 35, HOLD = 1400, PAUSE = 260;
+
+  function tick() {
+    const item = ROTATOR_WORDS[idx];
+    const word = item.word, emoji = item.emoji;
+    if (mode === 'typeWord') {
+      ch++;
+      wEl.textContent = word.slice(0, ch);
+      if (ch >= word.length) {
+        mode = 'typeEmoji'; ch = 0;
+        setTimeout(tick, 120);
+        return;
+      }
+      setTimeout(tick, TYPE + Math.random() * 30);
+    } else if (mode === 'typeEmoji') {
+      eEl.textContent = emoji;
+      mode = 'hold';
+      setTimeout(tick, HOLD);
+    } else if (mode === 'hold') {
+      mode = 'delEmoji';
+      setTimeout(tick, 0);
+    } else if (mode === 'delEmoji') {
+      eEl.textContent = '';
+      mode = 'delWord'; ch = word.length;
+      setTimeout(tick, 60);
+    } else if (mode === 'delWord') {
+      ch--;
+      wEl.textContent = word.slice(0, Math.max(0, ch));
+      if (ch <= 0) {
+        mode = 'typeWord';
+        idx = (idx + 1) % ROTATOR_WORDS.length;
+        setTimeout(tick, PAUSE);
+        return;
+      }
+      setTimeout(tick, DEL);
+    }
+  }
+  wEl.textContent = ''; eEl.textContent = '';
+  setTimeout(tick, 400);
+})();
+
+// ================================================
+// STATE
+// ================================================
+const state = {
+  prod: false,
+  currentTier: null,
+  currentPrice: 0,
+  mockResolve: null,
+};
+
+// ================================================
+// PROD TOGGLE
+// ================================================
+function togglePROD(e) {
+  if (e) e.preventDefault();
+  state.prod = !state.prod;
+  const el = document.getElementById('prod-toggle');
+  const status = document.getElementById('prod-status');
+  el.classList.toggle('on', state.prod);
+  status.textContent = state.prod ? 'PROD ON' : 'PROD OFF';
+  updateSkipVisibility();
+}
+function updateSkipVisibility() {
+  const skip = document.getElementById('skip-btn');
+  if (state.prod) skip.classList.add('hidden');
+  else skip.classList.remove('hidden');
+}
+
+// ================================================
+// SECTION NAV
+// ================================================
+const SECTIONS = [
+  'section-form', 'section-loading', 'section-error',
+  'section-report', 'section-waitlist', 'section-thanks'
+];
+function show(id) {
+  SECTIONS.forEach(s => document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  // Hide topbar + footer when on report (full-viewport pager)
+  const topbar = document.getElementById('topbar');
+  const footer = document.getElementById('site-footer');
+  if (id === 'section-report') {
+    topbar.classList.add('hidden');
+    footer.classList.add('hidden');
+    document.body.style.overflow = 'hidden';
+  } else {
+    topbar.classList.remove('hidden');
+    footer.classList.remove('hidden');
+    document.body.style.overflow = '';
+  }
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+function reset() {
+  document.getElementById('username').value = '';
+  document.getElementById('submit-btn').disabled = false;
+  show('section-form');
+  setTimeout(() => document.getElementById('username').focus(), 60);
+}
+
+// ================================================
+// LOADING
+// ================================================
+const LOADING_STAGES = [
+  { at: 0,     head: 'Reading it',   sub: 'Fetching your public LinkedIn data.' },
+  { at: 2500,  head: 'Reading it',   sub: 'Parsing headline, About, experience.' },
+  { at: 5500,  head: 'Judging it',   sub: 'Comparing you to engineers who land offers.' },
+  { at: 9000,  head: 'Judging it',   sub: 'Weighing keyword density and quantified impact.' },
+  { at: 13500, head: 'Judging it',   sub: 'Auditing your posts. Are they on-brand for the job?' },
+  { at: 18000, head: 'Rewriting it', sub: 'Drafting a headline that would actually work.' },
+  { at: 23000, head: 'Rewriting it', sub: 'Rewriting your bullets in STAR format.' },
+  { at: 28000, head: 'Almost done',  sub: 'Adding the salt.' },
+];
+const ESTIMATED_MS = 32000;   // aligned with faster prompt
+let loadingTimers = [], loadingRAF = null, loadingStart = 0;
+
+function startLoading() {
+  const headEl = document.getElementById('loading-headline');
+  const subEl = document.getElementById('loading-sub');
+  const fillEl = document.getElementById('progress-fill');
+  const signalsEl = document.getElementById('stat-signals');
+  const elapsedEl = document.getElementById('stat-elapsed');
+  loadingStart = Date.now();
+  loadingTimers.forEach(clearTimeout);
+  loadingTimers = LOADING_STAGES.map(stage =>
+    setTimeout(() => {
+      headEl.innerHTML = stage.head + '<span class="dot"></span>';
+      subEl.textContent = stage.sub;
+    }, stage.at)
+  );
+  const tick = () => {
+    const elapsed = Date.now() - loadingStart;
+    const pct = Math.min(94, (elapsed / ESTIMATED_MS) * 94);
+    fillEl.style.width = pct + '%';
+    signalsEl.textContent = Math.floor((elapsed / ESTIMATED_MS) * 48);
+    elapsedEl.textContent = Math.floor(elapsed / 1000);
+    loadingRAF = requestAnimationFrame(tick);
+  };
+  loadingRAF = requestAnimationFrame(tick);
+  updateSkipVisibility();
+}
+function stopLoading() {
+  loadingTimers.forEach(clearTimeout);
+  loadingTimers = [];
+  if (loadingRAF) cancelAnimationFrame(loadingRAF);
+  document.getElementById('progress-fill').style.width = '100%';
+}
+function skipLoading() {
+  if (state.mockResolve) {
+    const r = state.mockResolve;
+    state.mockResolve = null;
+    r(MOCK_RESPONSE);
+  }
+}
+
+// ================================================
+// SUBMIT
+// ================================================
+async function submitAudit(e) {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  if (!username) { document.getElementById('username').focus(); return false; }
+  document.getElementById('submit-btn').disabled = true;
+  const mockBadge = document.getElementById('mock-badge');
+  mockBadge.classList.toggle('hidden', state.prod);
+  show('section-loading');
+  startLoading();
+  try {
+    const data = state.prod
+      ? await realAudit(username)
+      : await mockAudit(username);
+    stopLoading();
+    mockBadge.classList.add('hidden');
+    renderReport(data, !state.prod);
+    show('section-report');
+    initPager();
+  } catch (err) {
+    stopLoading();
+    mockBadge.classList.add('hidden');
+    document.getElementById('error-text').textContent = err.message;
+    show('section-error');
+  } finally {
+    document.getElementById('submit-btn').disabled = false;
+  }
+  return false;
+}
+async function realAudit(username) {
+  const resp = await fetch('/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, targetRole: '' }),
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+    throw new Error(err.error || `HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+// ================================================
+// MOCK — sharper roast
+// ================================================
+const MOCK_RESPONSE = {
+  profile: {
+    fullname: "Andrii Bobchuk",
+    headline: "Senior Android Developer | Kotlin, KMP, Jetpack Compose, Coroutines, CI/CD, AIDL, MVI",
+    current_company: "Samsung Electronics",
+    location: "Warsaw, Mazowieckie, Poland",
+    picture: "https://media.licdn.com/dms/image/v2/D4D03AQF4fU_tmlPhDA/profile-displayphoto-crop_800_800/B4DaBDhYOWHgAU-/0/1787839219719?e=1790812800&v=beta&t=Jquklbc85ZVuoYPSNjuNAoiqnW9jCdcEiZE2wF88tPI",
+    follower_count: 4309,
+    years_experience: 6,
+  },
+  audit: {
+    score: 84,
+    role_detected: "Senior Android Engineer",
+    summary: "You've got a patent, you work at Samsung, and you shipped code to 50 million users — then you burned your entire Featured section on Polish tax advice. To any recruiter skimming, you're a mid-tier Android dev with a strong side hustle in JDG consulting. Which is a hilarious way to hide a top-15% engineer.",
+    benchmark: { percentile: "top 15%", reasoning: "Patent + AAOS/C++ HAL + Samsung is a stack you can't fake. You're just aggressively burying it under tax posts and acronym soup." },
+    findings: [
+      { section: "Experience", severity: "good", title: "You know how to write ONE good bullet", description: "The Samsung bullets have real metrics — 5-min Gradle reduction, 25% AAOS latency drop. Great. Now do it for the other eight that read like a Jira epic summary.", impact_points: 0 },
+      { section: "Featured", severity: "bad", title: "Your Featured section is a JDG seminar", description: "Five featured posts. All about Polish B2B tax. Zero mention that you HAVE A PATENT. You're teaching recruiters about składka zdrowotna instead of showing you shipped to 50M users. Swap them for your Medium articles and KMP project.", impact_points: 5 },
+      { section: "Headline", severity: "bad", title: "Your headline is a Kotlin dependency file", description: "AIDL, MVI, Coroutines — the acronym pile that every bootcamp grad also lists. Nowhere does it say Samsung, Patent, or AAOS. Currently you're indistinguishable from a mid-level Android dev. That's malpractice.", impact_points: 4 },
+      { section: "About", severity: "warn", title: "Your About reads like an HR training video", description: "'Value I deliver.' 'What I bring.' You're a senior IC with a patent, not a middle manager rehearsing a slide deck. Cut the template phrases. Lead with the patent.", impact_points: 3 },
+      { section: "Experience", severity: "warn", title: "You accidentally wrote a Scrum Master resume", description: "'Conducted progress meetings with clients.' Nobody got promoted to Staff for being good at status updates. Lead with what you shipped, not the meetings you attended.", impact_points: 2 },
+    ],
+    rewrites: {
+      headline: "Senior Android Engineer @ Samsung · Patent-Holder · Kotlin, KMP, Jetpack Compose, AAOS/C++ · Ex-SoftServe",
+      about_first_paragraph: "Senior Android Engineer, 6+ years shipping high-scale mobile and embedded Android at Samsung, SoftServe, and Devlight. Patent-holder in electronic device authentication. Deep in Jetpack Compose, Kotlin Multiplatform, and Android Automotive (AAOS/C++ HAL). Delivered features to 50M+ users while cutting build and runtime bottlenecks measurably.",
+      top_bullets: [
+        "Led refactor of Samsung Game Optimizer Service — migrated legacy XML to Jetpack Compose, profiled and eliminated perf bottlenecks, expanded unit-test coverage to 80% with MockK/JUnit.",
+        "Shipped in-app shop features for Plato App (50M+ downloads, 4.5★): drove +12% engagement and +7% purchase conversion, and modularized Gradle to cut build cycles by ~5 min.",
+        "Engineered navigation middleware on Android Automotive OS (AAOS/AOSP), integrating C++ Vehicle HAL components to reduce infotainment response time 25% on a US EV OEM's IVI system.",
+      ],
+    },
+  },
+};
+function mockAudit(username) {
+  return new Promise(resolve => {
+    state.mockResolve = resolve;
+    setTimeout(() => {
+      if (state.mockResolve === resolve) {
+        state.mockResolve = null;
+        resolve(MOCK_RESPONSE);
+      }
+    }, ESTIMATED_MS);
+  });
+}
+
+// ================================================
+// COPY BUTTONS
+// ================================================
+const copyableText = {};
+function registerCopy(key, text) { copyableText[key] = text; }
+async function copyText(btn, key) {
+  const text = copyableText[key] || btn.getAttribute('data-text') || '';
+  if (!text) return;
+  try { await navigator.clipboard.writeText(text); }
+  catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+  }
+  const original = btn.textContent;
+  btn.textContent = 'Copied ✓';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.classList.remove('copied');
+  }, 1500);
+}
+
+// ================================================
+// TIER → WAITLIST
+// ================================================
+function clickTier(tier, price) {
+  state.currentTier = tier;
+  state.currentPrice = price;
+  document.getElementById('wl-tier').textContent = 'The Recipe';
+  show('section-waitlist');
+}
+function submitWaitlist(e) {
+  e.preventDefault();
+  const email = document.getElementById('wl-email').value.trim();
+  if (!email || !email.includes('@')) return false;
+  document.getElementById('th-email').textContent = email;
+  show('section-thanks');
+  return false;
+}
+
+// ================================================
+// PAGER
+// ================================================
+const pager = {
+  current: 0,
+  total: 12,
+  transitioning: false,
+  wheelDebounce: 0,
+  touchStartY: 0,
+  touchStartX: 0,
+};
+
+function initPager() {
+  pager.current = 0;
+  const pages = document.querySelectorAll('#pager .page');
+  pager.total = pages.length;
+  pages.forEach((p, i) => {
+    p.classList.remove('current', 'past');
+    if (i === 0) p.classList.add('current');
+  });
+  buildDots();
+  updateDots();
+  updateNextVisibility();
+}
+
+function goToPage(idx) {
+  if (pager.transitioning) return;
+  if (idx < 0 || idx >= pager.total) return;
+  if (idx === pager.current) return;
+  pager.transitioning = true;
+  const pages = document.querySelectorAll('#pager .page');
+  const cur = pages[pager.current];
+  const next = pages[idx];
+  const forward = idx > pager.current;
+
+  cur.classList.remove('current');
+  cur.classList.add('past');
+
+  // Slight delay before revealing next so the crossfade reads
+  requestAnimationFrame(() => {
+    // If jumping non-adjacent, reset the destination's transform first
+    if (Math.abs(idx - pager.current) > 1) {
+      next.style.transition = 'none';
+      next.style.transform = `translateY(${forward ? 60 : -60}px) scale(0.98)`;
+      next.style.opacity = '0';
+      // Force reflow
+      void next.offsetHeight;
+      next.style.transition = '';
+      next.style.transform = '';
+      next.style.opacity = '';
+    }
+    next.classList.remove('past');
+    next.classList.add('current');
+    pager.current = idx;
+    updateDots();
+    updateNextVisibility();
+
+    setTimeout(() => {
+      // Clean up past classes on non-adjacent pages
+      pages.forEach((p, i) => {
+        if (i !== pager.current) p.classList.remove('current');
+      });
+      pager.transitioning = false;
+    }, 750);
+  });
+}
+function nextPage() { goToPage(pager.current + 1); }
+function prevPage() { goToPage(pager.current - 1); }
+
+function buildDots() {
+  const wrap = document.getElementById('pager-dots');
+  wrap.innerHTML = '';
+  for (let i = 0; i < pager.total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.setAttribute('data-i', i);
+    d.addEventListener('click', () => goToPage(i));
+    wrap.appendChild(d);
+  }
+}
+function updateDots() {
+  document.querySelectorAll('#pager-dots .dot').forEach((d, i) => {
+    d.classList.toggle('active', i === pager.current);
+  });
+}
+function updateNextVisibility() {
+  const next = document.getElementById('pager-next');
+  if (pager.current >= pager.total - 1) next.style.opacity = '0';
+  else next.style.opacity = '';
+}
+
+// Input handlers
+document.addEventListener('wheel', (e) => {
+  if (document.getElementById('section-report').classList.contains('hidden')) return;
+  const now = Date.now();
+  if (now - pager.wheelDebounce < 900) return;
+  if (Math.abs(e.deltaY) < 12) return;
+  pager.wheelDebounce = now;
+  if (e.deltaY > 0) nextPage(); else prevPage();
+}, { passive: true });
+
+document.addEventListener('keydown', (e) => {
+  if (document.getElementById('section-report').classList.contains('hidden')) return;
+  if (['ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); nextPage(); }
+  else if (['ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prevPage(); }
+  else if (e.key === 'Home') goToPage(0);
+  else if (e.key === 'End') goToPage(pager.total - 1);
+});
+
+document.addEventListener('touchstart', (e) => {
+  if (document.getElementById('section-report').classList.contains('hidden')) return;
+  pager.touchStartY = e.touches[0].clientY;
+  pager.touchStartX = e.touches[0].clientX;
+}, { passive: true });
+document.addEventListener('touchend', (e) => {
+  if (document.getElementById('section-report').classList.contains('hidden')) return;
+  const dy = e.changedTouches[0].clientY - pager.touchStartY;
+  const dx = e.changedTouches[0].clientX - pager.touchStartX;
+  if (Math.abs(dx) > Math.abs(dy)) return; // horizontal swipe -> ignore
+  if (Math.abs(dy) < 60) return;
+  if (dy < 0) nextPage(); else prevPage();
+}, { passive: true });
+
+// ================================================
+// RENDER REPORT
+// ================================================
+function renderReport(data, isMock) {
+  const { profile, audit } = data;
+
+  document.getElementById('pager-mock-lbl').classList.toggle('hidden', !isMock);
+
+  // 01 Subject
+  document.getElementById('r-name').textContent = profile.fullname || 'Unknown';
+  document.getElementById('r-headline').textContent = profile.headline || '';
+  const avatarEl = document.getElementById('r-avatar');
+  avatarEl.innerHTML = '';
+  if (profile.picture) {
+    const img = document.createElement('img');
+    img.src = profile.picture;
+    img.referrerPolicy = 'no-referrer';
+    img.alt = '';
+    avatarEl.appendChild(img);
+  }
+  const statsEl = document.getElementById('r-stats');
+  statsEl.innerHTML = '';
+  const stats = [];
+  if (audit.role_detected) stats.push(audit.role_detected);
+  if (profile.current_company) stats.push(profile.current_company);
+  if (profile.location) stats.push(profile.location.split(',')[0]);
+  if (profile.follower_count) stats.push(profile.follower_count.toLocaleString() + ' followers');
+  stats.forEach(s => {
+    const el = document.createElement('span');
+    el.className = 'stat-item';
+    el.textContent = s;
+    statsEl.appendChild(el);
+  });
+
+  // 02 Score
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.dataset.target = String(audit.score ?? 0);
+  scoreEl.textContent = String(audit.score ?? 0);
+  document.getElementById('r-role-line').textContent = 'as a ' + (audit.role_detected || 'engineer');
+
+  // 03 Rank
+  document.getElementById('r-percentile').textContent = (audit.benchmark?.percentile || '—').toUpperCase();
+  document.getElementById('r-reason').textContent = audit.benchmark?.reasoning || '';
+
+  // 04 Read
+  document.getElementById('r-summary').textContent = audit.summary || '';
+
+  // 05 Wins
+  const wins = (audit.findings || []).filter(f => f.severity === 'good');
+  const winsEl = document.getElementById('r-wins');
+  winsEl.innerHTML = '';
+  wins.forEach((g, i) => {
+    const div = document.createElement('div');
+    div.className = 'win anim d-' + Math.min(i + 2, 5);
+    div.innerHTML = `
+      <div class="win-num">0${i + 1}</div>
+      <div>
+        <div class="win-title"></div>
+        <div class="win-body"></div>
+      </div>
+    `;
+    div.querySelector('.win-title').textContent = g.title || '';
+    div.querySelector('.win-body').textContent = g.description || '';
+    winsEl.appendChild(div);
+  });
+  document.getElementById('page-wins').style.display = wins.length ? '' : 'none';
+
+  // 06 Worst
+  const nonGood = (audit.findings || []).filter(f => f.severity !== 'good');
+  const worst = nonGood.slice().sort((a,b) => (b.impact_points||0) - (a.impact_points||0))[0];
+  if (worst) {
+    document.getElementById('r-worst-tag').textContent = worst.section || 'Fix';
+    document.getElementById('r-worst-title').textContent = worst.title || '';
+    document.getElementById('r-worst-body').textContent = worst.description || '';
+    document.getElementById('r-worst-cost').textContent = `Costs you ${worst.impact_points || 0} points`;
+  }
+  document.getElementById('page-worst').style.display = worst ? '' : 'none';
+
+  // 07 Cuts
+  const others = worst ? nonGood.filter(f => f !== worst) : nonGood;
+  const cutsEl = document.getElementById('r-cuts');
+  cutsEl.innerHTML = '';
+  others.forEach((f, i) => {
+    const div = document.createElement('div');
+    div.className = 'cut';
+    const glyph = f.severity === 'bad' ? '×' : '−';
+    const cost = f.impact_points ? `−${f.impact_points} pts` : '';
+    div.innerHTML = `
+      <div class="c-glyph">${glyph}</div>
+      <div class="c-title"></div>
+      <div class="c-cost">${cost}</div>
+      <div class="c-body"></div>
+    `;
+    div.querySelector('.c-title').textContent = f.title || '';
+    div.querySelector('.c-body').textContent = f.description || '';
+    cutsEl.appendChild(div);
+  });
+  document.getElementById('page-cuts').style.display = others.length ? '' : 'none';
+
+  // 08-10 Rewrites
+  const r = audit.rewrites || {};
+
+  document.getElementById('r-old-headline').textContent = profile.headline || '';
+  document.getElementById('r-rw-headline').textContent = r.headline || '';
+  registerCopy('rw-headline', r.headline || '');
+  document.getElementById('page-rw-headline').style.display = r.headline ? '' : 'none';
+
+  document.getElementById('r-rw-about').textContent = r.about_first_paragraph || '';
+  registerCopy('rw-about', r.about_first_paragraph || '');
+  document.getElementById('page-rw-about').style.display = r.about_first_paragraph ? '' : 'none';
+
+  const bulletsEl = document.getElementById('r-rw-bullets');
+  bulletsEl.innerHTML = '';
+  const bullets = Array.isArray(r.top_bullets) ? r.top_bullets : [];
+  bullets.forEach((b, i) => {
+    const key = `rw-bullet-${i}`;
+    registerCopy(key, b);
+    const div = document.createElement('div');
+    div.className = 'rw-bullet';
+    div.innerHTML = `
+      <div class="rb-text"></div>
+      <button class="copy-btn" onclick="copyText(this, '${key}')">Copy</button>
+    `;
+    div.querySelector('.rb-text').textContent = b;
+    bulletsEl.appendChild(div);
+  });
+  document.getElementById('page-rw-bullets').style.display = bullets.length ? '' : 'none';
+
+  // 11 Math — dynamic
+  const score = audit.score || 0;
+  const target = Math.max(90, score + 8);
+  document.getElementById('math-now').textContent = score;
+  document.getElementById('math-after').textContent = target + '+';
+
+  // Update total pages after filtering hidden
+  setTimeout(() => {
+    const visiblePages = Array.from(document.querySelectorAll('#pager .page')).filter(p => p.style.display !== 'none');
+    pager.total = visiblePages.length;
+    buildDots();
+    updateDots();
+  }, 0);
+}
+</script>
+
+</body>
+</html>
