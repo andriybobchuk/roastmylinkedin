@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roast My LinkedIn — a brutally honest audit for engineers</title>
+<meta name="description" content="A harsh, AI-generated roast of your LinkedIn profile. Free. 30 seconds. No signup. Built for engineers.">
+<meta name="theme-color" content="#E85D45">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Your LinkedIn is boring 💩">
+<meta property="og:description" content="A harsh AI roast of your LinkedIn profile. Free. 30 seconds. No signup. Built for engineers.">
+<meta property="og:site_name" content="Roast My LinkedIn">
+<meta property="og:url" content="https://roastmylinkedin.net">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Your LinkedIn is boring 💩">
+<meta name="twitter:description" content="A harsh AI roast of your LinkedIn profile. Free. 30 seconds. No signup.">
+
 <style>
   :root {
     --bg: #E85D45;
@@ -1579,14 +1595,14 @@ const MOCK_RESPONSE = {
   audit: {
     score: 84,
     role_detected: "Senior Android Engineer",
-    summary: "You've got a patent, you work at Samsung, and you shipped code to 50 million users — then you burned your entire Featured section on Polish tax advice. To any recruiter skimming, you're a mid-tier Android dev with a strong side hustle in JDG consulting. Which is a hilarious way to hide a top-15% engineer.",
-    benchmark: { percentile: "top 15%", reasoning: "Patent + AAOS/C++ HAL + Samsung is a stack you can't fake. You're just aggressively burying it under tax posts and acronym soup." },
+    summary: "You have world-class receipts — Samsung, AOSP/automotive C++, a granted authentication patent, and a 50M+ download app — yet your profile reads like a Polish B2B tax blog. Strip away the accountant persona and lead with the low-level Android chops before recruiters bounce.",
+    benchmark: { percentile: "top 15%", reasoning: "Patent + AAOS/C++ HAL + Samsung is a stack most senior Android devs cannot fake — you just hide it behind acronym soup and tax posts." },
     findings: [
-      { section: "Experience", severity: "good", title: "You know how to write ONE good bullet", description: "The Samsung bullets have real metrics — 5-min Gradle reduction, 25% AAOS latency drop. Great. Now do it for the other eight that read like a Jira epic summary.", impact_points: 0 },
-      { section: "Featured", severity: "bad", title: "Your Featured section is a JDG seminar", description: "Five featured posts. All about Polish B2B tax. Zero mention that you HAVE A PATENT. You're teaching recruiters about składka zdrowotna instead of showing you shipped to 50M users. Swap them for your Medium articles and KMP project.", impact_points: 5 },
-      { section: "Headline", severity: "bad", title: "Your headline is a Kotlin dependency file", description: "AIDL, MVI, Coroutines — the acronym pile that every bootcamp grad also lists. Nowhere does it say Samsung, Patent, or AAOS. Currently you're indistinguishable from a mid-level Android dev. That's malpractice.", impact_points: 4 },
-      { section: "About", severity: "warn", title: "Your About reads like an HR training video", description: "'Value I deliver.' 'What I bring.' You're a senior IC with a patent, not a middle manager rehearsing a slide deck. Cut the template phrases. Lead with the patent.", impact_points: 3 },
-      { section: "Experience", severity: "warn", title: "You accidentally wrote a Scrum Master resume", description: "'Conducted progress meetings with clients.' Nobody got promoted to Staff for being good at status updates. Lead with what you shipped, not the meetings you attended.", impact_points: 2 },
+      { section: "Experience", severity: "good", title: "You know how to write ONE good bullet", description: "The Samsung bullets ship real metrics — 5-min Gradle drop, 25% AAOS latency cut. Great template. Now do it for the other eight that read like a Jira epic.", impact_points: 0 },
+      { section: "Featured", severity: "bad", title: "You look like a tax advisor, not an Android Architect", description: "All 5 pinned posts are about Polish B2B tax. Zero mention of your patent or 50M-download app. Swap them for the Medium articles and the KMP project.", impact_points: 5 },
+      { section: "Headline", severity: "bad", title: "Your headline reads like a build.gradle file", description: "AIDL, MVI, Coroutines — the same acronym pile every bootcamp grad also lists. Samsung, Patent, and AAOS never show up. That's malpractice for a top-15% engineer.", impact_points: 4 },
+      { section: "About", severity: "warn", title: "Your About sounds like an HR training deck", description: "'Value I deliver.' 'What I bring.' You're a senior IC with a patent, not a middle manager reading talking points. Cut the templates and lead with the patent.", impact_points: 3 },
+      { section: "Experience", severity: "warn", title: "You accidentally wrote a Scrum Master resume", description: "'Conducted progress meetings with clients.' Nobody got promoted to Staff for being good at status updates. Lead with what you shipped, not what you facilitated.", impact_points: 2 },
     ],
     rewrites: {
       headline: "Senior Android Engineer @ Samsung · Patent-Holder · Kotlin, KMP, Jetpack Compose, AAOS/C++ · Ex-SoftServe",

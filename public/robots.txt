@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /analyze
+Disallow: /analyze-status
+Disallow: /wireframe
+
+Sitemap: https://roastmylinkedin.net/sitemap.xml
