@@ -1515,17 +1515,52 @@ async function submitAudit(e) {
   }
   return false;
 }
+// Async job flow — kick off audit, poll status until done or error.
+// Works both on Netlify (background function + Blobs) and locally
+// (in-memory job store in server.js).
 async function realAudit(username) {
-  const resp = await fetch('/analyze', {
+  const jobId = (crypto.randomUUID?.() || Math.random().toString(36).slice(2) + Date.now().toString(36))
+    .replace(/[^a-zA-Z0-9-]/g, '')
+    .slice(0, 40);
+
+  // Kick off (server returns 202 immediately, work runs in background)
+  const startResp = await fetch('/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, targetRole: '' }),
+    body: JSON.stringify({ jobId, username, targetRole: '' }),
   });
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
-    throw new Error(err.error || `HTTP ${resp.status}`);
+  if (!startResp.ok && startResp.status !== 202) {
+    const err = await startResp.json().catch(() => ({ error: `HTTP ${startResp.status}` }));
+    throw new Error(err.error || `HTTP ${startResp.status}`);
   }
-  return resp.json();
+
+  // Poll for result. 2s cadence, max ~150s total.
+  const POLL_MS = 2000;
+  const MAX_ATTEMPTS = 75;
+  let unknownStreak = 0;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    await new Promise(r => setTimeout(r, POLL_MS));
+    let state;
+    try {
+      const resp = await fetch(`/analyze-status?id=${encodeURIComponent(jobId)}`, {
+        cache: 'no-store',
+      });
+      if (!resp.ok) continue;
+      state = await resp.json();
+    } catch {
+      continue; // transient network hiccup — keep polling
+    }
+    if (state.status === 'done') return state.result;
+    if (state.status === 'error') throw new Error(state.error || 'Analysis failed');
+    if (state.status === 'unknown') {
+      unknownStreak++;
+      // Job may have been evicted or never started. Give it ~30s of unknown before giving up.
+      if (unknownStreak > 15) throw new Error('Job lost — please try again');
+    } else {
+      unknownStreak = 0;
+    }
+  }
+  throw new Error('Analysis timed out — please try again');
 }
 
 // ================================================

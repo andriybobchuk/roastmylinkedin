@@ -1,10 +1,14 @@
 // Local dev server. On Netlify, static files are served automatically
-// and /analyze routes to netlify/functions/analyze.mjs.
+// and /analyze / /analyze-status are handled by Functions.
+//
+// Endpoints (async job pattern — matches Netlify prod behavior):
+//   POST /analyze          { jobId, username, targetRole }  → 202 (kicks off async work)
+//   GET  /analyze-status?id=X                                → { status: ..., result?, error? }
 //
 // Env vars:
 //   APIFY_TOKEN         required
 //   ANTHROPIC_API_KEY   optional. Preferred if set.
-//   GEMINI_API_KEY      optional. Free tier at aistudio.google.com
+//   GEMINI_API_KEY      optional (free tier: aistudio.google.com)
 //   PORT                default 3000
 //
 // Run:
@@ -33,19 +37,41 @@ if (!APIFY_TOKEN) {
   process.exit(1);
 }
 if (!PROVIDER) {
-  console.error('Missing LLM key. Set either:');
-  console.error('  GEMINI_API_KEY    (free tier: https://aistudio.google.com/app/apikey)');
-  console.error('  ANTHROPIC_API_KEY (paid: https://console.anthropic.com/settings/keys)');
+  console.error('Missing LLM key. Set either GEMINI_API_KEY or ANTHROPIC_API_KEY.');
   process.exit(1);
 }
 
+// -----------------------------------------------------------------------------
+// In-memory job store (Netlify uses Blobs; this mirrors the same interface).
+// Jobs auto-expire after 10 minutes to prevent memory leaks.
+// -----------------------------------------------------------------------------
+const jobs = new Map();
+const JOB_TTL_MS = 10 * 60 * 1000;
+
+function setJob(id, state) {
+  jobs.set(id, { ...state, _writtenAt: Date.now() });
+}
+function getJob(id) {
+  const j = jobs.get(id);
+  if (!j) return null;
+  if (Date.now() - j._writtenAt > JOB_TTL_MS) {
+    jobs.delete(id);
+    return null;
+  }
+  const { _writtenAt, ...rest } = j;
+  return rest;
+}
+
+// -----------------------------------------------------------------------------
+// HTTP plumbing
+// -----------------------------------------------------------------------------
 async function readBody(req) {
   const chunks = [];
   for await (const c of req) chunks.push(c);
   return Buffer.concat(chunks).toString('utf8');
 }
-function sendJson(res, status, obj) {
-  res.writeHead(status, { 'Content-Type': 'application/json' });
+function sendJson(res, status, obj, extraHeaders = {}) {
+  res.writeHead(status, { 'Content-Type': 'application/json', ...extraHeaders });
   res.end(JSON.stringify(obj));
 }
 async function serveStatic(res, filename, contentType) {
@@ -59,17 +85,35 @@ async function serveStatic(res, filename, contentType) {
   }
 }
 
-async function handleAnalyze(req, res) {
+// -----------------------------------------------------------------------------
+// POST /analyze — start an async audit job. Returns 202 immediately.
+// -----------------------------------------------------------------------------
+async function handleAnalyzeStart(req, res) {
   let body;
   try { body = JSON.parse(await readBody(req)); }
   catch { return sendJson(res, 400, { error: 'Invalid JSON body' }); }
 
+  const jobId = String(body.jobId || '').trim();
   const username = parseUsername(body.username);
   const targetRole = String(body.targetRole || '').trim();
+
+  if (!jobId || !/^[a-zA-Z0-9-]{8,64}$/.test(jobId)) return sendJson(res, 400, { error: 'Bad jobId' });
   if (!username) return sendJson(res, 400, { error: 'Invalid LinkedIn username or URL' });
 
+  setJob(jobId, { status: 'pending', createdAt: Date.now() });
+
+  // Fire and forget — client polls for result.
+  runAuditAsync(jobId, username, targetRole);
+
+  // 202 Accepted matches Netlify background function semantics.
+  res.writeHead(202, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ jobId, status: 'pending' }));
+}
+
+async function runAuditAsync(jobId, username, targetRole) {
+  const t0 = Date.now();
   try {
-    console.log(`[analyze] ${username}`);
+    console.log(`[analyze:start] ${jobId.slice(0, 8)}… ${username}`);
     const result = await runAudit({
       username,
       targetRole,
@@ -79,21 +123,38 @@ async function handleAnalyze(req, res) {
       claudeModel: CLAUDE_MODEL,
       geminiModel: GEMINI_MODEL,
     });
-    console.log(`[analyze] ${result.provider}: scrape=${result.timing_ms.scrape}ms llm=${result.timing_ms.llm}ms total=${result.timing_ms.total}ms score=${result.audit.score}`);
-    sendJson(res, 200, result);
+    setJob(jobId, { status: 'done', result, completedAt: Date.now() });
+    console.log(`[analyze:done] ${jobId.slice(0, 8)}… ${Date.now() - t0}ms score=${result.audit.score}`);
   } catch (err) {
-    console.error('[analyze] error:', err.message);
-    sendJson(res, 500, { error: err.message });
+    setJob(jobId, { status: 'error', error: err?.message || 'Unknown error', completedAt: Date.now() });
+    console.error(`[analyze:err] ${jobId.slice(0, 8)}… ${err?.message}`);
   }
 }
 
+// -----------------------------------------------------------------------------
+// GET /analyze-status?id=X — poll for job state.
+// -----------------------------------------------------------------------------
+function handleAnalyzeStatus(req, res, url) {
+  const jobId = String(url.searchParams.get('id') || '').trim();
+  if (!jobId || !/^[a-zA-Z0-9-]{8,64}$/.test(jobId)) {
+    return sendJson(res, 400, { error: 'Bad jobId' });
+  }
+  const state = getJob(jobId);
+  if (!state) return sendJson(res, 200, { status: 'unknown' }, { 'Cache-Control': 'no-store' });
+  return sendJson(res, 200, state, { 'Cache-Control': 'no-store' });
+}
+
+// -----------------------------------------------------------------------------
+// Router
+// -----------------------------------------------------------------------------
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
-  if (req.method === 'GET' && url.pathname === '/')          return serveStatic(res, 'index.html',     'text/html; charset=utf-8');
-  if (req.method === 'GET' && url.pathname === '/terms')     return serveStatic(res, 'terms.html',     'text/html; charset=utf-8');
-  if (req.method === 'GET' && url.pathname === '/privacy')   return serveStatic(res, 'privacy.html',   'text/html; charset=utf-8');
-  if (req.method === 'GET' && url.pathname === '/wireframe') return serveStatic(res, 'wireframe.html', 'text/html; charset=utf-8');
-  if (req.method === 'POST' && url.pathname === '/analyze')  return handleAnalyze(req, res);
+  if (req.method === 'GET' && url.pathname === '/')                return serveStatic(res, 'index.html',     'text/html; charset=utf-8');
+  if (req.method === 'GET' && url.pathname === '/terms')           return serveStatic(res, 'terms.html',     'text/html; charset=utf-8');
+  if (req.method === 'GET' && url.pathname === '/privacy')         return serveStatic(res, 'privacy.html',   'text/html; charset=utf-8');
+  if (req.method === 'GET' && url.pathname === '/wireframe')       return serveStatic(res, 'wireframe.html', 'text/html; charset=utf-8');
+  if (req.method === 'POST' && url.pathname === '/analyze')        return handleAnalyzeStart(req, res);
+  if (req.method === 'GET' && url.pathname === '/analyze-status')  return handleAnalyzeStatus(req, res, url);
 
   res.writeHead(404, { 'Content-Type': 'text/plain' });
   res.end('Not found');
@@ -102,5 +163,5 @@ const server = createServer(async (req, res) => {
 server.listen(PORT, () => {
   const model = PROVIDER === 'anthropic' ? CLAUDE_MODEL : GEMINI_MODEL;
   console.log(`Roast My LinkedIn (dev) at http://localhost:${PORT}`);
-  console.log(`Provider: ${PROVIDER} · Model: ${model}`);
+  console.log(`Provider: ${PROVIDER} · Model: ${model} · Mode: async polling`);
 });

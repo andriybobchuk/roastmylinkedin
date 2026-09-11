@@ -1,13 +1,14 @@
 # Netlify config for Roast My LinkedIn.
 #
-# Deploy: drag-and-drop this folder at https://app.netlify.com/drop
-# OR connect a Git repo — Netlify auto-detects this file.
+# Free-tier compatible: uses background function + polling (avoids the 10s sync timeout).
 #
-# Env vars to set in Netlify UI (Site → Settings → Environment variables):
+# Deploy: connect this repo in Netlify, first push auto-deploys.
+#
+# Env vars to set in Netlify UI (Site → Environment variables):
 #   APIFY_TOKEN
-#   GEMINI_API_KEY   (or ANTHROPIC_API_KEY if you switch to paid Claude)
+#   GEMINI_API_KEY   (or ANTHROPIC_API_KEY to prefer Claude)
 # Optional:
-#   GEMINI_MODEL     (default gemini-2.5-flash)
+#   GEMINI_MODEL     (default gemini-3.6-flash)
 #   CLAUDE_MODEL     (default claude-sonnet-4-6)
 
 [build]
@@ -17,15 +18,22 @@
 [functions]
   node_bundler = "esbuild"
 
-# Route /analyze to the serverless function without exposing the /.netlify path
+# POST /analyze → kick off the background audit function.
+# Netlify returns 202 immediately, function runs up to 15 min.
 [[redirects]]
   from = "/analyze"
-  to = "/.netlify/functions/analyze"
+  to = "/.netlify/functions/analyze-background"
   status = 200
   force = true
 
-# SPA-style fallback isn't needed — every route has its own file. But this catches
-# typos and returns index.html so users don't see raw 404 pages.
+# GET /analyze-status?id=X → read current job state from Blobs.
+[[redirects]]
+  from = "/analyze-status"
+  to = "/.netlify/functions/analyze-status"
+  status = 200
+  force = true
+
+# Fallback for unknown routes — serve landing page with 404 status code.
 [[redirects]]
   from = "/*"
   to = "/index.html"
