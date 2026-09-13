@@ -9,7 +9,7 @@
 
 import { getStore } from '@netlify/blobs';
 
-const store = () => getStore({ name: 'audit-jobs', consistency: 'strong' });
+const store = () => getStore('audit-jobs');
 
 export const handler = async (event) => {
   if (event.httpMethod !== 'GET') {
