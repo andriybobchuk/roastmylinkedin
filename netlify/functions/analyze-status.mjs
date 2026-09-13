@@ -7,14 +7,14 @@
 //   { status: "error", error: "..." }
 //   { status: "unknown" }        (job not found — client should keep polling briefly)
 
-import { getStore } from '@netlify/blobs';
-
-const store = () => getStore('audit-jobs');
+import { connectLambda, getStore } from '@netlify/blobs';
 
 export const handler = async (event) => {
   if (event.httpMethod !== 'GET') {
     return { statusCode: 405, body: 'Method not allowed' };
   }
+
+  connectLambda(event);
 
   const jobId = String(event.queryStringParameters?.id || '').trim();
   if (!jobId || !/^[a-zA-Z0-9-]{8,64}$/.test(jobId)) {
@@ -26,7 +26,7 @@ export const handler = async (event) => {
   }
 
   try {
-    const state = await store().get(jobId, { type: 'json' });
+    const state = await getStore('audit-jobs').get(jobId, { type: 'json' });
     if (!state) {
       return {
         statusCode: 200,
