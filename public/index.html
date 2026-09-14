@@ -487,16 +487,21 @@
     backdrop-filter: blur(0);
   }
   .pager-back {
-    background: transparent;
-    border: 1px solid var(--fg-faint);
-    color: var(--fg-dim);
-    padding: 8px 14px;
-    font-family: var(--mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.18em; text-transform: uppercase;
+    background: var(--ink);
+    color: var(--fg);
+    border: none;
+    padding: 9px 12px 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    line-height: 1;
     cursor: pointer;
+    transform: rotate(-2.5deg);
+    transform-origin: left center;
+    display: inline-block;
   }
-  .pager-back:hover { color: var(--amber); border-color: var(--amber); }
+  .pager-back:hover { background: var(--amber); color: var(--ink); }
   .pager-mock {
     font-family: var(--mono);
     font-size: 10px; font-weight: 700;
@@ -504,15 +509,19 @@
     color: var(--amber);
   }
 
-  /* Continuous scroll — each .page is a natural block that fills at least a
-     viewport, so users can't miss content and nothing overlaps on phones. */
+  /* Continuous scroll — content decides height so short slides stay
+     compact and phones don't paginate a huge blank canvas per section. */
   .pager { position: relative; }
   .page {
     position: relative;
-    min-height: 100dvh;
-    padding: 60px 24px 80px;
+    padding: 44px 20px 44px;
     display: flex; flex-direction: column;
     justify-content: center;
+  }
+  .page + .page { padding-top: 24px; }
+  @media (min-width: 720px) {
+    .page { padding: 70px 24px 60px; }
+    .page + .page { padding-top: 40px; }
   }
   .page.invert {
     background: var(--fg);
@@ -542,33 +551,8 @@
   .page.invert .page-num .lbl { color: rgba(20,20,20,0.55); }
   .page.invert .page-num .num { color: var(--bg-dark); }
 
-  /* Entrance animations trigger via IntersectionObserver adding .visible */
-  .page .anim { opacity: 0; }
-  .page.visible .anim {
-    animation: fadeUp 700ms var(--ease-out) both;
-  }
-  .page.visible .anim.d-1 { animation-delay: 100ms; }
-  .page.visible .anim.d-2 { animation-delay: 220ms; }
-  .page.visible .anim.d-3 { animation-delay: 340ms; }
-  .page.visible .anim.d-4 { animation-delay: 460ms; }
-  .page.visible .anim.d-5 { animation-delay: 580ms; }
-  .page.visible .anim.slam { animation: slam 800ms var(--ease-out) both; }
-  .page.visible .anim.slam-tilt { animation: slamTilt 800ms var(--ease-out) both; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes slam {
-    0% { opacity: 0; transform: scale(0.85); }
-    70% { opacity: 1; transform: scale(1.03); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-  @keyframes slamTilt {
-    0% { opacity: 0; transform: scale(0.75) rotate(-6deg); }
-    70% { opacity: 1; transform: scale(1.05) rotate(-2deg); }
-    100% { opacity: 1; transform: scale(1) rotate(-1.5deg); }
-  }
+  /* Entrance animations removed — no more scroll jumps. .anim is a no-op
+     class kept only so we don't have to strip it from every element. */
 
   /* Legacy dot + next elements are gone from markup, but keep hidden guards
      in case anything old references them. */
@@ -1463,7 +1447,7 @@
 
   <!-- Pager top bar -->
   <div class="pager-topbar">
-    <button class="pager-back" onclick="reset()">← Back</button>
+    <button class="pager-back" onclick="reset()" aria-label="Back to home">RML</button>
     <div class="pager-mock hidden" id="pager-mock-lbl">MOCK MODE</div>
   </div>
 
@@ -1492,10 +1476,6 @@
 
         <div class="v-summary anim d-4" id="r-summary">—</div>
 
-        <div class="v-continue anim d-5">
-          <span>keep going</span>
-          <span class="v-continue-arrow">↓</span>
-        </div>
       </div>
     </div>
 
@@ -1517,7 +1497,7 @@
     <div class="page" data-page="2" id="page-cuts">
       <div class="page-inner">
         <div class="page-num anim"><span class="num">03</span><span class="lbl">SMALLER CUTS</span></div>
-        <h2 class="page-h anim d-1">And these smaller ones.</h2>
+        <h2 class="page-h anim d-1">Other cuts.</h2>
         <div class="cuts-list anim d-2" id="r-cuts"></div>
       </div>
     </div>
@@ -1526,13 +1506,10 @@
     <div class="page" data-page="3" id="page-rw-headline">
       <div class="page-inner">
         <div class="page-num anim"><span class="num">04</span><span class="lbl">FIX 01 · HEADLINE</span></div>
-        <h2 class="page-h anim d-1">Paste this instead.</h2>
-        <div class="rw-label anim d-1">Before</div>
+        <h2 class="page-h anim d-1">Your new headline.</h2>
         <div class="rw-old anim d-2" id="r-old-headline">—</div>
-        <div class="rw-label anim d-2">After</div>
         <div class="rw-card tilt-l anim slam"><span id="r-rw-headline">—</span></div>
-        <button class="copy-btn hero-copy anim d-4" onclick="copyText(this, 'rw-headline')">Copy headline</button>
-        <p class="rw-note anim d-5">Leads with your current company. Names your differentiators. Drops the acronym soup.</p>
+        <button class="copy-btn hero-copy anim d-4" onclick="copyText(this, 'rw-headline')">Copy</button>
       </div>
     </div>
 
@@ -1540,10 +1517,9 @@
     <div class="page" data-page="4" id="page-rw-about">
       <div class="page-inner">
         <div class="page-num anim"><span class="num">05</span><span class="lbl">FIX 02 · ABOUT</span></div>
-        <h2 class="page-h anim d-1">Rewrite your About like this.</h2>
+        <h2 class="page-h anim d-1">Your new About.</h2>
         <div class="rw-card tilt-r anim slam"><span id="r-rw-about">—</span></div>
-        <button class="copy-btn hero-copy anim d-3" onclick="copyText(this, 'rw-about')">Copy About</button>
-        <p class="rw-note anim d-4">No "passionate about." Leads with your strongest signals. Recruiters read this in 10 seconds — make them count.</p>
+        <button class="copy-btn hero-copy anim d-3" onclick="copyText(this, 'rw-about')">Copy</button>
       </div>
     </div>
 
@@ -1551,9 +1527,8 @@
     <div class="page" data-page="5" id="page-rw-bullets">
       <div class="page-inner">
         <div class="page-num anim"><span class="num">06</span><span class="lbl">FIX 03 · BULLETS</span></div>
-        <h2 class="page-h anim d-1">Rewrite your bullets like this.</h2>
+        <h2 class="page-h anim d-1">Your new bullets.</h2>
         <div class="rw-bullets anim slam" id="r-rw-bullets"></div>
-        <p class="rw-note anim d-3">STAR format. Quantified. Uses your real projects and numbers — not made-up ones.</p>
       </div>
     </div>
 
@@ -1585,7 +1560,7 @@
     <div class="page p-value" data-page="7" id="page-value">
       <div class="page-inner">
         <div class="page-num anim"><span class="num">08</span><span class="lbl">YOUR FIX KIT</span></div>
-        <h2 class="page-h anim d-1">Every flaw. Every fix. Copy-paste ready.</h2>
+        <h2 class="page-h anim d-1">Unlock every fix.</h2>
 
         <div class="fix-table anim d-2" id="r-fix-table"></div>
 
@@ -2014,11 +1989,9 @@ function clickTier(tier, price) {
 
 // ================================================
 // REPORT SCROLL — continuous document scroll.
-// Native browser scroll drives everything; IntersectionObserver adds
-// .visible to each .page when it comes into view (triggers CSS entrance
-// animations), and a scroll listener updates the top progress bar.
+// Just a top progress bar tracking depth. No scroll-triggered animations
+// (they were causing scroll jump on mobile).
 // ================================================
-let slideObserver = null;
 let scrollProgressHandler = null;
 
 function initReportScroll() {
@@ -2026,22 +1999,8 @@ function initReportScroll() {
   const progressEl = document.getElementById('scroll-progress');
   if (!reportEl || !progressEl) return;
 
-  // 1) Reset animation state and observe every visible page
-  document.querySelectorAll('#pager .page').forEach(p => p.classList.remove('visible'));
-  if (slideObserver) slideObserver.disconnect();
-  slideObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) entry.target.classList.add('visible');
-    });
-  }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
-  document.querySelectorAll('#pager .page').forEach(p => {
-    if (p.style.display !== 'none') slideObserver.observe(p);
-  });
-
-  // 2) Scroll to top so the report opens on the Verdict slide
   window.scrollTo({ top: 0, behavior: 'instant' });
 
-  // 3) Update the top scroll-progress bar as the user scrolls
   if (scrollProgressHandler) window.removeEventListener('scroll', scrollProgressHandler);
   scrollProgressHandler = () => {
     if (reportEl.classList.contains('hidden')) return;
@@ -2053,13 +2012,7 @@ function initReportScroll() {
   scrollProgressHandler();
 }
 
-// Called after renderReport may have shown/hidden rewrite slides
 function syncReportObservers() {
-  if (!slideObserver) return;
-  document.querySelectorAll('#pager .page').forEach(p => {
-    slideObserver.unobserve(p);
-    if (p.style.display !== 'none') slideObserver.observe(p);
-  });
   if (scrollProgressHandler) scrollProgressHandler();
 }
 
