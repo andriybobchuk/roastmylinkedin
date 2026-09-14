@@ -10,6 +10,7 @@
     "dev": "node server.js"
   },
   "dependencies": {
-    "@netlify/blobs": "^11.0.3"
+    "@netlify/blobs": "^11.0.3",
+    "stripe": "^17.4.0"
   }
 }

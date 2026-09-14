@@ -31,6 +31,20 @@
   status = 200
   force = true
 
+# POST /stripe-webhook → Stripe fulfillment webhook.
+[[redirects]]
+  from = "/stripe-webhook"
+  to = "/.netlify/functions/stripe-webhook"
+  status = 200
+  force = true
+
+# GET /recipe/<token> → serves the customer's unlocked Recipe.
+[[redirects]]
+  from = "/recipe/*"
+  to = "/.netlify/functions/serve-recipe/:splat"
+  status = 200
+  force = true
+
 # Fallback for unknown routes — serve landing page with 404 status code.
 [[redirects]]
   from = "/*"

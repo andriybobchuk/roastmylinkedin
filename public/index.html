@@ -1846,6 +1846,10 @@ async function realAudit(username, onPartial) {
   const jobId = (crypto.randomUUID?.() || Math.random().toString(36).slice(2) + Date.now().toString(36))
     .replace(/[^a-zA-Z0-9-]/g, '')
     .slice(0, 40);
+  // Stash so clickTier can pass client_reference_id to Stripe (webhook uses
+  // this to look up the audit and generate the extended Recipe).
+  state.lastJobId = jobId;
+  try { localStorage.setItem('rml_last_jobid', jobId); } catch {}
 
   const startResp = await fetch('/analyze', {
     method: 'POST',
@@ -1978,12 +1982,23 @@ const CHECKOUT_URL_BASE = 'https://buy.stripe.com/9B63cx62E45fg0a1Ti38400';
 function clickTier(tier, price) {
   state.currentTier = tier;
   state.currentPrice = price;
-  // Attach the promoted price + tier as query params for downstream analytics/prefill
-  const url = `${CHECKOUT_URL_BASE}?tier=${encodeURIComponent(tier)}&price=${price}`;
+
+  // Pull the last audit's jobId so the Stripe webhook can look up the audit
+  // and generate the extended Recipe automatically.
+  let jobId = state.lastJobId;
+  if (!jobId) {
+    try { jobId = localStorage.getItem('rml_last_jobid') || ''; } catch {}
+  }
+
+  const params = new URLSearchParams();
+  if (jobId) params.set('client_reference_id', jobId);
+  params.set('tier', tier);
+  params.set('price', String(price));
+
+  const url = `${CHECKOUT_URL_BASE}?${params.toString()}`;
   const fallback = document.getElementById('checkout-fallback');
   fallback.href = url;
   show('section-checkout');
-  // Try opening in a new tab immediately
   setTimeout(() => { window.open(url, '_blank', 'noopener'); }, 250);
 }
 
