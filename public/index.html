@@ -1890,7 +1890,7 @@ async function submitAudit(e) {
   try {
     if (state.prod) {
       const data = await realAudit(username, revealPartial);
-      // Rewrites now available — patch the report in place
+      // Rewrites now available — patch the report in place (user is already on report)
       renderReport(data, !state.prod);
     } else {
       const data = await mockAudit(username);
@@ -1901,10 +1901,17 @@ async function submitAudit(e) {
       initPager();
     }
   } catch (err) {
-    if (!jumped) stopLoading();
     mockBadge.classList.add('hidden');
-    document.getElementById('error-text').textContent = err.message;
-    show('section-error');
+    if (jumped) {
+      // The user is already on the report with partial data (score + findings).
+      // Don't blow that away with an error page — just log it. The rewrite
+      // slides simply stay hidden and the report is still useful.
+      console.warn('[audit] deep stage failed after partial render:', err.message);
+    } else {
+      stopLoading();
+      document.getElementById('error-text').textContent = err.message;
+      show('section-error');
+    }
   } finally {
     document.getElementById('submit-btn').disabled = false;
   }
@@ -1933,7 +1940,7 @@ async function realAudit(username, onPartial) {
   }
 
   const POLL_MS = 1500;
-  const MAX_ATTEMPTS = 100;
+  const MAX_ATTEMPTS = 160;   // ~4 min budget; Gemini can be slow under load
   let unknownStreak = 0;
   let partialFired = false;
 
@@ -2059,25 +2066,31 @@ function clickTier(tier, price) {
 }
 
 // ================================================
-// PAGER
+// PAGER — always operates on the VISIBLE subset of pages,
+// so dynamically-hidden slides (e.g. rewrites still loading)
+// never appear in the navigation stream.
 // ================================================
 const pager = {
   current: 0,
-  total: 12,
+  visible: [],
   transitioning: false,
   wheelDebounce: 0,
   touchStartY: 0,
   touchStartX: 0,
 };
 
+function refreshVisible() {
+  pager.visible = Array.from(document.querySelectorAll('#pager .page'))
+    .filter(p => p.style.display !== 'none');
+  // Clamp current index in case pages hid while we were on one
+  if (pager.current >= pager.visible.length) pager.current = Math.max(0, pager.visible.length - 1);
+}
+
 function initPager() {
   pager.current = 0;
-  const pages = document.querySelectorAll('#pager .page');
-  pager.total = pages.length;
-  pages.forEach((p, i) => {
-    p.classList.remove('current', 'past');
-    if (i === 0) p.classList.add('current');
-  });
+  refreshVisible();
+  document.querySelectorAll('#pager .page').forEach(p => p.classList.remove('current', 'past'));
+  if (pager.visible[0]) pager.visible[0].classList.add('current');
   buildDots();
   updateDots();
   updateNextVisibility();
@@ -2085,25 +2098,22 @@ function initPager() {
 
 function goToPage(idx) {
   if (pager.transitioning) return;
-  if (idx < 0 || idx >= pager.total) return;
+  refreshVisible();
+  if (idx < 0 || idx >= pager.visible.length) return;
   if (idx === pager.current) return;
   pager.transitioning = true;
-  const pages = document.querySelectorAll('#pager .page');
-  const cur = pages[pager.current];
-  const next = pages[idx];
+  const cur = pager.visible[pager.current];
+  const next = pager.visible[idx];
   const forward = idx > pager.current;
 
-  cur.classList.remove('current');
-  cur.classList.add('past');
+  if (cur) { cur.classList.remove('current'); cur.classList.add('past'); }
 
-  // Slight delay before revealing next so the crossfade reads
   requestAnimationFrame(() => {
-    // If jumping non-adjacent, reset the destination's transform first
     if (Math.abs(idx - pager.current) > 1) {
+      // Non-adjacent jump — reset destination transform first
       next.style.transition = 'none';
       next.style.transform = `translateY(${forward ? 60 : -60}px) scale(0.98)`;
       next.style.opacity = '0';
-      // Force reflow
       void next.offsetHeight;
       next.style.transition = '';
       next.style.transform = '';
@@ -2116,8 +2126,7 @@ function goToPage(idx) {
     updateNextVisibility();
 
     setTimeout(() => {
-      // Clean up past classes on non-adjacent pages
-      pages.forEach((p, i) => {
+      pager.visible.forEach((p, i) => {
         if (i !== pager.current) p.classList.remove('current');
       });
       pager.transitioning = false;
@@ -2130,7 +2139,7 @@ function prevPage() { goToPage(pager.current - 1); }
 function buildDots() {
   const wrap = document.getElementById('pager-dots');
   wrap.innerHTML = '';
-  for (let i = 0; i < pager.total; i++) {
+  for (let i = 0; i < pager.visible.length; i++) {
     const d = document.createElement('div');
     d.className = 'dot';
     d.setAttribute('data-i', i);
@@ -2145,8 +2154,21 @@ function updateDots() {
 }
 function updateNextVisibility() {
   const next = document.getElementById('pager-next');
-  if (pager.current >= pager.total - 1) next.style.opacity = '0';
+  if (pager.current >= pager.visible.length - 1) next.style.opacity = '0';
   else next.style.opacity = '';
+}
+// Called by renderReport after slides are shown/hidden
+function refreshPagerVisibility() {
+  const currentEl = pager.visible[pager.current];
+  refreshVisible();
+  // Keep the user on the same slide they were on — find its new index
+  if (currentEl) {
+    const idx = pager.visible.indexOf(currentEl);
+    if (idx >= 0) pager.current = idx;
+  }
+  buildDots();
+  updateDots();
+  updateNextVisibility();
 }
 
 // Input handlers
@@ -2306,13 +2328,9 @@ function renderReport(data, isMock) {
     fixTable.appendChild(div);
   });
 
-  // Update total pages after filtering hidden
-  setTimeout(() => {
-    const visiblePages = Array.from(document.querySelectorAll('#pager .page')).filter(p => p.style.display !== 'none');
-    pager.total = visiblePages.length;
-    buildDots();
-    updateDots();
-  }, 0);
+  // Sync the pager to the new visible-page set (rewrite slides may have
+  // just appeared/disappeared based on whether the deep stage returned).
+  setTimeout(refreshPagerVisibility, 0);
 }
 </script>
 
