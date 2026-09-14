@@ -1782,6 +1782,30 @@ function fireFormError() {
   inp.focus();
 }
 
+// Map internal error messages to short user-facing copy.
+function friendlyErrorMessage(raw) {
+  const s = String(raw).toLowerCase();
+  if (/non-json|json.*parse|unexpected token/.test(s)) {
+    return "The AI hiccuped mid-sentence. This usually clears in a few seconds — try again.";
+  }
+  if (/timed out|timeout/.test(s)) {
+    return "That took longer than we allow. Please try again.";
+  }
+  if (/apify/.test(s)) {
+    return "We couldn't fetch that LinkedIn profile. Double-check the URL or username.";
+  }
+  if (/overloaded|503|429|unavailable|high demand/.test(s)) {
+    return "The AI is overloaded right now. Give it 30 seconds and try again.";
+  }
+  if (/invalid.*username|bad.*username|linkedin username/.test(s)) {
+    return "That doesn't look like a valid LinkedIn URL or username.";
+  }
+  if (/job lost/.test(s)) {
+    return "We lost your job in transit. Please try again.";
+  }
+  return "Something broke on our side. Please try again — if it keeps failing, email andriybobchuk@gmail.com.";
+}
+
 async function submitAudit(e) {
   e.preventDefault();
   const username = document.getElementById('username').value.trim();
@@ -1827,7 +1851,11 @@ async function submitAudit(e) {
       console.warn('[audit] deep stage failed after partial render:', err.message);
     } else {
       stopLoading();
-      document.getElementById('error-text').textContent = err.message;
+      // Never dump raw JSON / stack traces at the user. Log the real error
+      // for us, show a short friendly message to them.
+      console.error('[audit] failed:', err);
+      const msg = friendlyErrorMessage(err.message || '');
+      document.getElementById('error-text').textContent = msg;
       show('section-error');
     }
   } finally {
