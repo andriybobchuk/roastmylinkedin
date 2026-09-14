@@ -77,7 +77,7 @@
         {
           "@type": "Offer",
           "name": "The Recipe",
-          "price": "49",
+          "price": "79",
           "priceCurrency": "PLN",
           "url": "https://roastmylinkedin.net/#the-recipe",
           "eligibleCustomerType": "https://schema.org/BusinessEntityType"
@@ -123,7 +123,7 @@
           "name": "Is it free?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The Roast tier is free forever — score, findings, and three rewrites. The Recipe tier unlocks every bullet rewritten in STAR format, a Featured section strategy, recommendation-request templates, and skills gap analysis for 49 zł with promo code ROAST (79 zł without)."
+            "text": "The Roast tier is free forever — score, findings, and three rewrites. The Recipe tier unlocks every bullet rewritten in STAR format, a Featured section strategy, recommendation-request templates, and skills gap analysis for 79 zł with promo code ROAST (99 zł without)."
           }
         },
         {
@@ -458,22 +458,34 @@
   /* REPORT — vertical pager                            */
   /* ================================================== */
   #section-report {
-    position: fixed;
-    inset: 0;
+    position: relative;
     background: var(--bg);
-    z-index: 5;
-    overflow: hidden;
+    min-height: 100vh;
   }
   #section-report.hidden { display: none; }
 
-  .pager-topbar {
-    position: absolute; top: 0; left: 0; right: 0;
-    z-index: 12;
-    padding: 20px 22px;
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 12px; pointer-events: none;
+  /* Thin scroll-progress bar pinned to the top of the viewport */
+  .scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    width: 0%;
+    background: var(--amber);
+    box-shadow: 0 0 10px var(--amber);
+    z-index: 30;
+    transition: width 60ms linear;
+    pointer-events: none;
   }
-  .pager-topbar > * { pointer-events: auto; }
+
+  .pager-topbar {
+    position: sticky; top: 0;
+    z-index: 12;
+    padding: 16px 22px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px;
+    background: linear-gradient(to bottom, var(--bg) 60%, transparent);
+    backdrop-filter: blur(0);
+  }
   .pager-back {
     background: transparent;
     border: 1px solid var(--fg-faint);
@@ -492,38 +504,15 @@
     color: var(--amber);
   }
 
-  .pager {
-    position: absolute;
-    inset: 0;
-  }
+  /* Continuous scroll — each .page is a natural block that fills at least a
+     viewport, so users can't miss content and nothing overlaps on phones. */
+  .pager { position: relative; }
   .page {
-    position: absolute;
-    inset: 0;
-    padding: 60px 24px 70px;
+    position: relative;
+    min-height: 100dvh;
+    padding: 60px 24px 80px;
     display: flex; flex-direction: column;
     justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(140px) scale(0.94);
-    filter: blur(6px);
-    transition:
-      opacity 820ms var(--ease),
-      transform 820ms var(--ease),
-      filter 820ms var(--ease);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .page.current {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-    pointer-events: auto;
-    transition-delay: 90ms;
-  }
-  .page.past {
-    opacity: 0;
-    transform: translateY(-140px) scale(0.94);
-    filter: blur(6px);
   }
   .page.invert {
     background: var(--fg);
@@ -533,7 +522,6 @@
     max-width: 780px;
     width: 100%;
     margin: 0 auto;
-    animation-fill-mode: both;
   }
 
   .page-num {
@@ -554,17 +542,18 @@
   .page.invert .page-num .lbl { color: rgba(20,20,20,0.55); }
   .page.invert .page-num .num { color: var(--bg-dark); }
 
-  /* Content animation on page.current */
-  .page.current .anim {
-    animation: fadeUp 800ms var(--ease-out) both;
+  /* Entrance animations trigger via IntersectionObserver adding .visible */
+  .page .anim { opacity: 0; }
+  .page.visible .anim {
+    animation: fadeUp 700ms var(--ease-out) both;
   }
-  .page.current .anim.d-1 { animation-delay: 180ms; }
-  .page.current .anim.d-2 { animation-delay: 340ms; }
-  .page.current .anim.d-3 { animation-delay: 500ms; }
-  .page.current .anim.d-4 { animation-delay: 660ms; }
-  .page.current .anim.d-5 { animation-delay: 820ms; }
-  .page.current .anim.slam { animation: slam 900ms var(--ease-out) both; }
-  .page.current .anim.slam-tilt { animation: slamTilt 900ms var(--ease-out) both; }
+  .page.visible .anim.d-1 { animation-delay: 100ms; }
+  .page.visible .anim.d-2 { animation-delay: 220ms; }
+  .page.visible .anim.d-3 { animation-delay: 340ms; }
+  .page.visible .anim.d-4 { animation-delay: 460ms; }
+  .page.visible .anim.d-5 { animation-delay: 580ms; }
+  .page.visible .anim.slam { animation: slam 800ms var(--ease-out) both; }
+  .page.visible .anim.slam-tilt { animation: slamTilt 800ms var(--ease-out) both; }
 
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -581,50 +570,9 @@
     100% { opacity: 1; transform: scale(1) rotate(-1.5deg); }
   }
 
-  /* Progress dots — right side */
-  .pager-dots {
-    position: absolute;
-    right: 18px; top: 50%;
-    transform: translateY(-50%);
-    display: flex; flex-direction: column; gap: 10px;
-    z-index: 15;
-  }
-  .pager-dots .dot {
-    width: 8px; height: 8px;
-    background: var(--fg-ghost);
-    cursor: pointer;
-    transition: background 200ms;
-  }
-  .pager-dots .dot:hover { background: var(--fg-dim); }
-  .pager-dots .dot.active { background: var(--amber); width: 8px; height: 16px; }
-  @media (max-width: 520px) {
-    .pager-dots { display: none; }
-  }
-
-  /* Bottom next indicator */
-  .pager-next {
-    position: absolute;
-    bottom: 22px; left: 50%;
-    transform: translateX(-50%);
-    z-index: 12;
-    background: transparent;
-    color: var(--fg-dim);
-    border: none;
-    font-family: var(--mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    cursor: pointer;
-    padding: 8px 14px;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-  }
-  .pager-next .arrow { font-size: 14px; animation: bounce 1.8s ease-in-out infinite; }
-  .pager-next:hover { color: var(--amber); }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(4px); }
-  }
-  .page.invert ~ .pager-next { color: rgba(20,20,20,0.55); }
-  .page.invert ~ .pager-next:hover { color: var(--bg-dark); }
+  /* Legacy dot + next elements are gone from markup, but keep hidden guards
+     in case anything old references them. */
+  .pager-dots, .pager-next { display: none !important; }
 
   /* ================================================== */
   /* PAGE-SPECIFIC LAYOUTS                              */
@@ -1643,8 +1591,8 @@
 
         <div class="fix-buy anim d-3">
           <div class="fix-price">
-            <span class="fix-price-old">79 zł</span>
-            <span class="fix-price-new">49<span class="u">zł</span></span>
+            <span class="fix-price-old">99 zł</span>
+            <span class="fix-price-new">79<span class="u">zł</span></span>
           </div>
           <div class="fix-promo">
             <span>Use code</span>
@@ -1653,21 +1601,15 @@
           </div>
         </div>
 
-        <button class="fix-cta anim d-4" onclick="clickTier('recipe-promo', 49)">Get every fix →</button>
+        <button class="fix-cta anim d-4" onclick="clickTier('recipe-promo', 79)">Get every fix →</button>
         <p class="fix-guarantee anim d-5">30-day interviews-or-refund guarantee</p>
       </div>
     </div>
 
   </div>
 
-  <!-- Progress dots -->
-  <div class="pager-dots" id="pager-dots"></div>
-
-  <!-- Next indicator -->
-  <button class="pager-next" id="pager-next" onclick="nextPage()">
-    <span class="lbl">Continue</span>
-    <span class="arrow">↓</span>
-  </button>
+  <!-- Scroll depth indicator -->
+  <div class="scroll-progress" id="scroll-progress"></div>
 
 </section>
 
@@ -1773,7 +1715,8 @@ function show(id) {
   if (id === 'section-report') {
     topbar.classList.add('hidden');
     footer.classList.add('hidden');
-    document.body.style.overflow = 'hidden';
+    // Continuous scroll — keep body scrollable
+    document.body.style.overflow = '';
   } else {
     topbar.classList.remove('hidden');
     footer.classList.remove('hidden');
@@ -1884,7 +1827,7 @@ async function submitAudit(e) {
     mockBadge.classList.add('hidden');
     renderReport(partial, !state.prod);
     show('section-report');
-    initPager();
+    initReportScroll();
   };
 
   try {
@@ -1898,7 +1841,7 @@ async function submitAudit(e) {
       mockBadge.classList.add('hidden');
       renderReport(data, !state.prod);
       show('section-report');
-      initPager();
+      initReportScroll();
     }
   } catch (err) {
     mockBadge.classList.add('hidden');
@@ -2049,9 +1992,13 @@ async function copyText(btn, key) {
 // ================================================
 // TIER → STRIPE CHECKOUT
 // ================================================
-// Swap this URL to your live Stripe Payment Link for The Recipe (79 zł / 49 zł with promo).
-// Buy Buttons work too; anything that returns a hosted checkout URL.
-const CHECKOUT_URL_BASE = 'https://buy.stripe.com/test_ROAST_REPLACE_ME';
+// TO GO LIVE:
+//   1. In Stripe Dashboard → Payment Links → New link → pick The Recipe (99 zł)
+//   2. Under "After payment" set the redirect to https://roastmylinkedin.net/success
+//   3. Turn on "Allow promotion codes" so ROAST discounts to 79 zł
+//   4. Copy the URL from the dashboard (looks like https://buy.stripe.com/xxxx)
+//   5. Paste it below, replacing REPLACE_WITH_YOUR_STRIPE_PAYMENT_LINK
+const CHECKOUT_URL_BASE = 'https://buy.stripe.com/REPLACE_WITH_YOUR_STRIPE_PAYMENT_LINK';
 
 function clickTier(tier, price) {
   state.currentTier = tier;
@@ -2066,142 +2013,55 @@ function clickTier(tier, price) {
 }
 
 // ================================================
-// PAGER — always operates on the VISIBLE subset of pages,
-// so dynamically-hidden slides (e.g. rewrites still loading)
-// never appear in the navigation stream.
+// REPORT SCROLL — continuous document scroll.
+// Native browser scroll drives everything; IntersectionObserver adds
+// .visible to each .page when it comes into view (triggers CSS entrance
+// animations), and a scroll listener updates the top progress bar.
 // ================================================
-const pager = {
-  current: 0,
-  visible: [],
-  transitioning: false,
-  wheelDebounce: 0,
-  touchStartY: 0,
-  touchStartX: 0,
-};
+let slideObserver = null;
+let scrollProgressHandler = null;
 
-function refreshVisible() {
-  pager.visible = Array.from(document.querySelectorAll('#pager .page'))
-    .filter(p => p.style.display !== 'none');
-  // Clamp current index in case pages hid while we were on one
-  if (pager.current >= pager.visible.length) pager.current = Math.max(0, pager.visible.length - 1);
-}
+function initReportScroll() {
+  const reportEl = document.getElementById('section-report');
+  const progressEl = document.getElementById('scroll-progress');
+  if (!reportEl || !progressEl) return;
 
-function initPager() {
-  pager.current = 0;
-  refreshVisible();
-  document.querySelectorAll('#pager .page').forEach(p => p.classList.remove('current', 'past'));
-  if (pager.visible[0]) pager.visible[0].classList.add('current');
-  buildDots();
-  updateDots();
-  updateNextVisibility();
-}
-
-function goToPage(idx) {
-  if (pager.transitioning) return;
-  refreshVisible();
-  if (idx < 0 || idx >= pager.visible.length) return;
-  if (idx === pager.current) return;
-  pager.transitioning = true;
-  const cur = pager.visible[pager.current];
-  const next = pager.visible[idx];
-  const forward = idx > pager.current;
-
-  if (cur) { cur.classList.remove('current'); cur.classList.add('past'); }
-
-  requestAnimationFrame(() => {
-    if (Math.abs(idx - pager.current) > 1) {
-      // Non-adjacent jump — reset destination transform first
-      next.style.transition = 'none';
-      next.style.transform = `translateY(${forward ? 60 : -60}px) scale(0.98)`;
-      next.style.opacity = '0';
-      void next.offsetHeight;
-      next.style.transition = '';
-      next.style.transform = '';
-      next.style.opacity = '';
-    }
-    next.classList.remove('past');
-    next.classList.add('current');
-    pager.current = idx;
-    updateDots();
-    updateNextVisibility();
-
-    setTimeout(() => {
-      pager.visible.forEach((p, i) => {
-        if (i !== pager.current) p.classList.remove('current');
-      });
-      pager.transitioning = false;
-    }, 950);
+  // 1) Reset animation state and observe every visible page
+  document.querySelectorAll('#pager .page').forEach(p => p.classList.remove('visible'));
+  if (slideObserver) slideObserver.disconnect();
+  slideObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('#pager .page').forEach(p => {
+    if (p.style.display !== 'none') slideObserver.observe(p);
   });
-}
-function nextPage() { goToPage(pager.current + 1); }
-function prevPage() { goToPage(pager.current - 1); }
 
-function buildDots() {
-  const wrap = document.getElementById('pager-dots');
-  wrap.innerHTML = '';
-  for (let i = 0; i < pager.visible.length; i++) {
-    const d = document.createElement('div');
-    d.className = 'dot';
-    d.setAttribute('data-i', i);
-    d.addEventListener('click', () => goToPage(i));
-    wrap.appendChild(d);
-  }
+  // 2) Scroll to top so the report opens on the Verdict slide
+  window.scrollTo({ top: 0, behavior: 'instant' });
+
+  // 3) Update the top scroll-progress bar as the user scrolls
+  if (scrollProgressHandler) window.removeEventListener('scroll', scrollProgressHandler);
+  scrollProgressHandler = () => {
+    if (reportEl.classList.contains('hidden')) return;
+    const max = reportEl.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0;
+    progressEl.style.width = pct + '%';
+  };
+  window.addEventListener('scroll', scrollProgressHandler, { passive: true });
+  scrollProgressHandler();
 }
-function updateDots() {
-  document.querySelectorAll('#pager-dots .dot').forEach((d, i) => {
-    d.classList.toggle('active', i === pager.current);
+
+// Called after renderReport may have shown/hidden rewrite slides
+function syncReportObservers() {
+  if (!slideObserver) return;
+  document.querySelectorAll('#pager .page').forEach(p => {
+    slideObserver.unobserve(p);
+    if (p.style.display !== 'none') slideObserver.observe(p);
   });
+  if (scrollProgressHandler) scrollProgressHandler();
 }
-function updateNextVisibility() {
-  const next = document.getElementById('pager-next');
-  if (pager.current >= pager.visible.length - 1) next.style.opacity = '0';
-  else next.style.opacity = '';
-}
-// Called by renderReport after slides are shown/hidden
-function refreshPagerVisibility() {
-  const currentEl = pager.visible[pager.current];
-  refreshVisible();
-  // Keep the user on the same slide they were on — find its new index
-  if (currentEl) {
-    const idx = pager.visible.indexOf(currentEl);
-    if (idx >= 0) pager.current = idx;
-  }
-  buildDots();
-  updateDots();
-  updateNextVisibility();
-}
-
-// Input handlers
-document.addEventListener('wheel', (e) => {
-  if (document.getElementById('section-report').classList.contains('hidden')) return;
-  const now = Date.now();
-  if (now - pager.wheelDebounce < 1100) return;
-  if (Math.abs(e.deltaY) < 12) return;
-  pager.wheelDebounce = now;
-  if (e.deltaY > 0) nextPage(); else prevPage();
-}, { passive: true });
-
-document.addEventListener('keydown', (e) => {
-  if (document.getElementById('section-report').classList.contains('hidden')) return;
-  if (['ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); nextPage(); }
-  else if (['ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prevPage(); }
-  else if (e.key === 'Home') goToPage(0);
-  else if (e.key === 'End') goToPage(pager.total - 1);
-});
-
-document.addEventListener('touchstart', (e) => {
-  if (document.getElementById('section-report').classList.contains('hidden')) return;
-  pager.touchStartY = e.touches[0].clientY;
-  pager.touchStartX = e.touches[0].clientX;
-}, { passive: true });
-document.addEventListener('touchend', (e) => {
-  if (document.getElementById('section-report').classList.contains('hidden')) return;
-  const dy = e.changedTouches[0].clientY - pager.touchStartY;
-  const dx = e.changedTouches[0].clientX - pager.touchStartX;
-  if (Math.abs(dx) > Math.abs(dy)) return; // horizontal swipe -> ignore
-  if (Math.abs(dy) < 60) return;
-  if (dy < 0) nextPage(); else prevPage();
-}, { passive: true });
 
 // ================================================
 // RENDER REPORT
@@ -2330,7 +2190,7 @@ function renderReport(data, isMock) {
 
   // Sync the pager to the new visible-page set (rewrite slides may have
   // just appeared/disappeared based on whether the deep stage returned).
-  setTimeout(refreshPagerVisibility, 0);
+  setTimeout(syncReportObservers, 0);
 }
 </script>
 

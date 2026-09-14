@@ -188,6 +188,8 @@ const server = createServer(async (req, res) => {
   if (req.method === 'GET' && url.pathname === '/')                return serveStatic(res, 'index.html',     'text/html; charset=utf-8');
   if (req.method === 'GET' && url.pathname === '/terms')           return serveStatic(res, 'terms.html',     'text/html; charset=utf-8');
   if (req.method === 'GET' && url.pathname === '/privacy')         return serveStatic(res, 'privacy.html',   'text/html; charset=utf-8');
+  if (req.method === 'GET' && url.pathname === '/success')         return serveStatic(res, 'success.html',   'text/html; charset=utf-8');
+  if (req.method === 'GET' && url.pathname === '/cancel')          return serveStatic(res, 'cancel.html',    'text/html; charset=utf-8');
   if (req.method === 'POST' && url.pathname === '/analyze')        return handleAnalyzeStart(req, res);
   if (req.method === 'GET' && url.pathname === '/analyze-status')  return handleAnalyzeStatus(req, res, url);
 

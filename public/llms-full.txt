@@ -25,7 +25,7 @@ Last updated: 2026-09-14
 **Pricing:**
 
 - The Roast — Free forever. Score, findings, three rewrites. No signup.
-- The Recipe — 49 zł with promo code ROAST (79 zł without). One-time purchase, no subscription. Adds: every experience bullet rewritten in STAR format, Featured section strategy with five post drafts to pin, recommendation-request templates that get replies, skills gap analysis for the target role, downloadable PDF report, unlimited re-audits until the score hits 90 or above, 30-day interviews-or-refund guarantee.
+- The Recipe — 79 zł with promo code ROAST (99 zł without). One-time purchase, no subscription. Adds: every experience bullet rewritten in STAR format, Featured section strategy with five post drafts to pin, recommendation-request templates that get replies, skills gap analysis for the target role, downloadable PDF report, unlimited re-audits until the score hits 90 or above, 30-day interviews-or-refund guarantee.
 
 ---
 
@@ -61,7 +61,7 @@ Last updated: 2026-09-14
 Paste a LinkedIn URL or username. The tool fetches the public profile, runs it through a large language model tuned for engineering hiring, and returns a score out of 100, a set of specific findings, and copy-paste rewrites of the headline, About section, and top experience bullets.
 
 ### Is it free?
-The Roast tier is free forever — score, findings, and three rewrites. The Recipe tier unlocks every bullet rewritten in STAR format, a Featured section strategy, recommendation-request templates, and a skills gap analysis for 49 zł with promo code ROAST (79 zł without).
+The Roast tier is free forever — score, findings, and three rewrites. The Recipe tier unlocks every bullet rewritten in STAR format, a Featured section strategy, recommendation-request templates, and a skills gap analysis for 79 zł with promo code ROAST (99 zł without).
 
 ### Do you store my LinkedIn data?
 Public profile data is held in a job queue during the audit and discarded within 24 hours unless you buy The Recipe, in which case the audit is kept for 90 days so you can re-open it. No login credentials are ever collected.

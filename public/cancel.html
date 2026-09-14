@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>No worries — Roast My LinkedIn</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#17130F">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23080605'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='SF Pro Display,-apple-system,Segoe UI,Helvetica,Arial,sans-serif' font-weight='900' font-size='24' fill='%23F1EBDF' letter-spacing='0.5'%3ERML%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #17130F;
+    --ink: #080605;
+    --fg: #F1EBDF;
+    --fg-dim: rgba(241, 235, 223, 0.68);
+    --fg-faint: rgba(241, 235, 223, 0.42);
+    --amber: #D4A574;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    display: flex; flex-direction: column;
+    padding: 40px 20px;
+  }
+  .wrap { max-width: 540px; margin: auto; text-align: center; }
+  h1 {
+    font-weight: 800;
+    font-size: clamp(38px, 8vw, 60px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+    max-width: 16ch;
+    margin-left: auto; margin-right: auto;
+  }
+  .sub {
+    font-weight: 500;
+    font-size: clamp(16px, 2.2vw, 19px);
+    color: var(--fg-dim);
+    max-width: 40ch;
+    margin: 0 auto 32px;
+    line-height: 1.5;
+  }
+  .promo {
+    display: inline-flex; align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px dashed var(--amber);
+    font-family: ui-monospace, "SF Mono", "Menlo", monospace;
+    color: var(--fg-dim);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 34px;
+  }
+  .promo strong { color: var(--amber); font-weight: 900; letter-spacing: 0.24em; }
+  .cta {
+    display: inline-block;
+    padding: 16px 26px;
+    background: var(--amber);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: -0.005em;
+  }
+  .cta:hover { background: var(--fg); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>No worries. Payment didn't go through.</h1>
+    <p class="sub">Your free roast is still yours. If you change your mind, the code below knocks 20 zł off at checkout.</p>
+    <div class="promo">Code <strong>ROAST</strong> · 79 zł instead of 99 zł</div>
+    <a class="cta" href="/">← Back to the report</a>
+  </div>
+</body>
+</html>
