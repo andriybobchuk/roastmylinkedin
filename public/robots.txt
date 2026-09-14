@@ -1,8 +1,94 @@
+# robots.txt for roastmylinkedin.net
+# Named user-agents override the "*" group under robots.txt's most-specific-match
+# rule, so every AI crawler we explicitly want gets its own permissive block.
+
 User-agent: *
 Allow: /
-
 Disallow: /analyze
 Disallow: /analyze-status
 Disallow: /.netlify/
+
+# ------------------------------------------------------------------
+# Classic search
+# ------------------------------------------------------------------
+User-agent: Googlebot
+Allow: /
+Disallow: /analyze
+Disallow: /analyze-status
+Disallow: /.netlify/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /analyze
+Disallow: /analyze-status
+Disallow: /.netlify/
+
+User-agent: DuckDuckBot
+Allow: /
+
+# ------------------------------------------------------------------
+# AI training + retrieval crawlers
+# ------------------------------------------------------------------
+# OpenAI
+User-agent: GPTBot
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-User
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+User-agent: Perplexity-User
+Allow: /
+
+# Google AI training opt-in
+User-agent: Google-Extended
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+
+# DuckDuckGo Assist
+User-agent: DuckAssistBot
+Allow: /
+
+# Amazon
+User-agent: Amazonbot
+Allow: /
+
+# Meta AI
+User-agent: meta-externalagent
+Allow: /
+
+# Common Crawl (feeds many datasets + LLM pretraining)
+User-agent: CCBot
+Allow: /
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+
+# You.com
+User-agent: YouBot
+Allow: /
+
+# Mistral
+User-agent: MistralAI-User
+Allow: /
 
 Sitemap: https://roastmylinkedin.net/sitemap.xml

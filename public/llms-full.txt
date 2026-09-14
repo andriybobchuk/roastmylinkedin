@@ -1,0 +1,88 @@
+# Roast My LinkedIn — Full Site Content
+
+Source: https://roastmylinkedin.net/
+Operator: Andrii Bobchuk, Warsaw, Poland
+Contact: andriybobchuk@gmail.com
+Last updated: 2026-09-14
+
+---
+
+## Home
+
+**Headline:** Your LinkedIn is boring.
+
+**Description:** A brutally honest, AI-generated audit of a LinkedIn profile for software engineers. Paste a LinkedIn URL or username, get a score out of 100 and copy-paste rewrites in about twenty seconds. Free tier available. No signup.
+
+**How it works:**
+1. Paste a LinkedIn URL or username on the landing page.
+2. The tool fetches the public profile data (no login required from you).
+3. A large language model tuned for engineering hiring produces:
+   - A verdict: score out of 100, percentile rank, one-sentence reasoning.
+   - Findings: three to five specific problems (headline, About, experience bullets, Featured section, skills coverage, activity, recommendations).
+   - Rewrites: replacement headline, replacement About opening paragraph, three replacement experience bullets in STAR format — all referencing the real companies, technologies, and numbers from the profile.
+4. Copy any rewrite with one click.
+
+**Pricing:**
+
+- The Roast — Free forever. Score, findings, three rewrites. No signup.
+- The Recipe — 49 zł with promo code ROAST (79 zł without). One-time purchase, no subscription. Adds: every experience bullet rewritten in STAR format, Featured section strategy with five post drafts to pin, recommendation-request templates that get replies, skills gap analysis for the target role, downloadable PDF report, unlimited re-audits until the score hits 90 or above, 30-day interviews-or-refund guarantee.
+
+---
+
+## Terms of Service (summary)
+
+- Operated by Andrii Bobchuk, Warsaw, Poland. Contact: andriybobchuk@gmail.com.
+- The service is provided as-is. No guarantee of specific job-search outcomes.
+- Users must be 16 or older.
+- LinkedIn is a trademark of LinkedIn Corporation. This service is not affiliated with, endorsed by, or sponsored by LinkedIn. It reads only publicly visible profile information via a third-party data provider.
+- Paid audits are one-time purchases processed by Stripe. 30-day money-back guarantee. EU consumers also have a 14-day right of withdrawal for standard digital purchases.
+- The rewritten copy generated for the user belongs to the user. The operator may retain anonymized aggregate scoring data for product improvement.
+- Governed by Polish law. Disputes may be brought before Polish courts or the EU Online Dispute Resolution platform.
+- Full terms: https://roastmylinkedin.net/terms
+
+---
+
+## Privacy Policy (summary)
+
+- Data controller: Andrii Bobchuk, Warsaw, Poland.
+- Collected: LinkedIn URL or username submitted; public profile data returned about that URL by the data provider; email (only if provided for paid delivery); basic technical logs for security (retained 30 days).
+- Not collected: LinkedIn login credentials. No third-party advertising cookies, tracking pixels, or session-replay tools.
+- Subprocessors: Apify (LinkedIn scrape), Google or Anthropic (LLM analysis), Netlify (hosting + job store), Stripe (payment).
+- Retention: public profile data discarded within 24 hours unless a report is purchased (then 90 days). Emails retained until unsubscribe/deletion.
+- No cookies are set today. Analytics will require explicit consent when added.
+- GDPR rights available to EU/UK users; complaints may be filed with the Polish DPA (UODO).
+- Full policy: https://roastmylinkedin.net/privacy
+
+---
+
+## Frequently asked questions
+
+### How does Roast My LinkedIn work?
+Paste a LinkedIn URL or username. The tool fetches the public profile, runs it through a large language model tuned for engineering hiring, and returns a score out of 100, a set of specific findings, and copy-paste rewrites of the headline, About section, and top experience bullets.
+
+### Is it free?
+The Roast tier is free forever — score, findings, and three rewrites. The Recipe tier unlocks every bullet rewritten in STAR format, a Featured section strategy, recommendation-request templates, and a skills gap analysis for 49 zł with promo code ROAST (79 zł without).
+
+### Do you store my LinkedIn data?
+Public profile data is held in a job queue during the audit and discarded within 24 hours unless you buy The Recipe, in which case the audit is kept for 90 days so you can re-open it. No login credentials are ever collected.
+
+### Is this affiliated with LinkedIn?
+No. LinkedIn is a trademark of LinkedIn Corporation. This is an independent tool that analyzes publicly visible profile information via a third-party data provider.
+
+### What makes this different from other LinkedIn optimizers?
+The prompt is tuned for software engineers. It roasts buzzword-heavy headlines, keyword-list About sections, and Jira-flavored bullets, then rewrites them in STAR format using the person's real companies, technologies, and numbers.
+
+### Which languages does it support?
+The audit matches the input profile's language automatically. Currently strongest in English and Polish.
+
+### How long does it take?
+About 15 to 20 seconds end to end. The verdict lands first; the rewrites arrive a few seconds later.
+
+### Do you offer refunds?
+Yes — 30 days, no questions. Email andriybobchuk@gmail.com.
+
+---
+
+## Sources and further reading
+
+Structured data on this site follows schema.org vocabulary. Sitemap: https://roastmylinkedin.net/sitemap.xml. AI-crawler index: https://roastmylinkedin.net/llms.txt.

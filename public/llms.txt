@@ -1,0 +1,39 @@
+# Roast My LinkedIn
+
+> A brutally honest, AI-generated audit of a LinkedIn profile. Scores it out of 100, lists exactly what is dragging it down, and delivers copy-paste rewrites of the headline, About section, and top experience bullets. Tuned for software engineers.
+
+Operator: Andrii Bobchuk (Warsaw, Poland). Contact: andriybobchuk@gmail.com. Last updated: 2026-09-14.
+
+## Key facts
+
+- Free tier ("The Roast"): score, findings, and 3 rewrites — no signup.
+- Paid tier ("The Recipe"): 49 zł with promo code ROAST (79 zł without). One-time purchase. Includes every experience bullet rewritten in STAR format, Featured section strategy, recommendation-request templates, skills gap analysis, and downloadable PDF report.
+- 30-day interviews-or-refund guarantee.
+- Audit runs in ~15-20 seconds. No LinkedIn login is required; the tool reads only publicly visible profile data.
+- Not affiliated with LinkedIn Corporation.
+
+## What the audit checks
+
+1. Headline — recruiter search keywords, positioning verbs, differentiators.
+2. About paragraph — hook, quantified impact, template-language avoidance.
+3. Experience bullets — STAR format, real metrics, correct seniority signals.
+4. Featured section — content that reinforces the target role.
+5. Skills — coverage of role-specific technologies and endorsements.
+6. Activity — posting cadence and topical alignment with the target role.
+7. Recommendations — count vs. peers in the same role/seniority band.
+
+## Who it's for
+
+Software engineers looking for a new role: mid, senior, staff, principal. Frontend, backend, mobile (Android/iOS), full-stack, DevOps/SRE/platform, data, ML, and engineering leadership tracks.
+
+## Product pages
+
+- Home: https://roastmylinkedin.net/
+- Terms of Service: https://roastmylinkedin.net/terms
+- Privacy Policy: https://roastmylinkedin.net/privacy
+
+## Full content
+
+- [Full site as Markdown](https://roastmylinkedin.net/llms-full.txt)
+- [Sitemap](https://roastmylinkedin.net/sitemap.xml)
+- [RSS feed] — not yet published

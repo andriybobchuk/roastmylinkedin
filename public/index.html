@@ -2,23 +2,159 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roast My LinkedIn — a brutally honest audit for engineers</title>
-<meta name="description" content="A harsh, AI-generated roast of your LinkedIn profile. Free. 30 seconds. No signup. Built for engineers.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Roast My LinkedIn — brutally honest AI audit for engineers</title>
+<meta name="description" content="Paste your LinkedIn URL, get a savage but useful audit in 30 seconds. Score, findings, and copy-paste rewrites for engineers. Free.">
+<meta name="keywords" content="linkedin audit, linkedin roast, linkedin optimizer for engineers, linkedin profile score, rewrite linkedin headline, linkedin about generator, developer linkedin, engineer resume linkedin, kotlin android linkedin, staff engineer linkedin">
+<meta name="author" content="Andrii Bobchuk">
 <meta name="theme-color" content="#17130F">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+
+<link rel="canonical" href="https://roastmylinkedin.net/">
+<link rel="alternate" type="text/markdown" href="https://roastmylinkedin.net/llms-full.txt" title="Full site content as Markdown for LLMs">
+<link rel="alternate" type="text/plain" href="https://roastmylinkedin.net/llms.txt" title="llms.txt index for AI crawlers">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23080605'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='SF Pro Display,-apple-system,Segoe UI,Helvetica,Arial,sans-serif' font-weight='900' font-size='24' fill='%23F1EBDF' letter-spacing='0.5'%3ERML%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23080605'/%3E%3Ctext x='90' y='118' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif' font-weight='900' font-size='68' fill='%23F1EBDF' letter-spacing='1'%3ERML%3C/text%3E%3C/svg%3E">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="Your LinkedIn is boring 💩">
-<meta property="og:description" content="A harsh AI roast of your LinkedIn profile. Free. 30 seconds. No signup. Built for engineers.">
+<meta property="og:title" content="Your LinkedIn is boring.">
+<meta property="og:description" content="Paste your LinkedIn URL, get a savage but useful audit in 30 seconds. Free.">
 <meta property="og:site_name" content="Roast My LinkedIn">
-<meta property="og:url" content="https://roastmylinkedin.net">
+<meta property="og:url" content="https://roastmylinkedin.net/">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="pl_PL">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Your LinkedIn is boring 💩">
-<meta name="twitter:description" content="A harsh AI roast of your LinkedIn profile. Free. 30 seconds. No signup.">
+<meta name="twitter:title" content="Your LinkedIn is boring.">
+<meta name="twitter:description" content="Paste your LinkedIn URL, get a savage but useful audit in 30 seconds. Free.">
+
+<!-- Robots directives — AI overviews + max image preview -->
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<!-- Structured data: JSON-LD graph. Cross-referenced by @id so search
+     engines and AI overviews merge the entities. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://roastmylinkedin.net/#org",
+      "name": "Roast My LinkedIn",
+      "url": "https://roastmylinkedin.net/",
+      "logo": "https://roastmylinkedin.net/icon.svg",
+      "founder": { "@type": "Person", "name": "Andrii Bobchuk" },
+      "email": "andriybobchuk@gmail.com",
+      "areaServed": "Worldwide",
+      "sameAs": []
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://roastmylinkedin.net/#website",
+      "url": "https://roastmylinkedin.net/",
+      "name": "Roast My LinkedIn",
+      "publisher": { "@id": "https://roastmylinkedin.net/#org" },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://roastmylinkedin.net/#product",
+      "name": "Roast My LinkedIn",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "url": "https://roastmylinkedin.net/",
+      "description": "An AI audit tool that scores a LinkedIn profile out of 100, lists what is dragging it down, and delivers copy-paste rewrites of the headline, About, and experience bullets.",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "The Roast",
+          "price": "0",
+          "priceCurrency": "PLN",
+          "url": "https://roastmylinkedin.net/#the-roast"
+        },
+        {
+          "@type": "Offer",
+          "name": "The Recipe",
+          "price": "49",
+          "priceCurrency": "PLN",
+          "url": "https://roastmylinkedin.net/#the-recipe",
+          "eligibleCustomerType": "https://schema.org/BusinessEntityType"
+        }
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "42"
+      },
+      "provider": { "@id": "https://roastmylinkedin.net/#org" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://roastmylinkedin.net/#webpage",
+      "url": "https://roastmylinkedin.net/",
+      "name": "Roast My LinkedIn — brutally honest AI audit for engineers",
+      "isPartOf": { "@id": "https://roastmylinkedin.net/#website" },
+      "primaryImageOfPage": null,
+      "datePublished": "2026-09-11",
+      "dateModified": "2026-09-14",
+      "inLanguage": "en",
+      "about": { "@id": "https://roastmylinkedin.net/#product" },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": ["h1.hero-headline", ".hero-sub"]
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://roastmylinkedin.net/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does Roast My LinkedIn work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Paste a LinkedIn URL or username. We fetch the public profile, run it through a large language model tuned for engineering hiring, and return a score out of 100, a set of specific findings, and copy-paste rewrites of your headline, About section, and top experience bullets."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Roast tier is free forever — score, findings, and three rewrites. The Recipe tier unlocks every bullet rewritten in STAR format, a Featured section strategy, recommendation-request templates, and skills gap analysis for 49 zł with promo code ROAST (79 zł without)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you store my LinkedIn data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Public profile data is held in a job queue during your audit and discarded within 24 hours unless you buy The Recipe, in which case we keep the audit for 90 days so you can re-open it. No login credentials are ever collected."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this affiliated with LinkedIn?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. LinkedIn is a trademark of LinkedIn Corporation. We are an independent tool that analyzes publicly visible profile information via a third-party data provider."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What makes this different from other LinkedIn optimizers?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The prompt is tuned for software engineers. We roast buzzword-heavy headlines, keyword-list About sections, and Jira-flavored bullets, then rewrite them in STAR format using the person's real companies, technologies, and numbers."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 
 <style>
   :root {
@@ -162,7 +298,6 @@
     display: block;
     white-space: nowrap;
   }
-  .rotator-word .emoji { display: inline-block; margin-left: 4px; }
 
   .hero-sub {
     font-weight: 500;
@@ -186,6 +321,30 @@
   }
   .form-row input::placeholder { color: var(--fg-faint); }
   .form-row input:focus { background: var(--input-bg-focus); }
+  .form-row input.error {
+    background: rgba(224, 73, 43, 0.14);
+    box-shadow: inset 0 0 0 1px var(--amber-hot);
+    animation: shake 380ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+  @keyframes shake {
+    10%, 90%  { transform: translateX(-2px); }
+    20%, 80%  { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-8px); }
+    40%, 60%  { transform: translateX(8px); }
+  }
+  .form-error {
+    margin-top: 10px;
+    color: var(--amber-hot);
+    font-family: ui-monospace, "SF Mono", "Menlo", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 220ms ease;
+    text-align: center;
+  }
+  .form-error.on { opacity: 1; }
   .form-row button {
     background: var(--fg); color: var(--bg-dark);
     border: none; padding: 18px 28px;
@@ -209,55 +368,49 @@
   .find-helper a::after { content: " ↗"; }
 
   /* ------- Loading ------- */
-  .loading-wrap { width: 100%; max-width: 560px; position: relative; }
+  .loading-wrap { width: 100%; max-width: 620px; position: relative; text-align: center; }
+  .loading-kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 34px;
+  }
+  .loading-headline {
+    font-weight: 800;
+    font-size: clamp(46px, 9vw, 88px);
+    line-height: 1.02; letter-spacing: -0.035em;
+    margin-bottom: 22px;
+    transition: opacity 260ms ease, transform 260ms ease;
+  }
+  .loading-headline.fade { opacity: 0; transform: translateY(8px); }
+  .loading-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(17px, 2.2vw, 22px);
+    color: var(--fg-dim);
+    min-height: 32px;
+    line-height: 1.4;
+    max-width: 44ch;
+    margin: 0 auto 60px;
+    transition: opacity 260ms ease, transform 260ms ease;
+  }
+  .loading-sub.fade { opacity: 0; transform: translateY(6px); }
   .progress-track {
-    width: 100%; height: 2px;
+    width: 100%; height: 1px;
     background: var(--fg-ghost);
-    margin-bottom: 44px;
     position: relative; overflow: hidden;
+    margin: 0;
   }
   .progress-fill {
     position: absolute; inset: 0 auto 0 0;
     background: var(--amber);
     width: 0%;
     transition: width 0.4s linear;
-  }
-  .loading-headline {
-    font-weight: 800;
-    font-size: clamp(40px, 8vw, 72px);
-    line-height: 1.05; letter-spacing: -0.03em;
-    margin-bottom: 20px; text-align: center;
-  }
-  .loading-sub {
-    font-weight: 500;
-    font-size: clamp(16px, 2vw, 20px);
-    color: var(--fg-dim);
-    min-height: 32px; text-align: center;
-  }
-  .dot::after {
-    content: "";
-    display: inline-block; width: 24px; text-align: left;
-    animation: dotsAnim 1.2s steps(4, end) infinite;
-  }
-  @keyframes dotsAnim {
-    0% { content: ""; } 25% { content: "."; }
-    50% { content: ".."; } 75% { content: "..."; }
-    100% { content: ""; }
-  }
-  .loading-stats {
-    margin-top: 40px;
-    display: flex; justify-content: center; gap: 32px;
-    font-family: var(--mono);
-    font-size: 12px; letter-spacing: 0.08em;
-    color: var(--fg-dim); text-transform: uppercase;
-  }
-  .loading-stats .stat .n {
-    display: block;
-    font-family: var(--sans);
-    font-weight: 800; font-size: 28px;
-    color: var(--fg); line-height: 1;
-    margin-bottom: 4px;
-    font-variant-numeric: tabular-nums;
+    box-shadow: 0 0 12px var(--amber);
   }
   .skip-btn {
     position: absolute;
@@ -518,174 +671,104 @@
   }
   .subject-stats .stat-item:first-child::before { display: none; }
 
-  /* --- Page: consolidated Verdict (subject + score + rank + summary + top good) --- */
-  .p-verdict { justify-content: flex-start; padding-top: 70px; }
-  .p-verdict .page-inner { max-width: 820px; }
-  .v-subject-row {
-    display: flex; gap: 18px; align-items: center;
-    margin-bottom: 28px;
-  }
-  .v-subject-row .v-avatar {
-    width: 76px; height: 76px; border-radius: 50%;
-    background: var(--fg-ghost);
-    overflow: hidden; flex-shrink: 0;
-    border: 2px solid var(--fg);
-  }
-  .v-subject-row .v-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .v-subject-row .v-who .v-name {
-    font-weight: 800; font-size: clamp(24px, 3.4vw, 34px);
-    line-height: 1.05; letter-spacing: -0.025em;
-  }
-  .v-subject-row .v-who .v-headline {
-    font-family: var(--serif); font-style: italic;
-    font-size: clamp(14px, 1.8vw, 17px);
-    color: var(--fg-dim);
-    line-height: 1.35; margin-top: 4px;
-    max-width: 60ch;
-  }
-  .v-stats {
-    display: flex; flex-wrap: wrap; gap: 6px 14px;
-    font-family: var(--mono);
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--fg-dim);
-    margin-bottom: 32px;
-  }
-  .v-stats .stat-item::before {
-    content: "·"; color: var(--amber); margin-right: 8px;
-  }
-  .v-stats .stat-item:first-child::before { display: none; }
-
-  .v-verdict-row {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 22px;
+  /* --- Page: Verdict (minimal, hierarchical) --- */
+  .p-verdict {
+    justify-content: center;
     align-items: center;
-    padding: 26px 22px;
-    background: var(--fg);
-    color: var(--bg-dark);
-    box-shadow: 8px 8px 0 rgba(0,0,0,0.55);
-    margin-bottom: 28px;
+    text-align: center;
+    padding-top: 80px;
+    padding-bottom: 80px;
   }
-  @media (min-width: 640px) {
-    .v-verdict-row { grid-template-columns: auto 1fr; gap: 32px; padding: 30px 30px; }
+  .p-verdict .page-inner { max-width: 640px; }
+  .v-subject {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 12px;
+    margin-bottom: 48px;
   }
+  .v-avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--fg-ghost);
+    overflow: hidden;
+    border: 1px solid var(--fg-ghost);
+  }
+  .v-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .v-name {
+    font-weight: 800;
+    font-size: clamp(18px, 2.2vw, 22px);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .v-headline {
+    font-family: var(--serif); font-style: italic;
+    font-size: clamp(13px, 1.6vw, 15px);
+    color: var(--fg-dim);
+    line-height: 1.35;
+    max-width: 44ch;
+  }
+
+  .v-score-block { margin-bottom: 40px; }
   .v-score-big {
     font-weight: 900;
-    font-size: clamp(96px, 18vw, 160px);
-    line-height: 0.82;
-    letter-spacing: -0.05em;
+    font-size: clamp(160px, 32vw, 260px);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
     font-variant-numeric: tabular-nums lining-nums;
-    color: var(--bg-dark);
+    color: var(--fg);
     display: block;
   }
-  .v-score-big::after {
-    content: " / 100";
-    font-size: 0.24em;
-    font-weight: 700;
-    color: var(--bg-dark);
-    opacity: 0.6;
-    letter-spacing: 0.06em;
-    display: inline-block;
-    margin-left: 4px;
-    vertical-align: bottom;
-  }
-  .v-rank-line { display: flex; flex-direction: column; gap: 10px; }
-  .v-rank-badge {
-    display: inline-block;
-    background: var(--amber);
-    color: var(--ink);
-    padding: 8px 14px 7px;
+  .v-score-outof {
+    display: block;
+    margin-top: 6px;
     font-family: var(--mono);
-    font-weight: 800; font-size: 14px;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    line-height: 1;
-    align-self: flex-start;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+
+  .v-rank-line {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 6px 12px 5px;
+    background: rgba(212, 165, 116, 0.10);
+    border: 1px solid rgba(212, 165, 116, 0.35);
+    margin-bottom: 24px;
+    max-width: 100%;
+  }
+  .v-rank-pill {
+    font-family: var(--mono);
+    font-weight: 800; font-size: 11px;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--amber);
+    white-space: nowrap;
   }
   .v-rank-reason {
     font-family: var(--serif); font-style: italic;
-    font-size: clamp(15px, 1.7vw, 17px);
-    color: var(--bg-dark); opacity: 0.85;
-    line-height: 1.45;
-    max-width: 50ch;
+    font-size: 13px;
+    color: var(--fg-dim);
+    line-height: 1.35;
+    text-align: left;
   }
 
   .v-summary {
     font-family: var(--serif); font-style: italic;
-    font-size: clamp(18px, 2.4vw, 24px);
-    line-height: 1.4; letter-spacing: -0.015em;
-    padding: 4px 0 24px;
-    max-width: 46ch;
-    border-bottom: 1px solid var(--fg-ghost);
-    margin-bottom: 24px;
-  }
-  .v-summary::before {
-    content: '"';
-    font-family: var(--serif); font-style: normal;
-    font-size: 2.4em;
-    color: var(--amber);
-    line-height: 0.1;
-    display: inline-block;
-    margin-right: 6px;
-    vertical-align: -0.35em;
-  }
-
-  .v-good {
-    display: flex; gap: 16px; align-items: flex-start;
-    padding: 16px 0 4px;
-    margin-bottom: 30px;
-  }
-  .v-good .v-good-plus {
-    font-family: var(--mono);
-    font-weight: 900; font-size: 26px;
-    line-height: 1;
-    color: var(--amber);
-    flex-shrink: 0;
-  }
-  .v-good .v-good-content .v-good-lbl {
-    font-family: var(--mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--fg-dim);
-    margin-bottom: 4px;
-  }
-  .v-good .v-good-content .v-good-title {
-    font-weight: 700;
-    font-size: clamp(17px, 2.1vw, 20px);
-    line-height: 1.25;
-    margin-bottom: 4px;
-  }
-  .v-good .v-good-content .v-good-body {
-    font-weight: 500; font-size: 14px;
-    color: var(--fg-dim); line-height: 1.5;
-    max-width: 55ch;
+    font-size: clamp(17px, 2.2vw, 21px);
+    line-height: 1.5; letter-spacing: -0.01em;
+    color: var(--fg);
+    max-width: 42ch;
+    margin: 0 auto 60px;
   }
 
   .v-continue {
-    text-align: center;
-    padding: 12px 0 4px;
     font-family: var(--mono);
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.24em; text-transform: uppercase;
-    color: var(--fg-dim);
-  }
-  .v-continue .v-hint {
-    display: block;
-    margin-bottom: 8px;
-    font-family: var(--sans);
-    font-style: italic;
-    font-weight: 500;
-    font-size: 15px;
-    letter-spacing: -0.01em;
-    text-transform: none;
-    color: var(--fg);
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--fg-faint);
+    display: inline-flex; flex-direction: column;
+    align-items: center; gap: 10px;
   }
   .v-continue-arrow {
-    font-size: 20px;
+    font-size: 16px;
     color: var(--amber);
     animation: continueBounce 1.8s ease-in-out infinite;
-    display: inline-block;
   }
   @keyframes continueBounce {
     0%, 100% { transform: translateY(0); }
@@ -693,142 +776,133 @@
   }
 
   /* --- Page: value table (paywall v2) --- */
-  .p-value { padding-top: 60px; }
-  .p-value .page-inner { max-width: 820px; }
+  .p-value {
+    justify-content: center;
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+  .p-value .page-inner { max-width: 640px; }
+  .p-value .page-h {
+    font-weight: 800;
+    font-size: clamp(28px, 4.4vw, 40px);
+    line-height: 1.08;
+    letter-spacing: -0.028em;
+    margin-bottom: 22px;
+    max-width: 22ch;
+  }
   .fix-table {
-    background: var(--fg);
-    color: var(--ink);
-    padding: 4px 0;
-    margin: 20px 0 28px;
-    box-shadow: 10px 10px 0 rgba(0,0,0,0.6);
-    border-left: 4px solid var(--amber);
+    background: transparent;
+    color: var(--fg);
+    margin: 6px 0 28px;
+    border-top: 1px solid var(--fg-ghost);
   }
   .fix-row {
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: 14px 20px;
-    padding: 14px 20px;
-    border-top: 1px solid rgba(20,20,20,0.08);
-    align-items: baseline;
-  }
-  .fix-row:first-child { border-top: none; }
-  .fix-row-head {
-    padding: 12px 20px 10px;
-    background: rgba(20,20,20,0.04);
-    font-family: var(--mono);
-    font-size: 10px; font-weight: 800;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    color: rgba(20,20,20,0.55);
+    gap: 8px 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--fg-ghost);
+    align-items: center;
   }
   .fix-row .fix-flaw {
-    font-weight: 600; font-size: 14px;
+    font-weight: 500; font-size: 14px;
     line-height: 1.35;
-    color: var(--ink);
+    color: var(--fg);
   }
   .fix-row .fix-solution {
     font-family: var(--mono);
     font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 0.02em;
-    color: var(--bg-dark);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
     text-align: right;
     white-space: nowrap;
+    text-transform: uppercase;
   }
-  .fix-row.locked .fix-solution { color: var(--ink); opacity: 0.72; }
-  .fix-row.locked .fix-solution::before { content: "🔒 "; margin-right: 4px; }
-  .fix-row.unlocked .fix-solution::before { content: "✓ "; color: #4A7C59; margin-right: 4px; font-weight: 900; }
-  .fix-row.unlocked { background: rgba(74,124,89,0.09); }
+  .fix-row.unlocked .fix-solution { color: #7EA890; }
+  .fix-row.unlocked .fix-solution::before { content: "✓  "; font-weight: 900; }
+  .fix-row.locked .fix-solution { color: var(--amber); }
+  .fix-row.locked .fix-solution::before { content: "＋  "; font-weight: 900; }
 
-  .fix-time {
-    text-align: center;
-    padding: 4px 0 22px;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: clamp(15px, 1.9vw, 18px);
-    color: var(--fg-dim);
-    max-width: 44ch;
-    margin: 0 auto;
-    line-height: 1.4;
-  }
-  .fix-time strong { font-style: normal; color: var(--amber); font-weight: 800; }
-
-  .fix-price {
+  /* Price line — sits on one row: old (crossed) → new (big) — promo chip beside */
+  .fix-buy {
     display: flex; flex-direction: column; align-items: center;
-    gap: 4px;
-    padding: 8px 0;
-    margin-bottom: 8px;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .fix-price {
+    display: inline-flex; align-items: baseline; gap: 14px;
   }
   .fix-price-old {
-    font-weight: 700; font-size: clamp(22px, 3vw, 28px);
+    font-weight: 600; font-size: 20px;
     text-decoration: line-through;
     text-decoration-color: var(--fg-faint);
-    text-decoration-thickness: 3px;
-    color: var(--fg-dim);
+    text-decoration-thickness: 2px;
+    color: var(--fg-faint);
     font-variant-numeric: tabular-nums;
   }
   .fix-price-new {
     font-weight: 900;
-    font-size: clamp(56px, 10vw, 92px);
+    font-size: clamp(56px, 9vw, 76px);
     line-height: 0.95;
     letter-spacing: -0.035em;
     color: var(--amber);
     font-variant-numeric: tabular-nums;
   }
   .fix-price-new .u {
-    font-size: 0.36em;
+    font-size: 0.34em;
     font-weight: 800;
     letter-spacing: 0.01em;
     color: var(--amber);
-    opacity: 0.75;
+    opacity: 0.7;
     margin-left: 6px;
   }
-  .fix-price-hint {
-    font-family: var(--mono);
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--fg-dim);
-    margin-top: 6px;
-  }
   .fix-promo {
-    display: flex; justify-content: center; align-items: center;
-    gap: 10px;
-    margin: 6px 0 24px;
+    display: inline-flex; align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--fg-dim);
+    text-transform: uppercase;
   }
   .fix-promo-code {
     display: inline-block;
-    background: var(--amber);
-    color: var(--ink);
-    padding: 12px 22px 11px;
+    background: transparent;
+    color: var(--amber);
+    padding: 6px 10px 5px;
     font-family: var(--mono);
     font-weight: 900;
-    font-size: 20px;
+    font-size: 14px;
     letter-spacing: 0.28em;
     line-height: 1;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
+    border: 1px dashed var(--amber);
   }
-  .fix-promo .copy-btn { padding: 12px 16px; font-size: 12px; }
+  .fix-promo .copy-btn { padding: 6px 10px; font-size: 10px; }
+
   .fix-cta {
     display: block;
     width: 100%;
-    max-width: 480px;
-    margin: 0 auto 14px;
-    background: var(--ink);
-    color: var(--amber);
+    max-width: 420px;
+    margin: 0 auto 12px;
+    background: var(--amber);
+    color: var(--ink);
     border: none;
     padding: 18px 24px;
     font-family: inherit;
     font-weight: 800;
-    font-size: 18px;
+    font-size: 17px;
     letter-spacing: -0.01em;
     cursor: pointer;
   }
-  .fix-cta:hover { background: var(--amber); color: var(--ink); }
+  .fix-cta:hover { background: var(--fg); color: var(--ink); }
   .fix-guarantee {
     text-align: center;
     font-family: var(--mono);
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--fg-dim);
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--fg-faint);
   }
 
   /* --- Page: score --- */
@@ -1385,14 +1459,13 @@
     <span class="rotator-line">
       <span class="rotator-window" aria-live="polite">
         <span class="rotator-stack" id="rotator-stack">
-          <span class="rotator-word">Boring<span class="emoji">😴</span></span>
-          <span class="rotator-word">Cringe<span class="emoji">💀</span></span>
-          <span class="rotator-word">Mediocre<span class="emoji">🥱</span></span>
-          <span class="rotator-word">Generic<span class="emoji">🗑️</span></span>
-          <span class="rotator-word">Forgettable<span class="emoji">💭</span></span>
-          <span class="rotator-word">Basic<span class="emoji">🍞</span></span>
+          <span class="rotator-word">boring.</span>
+          <span class="rotator-word">forgettable.</span>
+          <span class="rotator-word">mediocre.</span>
+          <span class="rotator-word">generic.</span>
+          <span class="rotator-word">basic.</span>
           <!-- Duplicate first item for seamless loop-back -->
-          <span class="rotator-word" aria-hidden="true">Boring<span class="emoji">😴</span></span>
+          <span class="rotator-word" aria-hidden="true">boring.</span>
         </span>
       </span>
     </span>
@@ -1401,9 +1474,10 @@
 
   <form onsubmit="return submitAudit(event)" style="width:100%;">
     <div class="form-row">
-      <input type="text" id="username" placeholder="LinkedIn username or URL" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <input type="text" id="username" placeholder="LinkedIn username or URL" autocomplete="off" autocapitalize="off" spellcheck="false" oninput="clearFormError()">
       <button type="submit" id="submit-btn">Roast it →</button>
     </div>
+    <div class="form-error" id="form-error">Paste your LinkedIn URL or username first.</div>
     <div class="find-helper">
       <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noopener noreferrer">Copy my LinkedIn Link</a>
     </div>
@@ -1415,13 +1489,10 @@
 <!-- ============================================ -->
 <section id="section-loading" class="stage hidden">
   <div class="loading-wrap">
-    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-    <h1 class="loading-headline" id="loading-headline">Reading it<span class="dot"></span></h1>
+    <div class="loading-kicker">The roast</div>
+    <h1 class="loading-headline" id="loading-headline">Reading it</h1>
     <p class="loading-sub" id="loading-sub">Fetching your public LinkedIn data.</p>
-    <div class="loading-stats">
-      <div class="stat"><span class="n" id="stat-signals">0</span>signals read</div>
-      <div class="stat"><span class="n" id="stat-elapsed">0</span>seconds</div>
-    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
     <button class="skip-btn hidden" id="skip-btn" onclick="skipLoading()">skip →</button>
   </div>
 </section>
@@ -1450,42 +1521,31 @@
 
   <div class="pager" id="pager">
 
-    <!-- 01 · The Verdict (consolidated: subject + score + rank + summary + top good) -->
+    <!-- 01 · The Verdict — minimal: subject / score / rank / summary -->
     <div class="page p-verdict current" data-page="0">
       <div class="page-inner">
         <div class="page-num anim"><span class="num">01</span><span class="lbl">THE VERDICT</span></div>
 
-        <div class="v-subject-row anim d-1">
+        <div class="v-subject anim d-1">
           <div class="v-avatar" id="r-avatar"></div>
-          <div class="v-who">
-            <div class="v-name" id="r-name">—</div>
-            <div class="v-headline" id="r-headline">—</div>
-          </div>
+          <div class="v-name" id="r-name">—</div>
+          <div class="v-headline" id="r-headline">—</div>
         </div>
 
-        <div class="v-stats anim d-2" id="r-stats"></div>
-
-        <div class="v-verdict-row anim d-3">
+        <div class="v-score-block anim d-2">
           <div class="v-score-big" id="r-score">0</div>
-          <div class="v-rank-line">
-            <div class="v-rank-badge" id="r-percentile">—</div>
-            <div class="v-rank-reason" id="r-reason">—</div>
-          </div>
+          <div class="v-score-outof">out of 100</div>
+        </div>
+
+        <div class="v-rank-line anim d-3">
+          <div class="v-rank-pill" id="r-percentile">—</div>
+          <div class="v-rank-reason" id="r-reason">—</div>
         </div>
 
         <div class="v-summary anim d-4" id="r-summary">—</div>
 
-        <div class="v-good anim d-5" id="r-top-good">
-          <div class="v-good-plus">+</div>
-          <div class="v-good-content">
-            <div class="v-good-lbl">What saves you</div>
-            <div class="v-good-title" id="r-top-good-title">—</div>
-            <div class="v-good-body" id="r-top-good-body">—</div>
-          </div>
-        </div>
-
         <div class="v-continue anim d-5">
-          <span class="v-hint">Now check what's dragging you down.</span>
+          <span>keep going</span>
           <span class="v-continue-arrow">↓</span>
         </div>
       </div>
@@ -1579,73 +1639,22 @@
         <div class="page-num anim"><span class="num">08</span><span class="lbl">YOUR FIX KIT</span></div>
         <h2 class="page-h anim d-1">Every flaw. Every fix. Copy-paste ready.</h2>
 
-        <div class="fix-table anim d-2" id="r-fix-table">
-          <div class="fix-row fix-row-head">
-            <div>The flaw</div>
-            <div>The fix</div>
+        <div class="fix-table anim d-2" id="r-fix-table"></div>
+
+        <div class="fix-buy anim d-3">
+          <div class="fix-price">
+            <span class="fix-price-old">79 zł</span>
+            <span class="fix-price-new">49<span class="u">zł</span></span>
+          </div>
+          <div class="fix-promo">
+            <span>Use code</span>
+            <span class="fix-promo-code" id="promo-code-el">ROAST</span>
+            <button class="copy-btn" onclick="copyText(this, 'promo-code')">Copy</button>
           </div>
         </div>
 
-        <p class="fix-time anim d-3">
-          You'd spend <strong>3-4 hours</strong> writing this yourself. We deliver it in <strong>5 minutes.</strong>
-        </p>
-
-        <div class="fix-price anim d-4">
-          <div class="fix-price-old">79 zł</div>
-          <div class="fix-price-new">49<span class="u">zł</span></div>
-          <div class="fix-price-hint">with promo code</div>
-        </div>
-
-        <div class="fix-promo anim d-5">
-          <span class="fix-promo-code" id="promo-code-el">ROAST</span>
-          <button class="copy-btn" onclick="copyText(this, 'promo-code')">Copy</button>
-        </div>
-
-        <button class="fix-cta anim d-5" onclick="clickTier('recipe-promo', 49)">Get all the fixes →</button>
+        <button class="fix-cta anim d-4" onclick="clickTier('recipe-promo', 49)">Get every fix →</button>
         <p class="fix-guarantee anim d-5">30-day interviews-or-refund guarantee</p>
-      </div>
-    </div>
-
-    <!-- 09 · Pricing Tiers (kept as fallback/A-B) -->
-    <div class="page p-pricing" data-page="8">
-      <div class="page-inner">
-        <div class="page-num anim" style="justify-content: center;"><span class="num">09</span><span class="lbl">PICK YOUR TEMPERATURE</span></div>
-        <h2 class="page-h anim d-1">You've got the fix. Want the whole kit?</h2>
-
-        <div class="pricing-grid">
-          <div class="tier anim d-2">
-            <div class="t-name">The Roast</div>
-            <div class="t-tag">You just got this. Nice.</div>
-            <div class="t-price">Free</div>
-            <div class="t-once">One-time · already yours</div>
-            <ul class="t-list">
-              <li>Score, verdict, and top findings</li>
-              <li>Rewritten headline</li>
-              <li>Rewritten About paragraph</li>
-              <li>Top 3 rewritten experience bullets</li>
-            </ul>
-            <button class="t-cta" disabled>You have this</button>
-          </div>
-
-          <div class="tier best anim slam-tilt">
-            <div class="t-badge">🌶️ Best Value</div>
-            <div class="t-name">The Recipe</div>
-            <div class="t-tag">Everything you need to actually fix it.</div>
-            <div class="t-price">79<span class="u">zł</span></div>
-            <div class="t-once">One-time · no subscription · lifetime access</div>
-            <div class="t-hero">Recipe holders average +8 points in a week. That's the threshold where inbound recruiter DMs 3×.</div>
-            <ul class="t-list">
-              <li>Every experience bullet rewritten in STAR format</li>
-              <li>Featured section strategy — 5 post drafts to pin</li>
-              <li>Recommendation-request templates that get replies</li>
-              <li>Skills gap analysis for your target role</li>
-              <li>Downloadable PDF report for your files or coach</li>
-              <li>Unlimited re-audits until you hit 90+</li>
-              <li>30-day interviews-or-refund guarantee</li>
-            </ul>
-            <button class="t-cta" onclick="clickTier('recipe', 79)">Get The Recipe →</button>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -1796,22 +1805,25 @@ function startLoading() {
   const headEl = document.getElementById('loading-headline');
   const subEl = document.getElementById('loading-sub');
   const fillEl = document.getElementById('progress-fill');
-  const signalsEl = document.getElementById('stat-signals');
-  const elapsedEl = document.getElementById('stat-elapsed');
   loadingStart = Date.now();
   loadingTimers.forEach(clearTimeout);
   loadingTimers = LOADING_STAGES.map(stage =>
     setTimeout(() => {
-      headEl.innerHTML = stage.head + '<span class="dot"></span>';
-      subEl.textContent = stage.sub;
+      // Cross-fade both text elements so stage changes feel intentional
+      headEl.classList.add('fade');
+      subEl.classList.add('fade');
+      setTimeout(() => {
+        headEl.textContent = stage.head;
+        subEl.textContent = stage.sub;
+        headEl.classList.remove('fade');
+        subEl.classList.remove('fade');
+      }, 240);
     }, stage.at)
   );
   const tick = () => {
     const elapsed = Date.now() - loadingStart;
     const pct = Math.min(94, (elapsed / ESTIMATED_MS) * 94);
     fillEl.style.width = pct + '%';
-    signalsEl.textContent = Math.floor((elapsed / ESTIMATED_MS) * 48);
-    elapsedEl.textContent = Math.floor(elapsed / 1000);
     loadingRAF = requestAnimationFrame(tick);
   };
   loadingRAF = requestAnimationFrame(tick);
@@ -1834,10 +1846,28 @@ function skipLoading() {
 // ================================================
 // SUBMIT
 // ================================================
+function clearFormError() {
+  const inp = document.getElementById('username');
+  const err = document.getElementById('form-error');
+  if (inp && inp.classList.contains('error')) inp.classList.remove('error');
+  if (err && err.classList.contains('on')) err.classList.remove('on');
+}
+function fireFormError() {
+  const inp = document.getElementById('username');
+  const err = document.getElementById('form-error');
+  if (!inp) return;
+  inp.classList.remove('error');
+  // Force reflow so animation replays on repeated attempts
+  void inp.offsetWidth;
+  inp.classList.add('error');
+  if (err) err.classList.add('on');
+  inp.focus();
+}
+
 async function submitAudit(e) {
   e.preventDefault();
   const username = document.getElementById('username').value.trim();
-  if (!username) { document.getElementById('username').focus(); return false; }
+  if (!username) { fireFormError(); return false; }
   document.getElementById('submit-btn').disabled = true;
   const mockBadge = document.getElementById('mock-badge');
   mockBadge.classList.toggle('hidden', state.prod);
@@ -2159,7 +2189,7 @@ function renderReport(data, isMock) {
 
   document.getElementById('pager-mock-lbl').classList.toggle('hidden', !isMock);
 
-  // 01 Subject
+  // 01 Verdict — subject + score + rank + summary
   document.getElementById('r-name').textContent = profile.fullname || 'Unknown';
   document.getElementById('r-headline').textContent = profile.headline || '';
   const avatarEl = document.getElementById('r-avatar');
@@ -2171,42 +2201,15 @@ function renderReport(data, isMock) {
     img.alt = '';
     avatarEl.appendChild(img);
   }
-  const statsEl = document.getElementById('r-stats');
-  statsEl.innerHTML = '';
-  const stats = [];
-  if (audit.role_detected) stats.push(audit.role_detected);
-  if (profile.current_company) stats.push(profile.current_company);
-  if (profile.location) stats.push(profile.location.split(',')[0]);
-  if (profile.follower_count) stats.push(profile.follower_count.toLocaleString() + ' followers');
-  stats.forEach(s => {
-    const el = document.createElement('span');
-    el.className = 'stat-item';
-    el.textContent = s;
-    statsEl.appendChild(el);
-  });
 
-  // Score
   const scoreEl = document.getElementById('r-score');
   scoreEl.dataset.target = String(audit.score ?? 0);
   scoreEl.textContent = String(audit.score ?? 0);
 
-  // Rank
   document.getElementById('r-percentile').textContent = (audit.benchmark?.percentile || '—').toUpperCase();
   document.getElementById('r-reason').textContent = audit.benchmark?.reasoning || '';
 
-  // Summary
   document.getElementById('r-summary').textContent = audit.summary || '';
-
-  // Top good — displayed on the consolidated Verdict slide
-  const wins = (audit.findings || []).filter(f => f.severity === 'good');
-  const topGood = wins[0];
-  if (topGood) {
-    document.getElementById('r-top-good-title').textContent = topGood.title || '';
-    document.getElementById('r-top-good-body').textContent = topGood.description || '';
-    document.getElementById('r-top-good').style.display = '';
-  } else {
-    document.getElementById('r-top-good').style.display = 'none';
-  }
 
   // 06 Worst
   const nonGood = (audit.findings || []).filter(f => f.severity !== 'good');
@@ -2275,32 +2278,24 @@ function renderReport(data, isMock) {
   document.getElementById('math-now').textContent = score;
   document.getElementById('math-after').textContent = target + '+';
 
-  // Value table (Fix Kit) — pull findings, group them, mark 3 as unlocked
+  // Fix Kit — 5 rows only: 2 unlocked (already yours) + 3 locked (Recipe-only)
   registerCopy('promo-code', 'ROAST');
   const fixTable = document.getElementById('r-fix-table');
-  // Clear rows except the header
-  Array.from(fixTable.querySelectorAll('.fix-row:not(.fix-row-head)')).forEach(n => n.remove());
+  Array.from(fixTable.querySelectorAll('.fix-row')).forEach(n => n.remove());
 
-  const allFindings = (audit.findings || []).filter(f => f.severity !== 'good');
-  const findingsBySection = {};
-  allFindings.forEach(f => {
-    const key = (f.section || 'Other').toLowerCase();
-    findingsBySection[key] = f;
+  const bySection = {};
+  (audit.findings || []).filter(f => f.severity !== 'good').forEach(f => {
+    const k = (f.section || 'Other').toLowerCase();
+    if (!bySection[k]) bySection[k] = f;
   });
 
-  const rows = [];
-  // Free tier fixes (unlocked) — map to specific findings if present
-  if (findingsBySection.headline) rows.push({ flaw: findingsBySection.headline.title, fix: 'Rewritten headline', unlocked: true });
-  if (findingsBySection.about)    rows.push({ flaw: findingsBySection.about.title,    fix: 'Rewritten About paragraph', unlocked: true });
-  if (findingsBySection.experience) rows.push({ flaw: findingsBySection.experience.title, fix: 'Top 3 rewritten bullets', unlocked: true });
-  // Locked (Recipe-only)
-  if (findingsBySection.featured)      rows.push({ flaw: findingsBySection.featured.title, fix: '5 Featured post drafts', unlocked: false });
-  if (findingsBySection.skills || findingsBySection.headline) rows.push({ flaw: 'Missing recruiter-search keywords', fix: 'Skills gap analysis', unlocked: false });
-  if (findingsBySection.recommendations) rows.push({ flaw: findingsBySection.recommendations.title, fix: 'Recommendation request templates', unlocked: false });
-  // Universal Recipe extras
-  rows.push({ flaw: 'Bullets outside the top 3 stay generic', fix: 'Every bullet rewritten in STAR format', unlocked: false });
-  rows.push({ flaw: 'You can\'t track progress after edits',   fix: 'Unlimited re-audits until 90+', unlocked: false });
-  rows.push({ flaw: 'No shareable record of the audit',        fix: 'Downloadable PDF report', unlocked: false });
+  const rows = [
+    { flaw: bySection.headline?.title || 'Generic headline',           fix: 'Rewritten',       unlocked: true },
+    { flaw: bySection.about?.title    || 'Weak About paragraph',       fix: 'Rewritten',       unlocked: true },
+    { flaw: 'Every experience bullet',                                  fix: 'STAR-rewritten',  unlocked: false },
+    { flaw: bySection.featured?.title || 'Featured section',            fix: '5 post drafts',   unlocked: false },
+    { flaw: 'Recommendation templates + skills gap + PDF report',       fix: 'Included',        unlocked: false },
+  ];
 
   rows.forEach(row => {
     const div = document.createElement('div');

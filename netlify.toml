@@ -37,14 +37,27 @@
   to = "/index.html"
   status = 404
 
-# Kill infra-identifying headers where possible. Netlify still sets a few of
-# its own (server: Netlify), which cannot be removed on this plan without an
-# enterprise-tier reverse proxy. Best effort:
+# Baseline security + crawler headers. Netlify still emits `server: Netlify`
+# and `x-nf-request-id` which cannot be suppressed without a proxy tier.
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Robots-Tag = "index, follow"
+    X-Robots-Tag = "index, follow, max-image-preview:large, max-snippet:-1"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     X-Frame-Options = "DENY"
+
+# Serve the AI-crawler surfaces with the correct MIME type so LLM bots
+# understand they're getting machine-readable content.
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=600"
+
+[[headers]]
+  for = "/llms-full.txt"
+  [headers.values]
+    Content-Type = "text/markdown; charset=utf-8"
+    Cache-Control = "public, max-age=600"
