@@ -18,7 +18,13 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { runAudit, parseUsername } from './lib/audit.mjs';
+import {
+  fetchProfile,
+  runFastStage,
+  runRewritesStage,
+  projectProfile,
+  parseUsername,
+} from './lib/audit.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = join(__dirname, 'public');
@@ -112,19 +118,49 @@ async function handleAnalyzeStart(req, res) {
 
 async function runAuditAsync(jobId, username, targetRole) {
   const t0 = Date.now();
+  const provider = ANTHROPIC_API_KEY ? 'anthropic' : 'gemini';
+  const opts = {
+    anthropicKey: ANTHROPIC_API_KEY,
+    geminiKey: GEMINI_API_KEY,
+    claudeModel: CLAUDE_MODEL,
+    geminiModel: GEMINI_MODEL,
+  };
+  console.log(`[analyze:start] ${jobId.slice(0, 8)}… ${username}`);
   try {
-    console.log(`[analyze:start] ${jobId.slice(0, 8)}… ${username}`);
-    const result = await runAudit({
-      username,
-      targetRole,
-      apifyToken: APIFY_TOKEN,
-      anthropicKey: ANTHROPIC_API_KEY,
-      geminiKey: GEMINI_API_KEY,
-      claudeModel: CLAUDE_MODEL,
-      geminiModel: GEMINI_MODEL,
+    const rawProfile = await fetchProfile(username, APIFY_TOKEN);
+    const profile = projectProfile(rawProfile);
+    const tScrape = Date.now() - t0;
+    setJob(jobId, { status: 'scrape_done', profile, createdAt: t0, timing_ms: { scrape: tScrape } });
+
+    const fastPromise = runFastStage(rawProfile, targetRole, opts);
+    const rewritesPromise = runRewritesStage(rawProfile, targetRole, opts);
+
+    fastPromise.then(fast => {
+      const tFast = Date.now() - t0;
+      const current = getJob(jobId) || {};
+      if (current.status !== 'done' && current.status !== 'error') {
+        setJob(jobId, {
+          status: 'fast_done',
+          profile,
+          audit: { ...fast, rewrites: null },
+          timing_ms: { ...(current.timing_ms || {}), scrape: tScrape, fast: tFast },
+          provider,
+        });
+        console.log(`[analyze:fast] ${jobId.slice(0, 8)}… ${tFast}ms score=${fast.score}`);
+      }
+    }).catch(() => {});
+
+    const [fast, rewrites] = await Promise.all([fastPromise, rewritesPromise]);
+    const tTotal = Date.now() - t0;
+    setJob(jobId, {
+      status: 'done',
+      profile,
+      audit: { ...fast, rewrites },
+      timing_ms: { scrape: tScrape, llm: tTotal - tScrape, total: tTotal },
+      provider,
+      completedAt: Date.now(),
     });
-    setJob(jobId, { status: 'done', result, completedAt: Date.now() });
-    console.log(`[analyze:done] ${jobId.slice(0, 8)}… ${Date.now() - t0}ms score=${result.audit.score}`);
+    console.log(`[analyze:done] ${jobId.slice(0, 8)}… ${tTotal}ms score=${fast.score}`);
   } catch (err) {
     setJob(jobId, { status: 'error', error: err?.message || 'Unknown error', completedAt: Date.now() });
     console.error(`[analyze:err] ${jobId.slice(0, 8)}… ${err?.message}`);
@@ -152,7 +188,6 @@ const server = createServer(async (req, res) => {
   if (req.method === 'GET' && url.pathname === '/')                return serveStatic(res, 'index.html',     'text/html; charset=utf-8');
   if (req.method === 'GET' && url.pathname === '/terms')           return serveStatic(res, 'terms.html',     'text/html; charset=utf-8');
   if (req.method === 'GET' && url.pathname === '/privacy')         return serveStatic(res, 'privacy.html',   'text/html; charset=utf-8');
-  if (req.method === 'GET' && url.pathname === '/wireframe')       return serveStatic(res, 'wireframe.html', 'text/html; charset=utf-8');
   if (req.method === 'POST' && url.pathname === '/analyze')        return handleAnalyzeStart(req, res);
   if (req.method === 'GET' && url.pathname === '/analyze-status')  return handleAnalyzeStatus(req, res, url);
 

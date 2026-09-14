@@ -4,63 +4,109 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy Policy — Roast My LinkedIn</title>
+<meta name="theme-color" content="#17130F">
 <style>
+  :root {
+    --bg: #17130F;
+    --ink: #080605;
+    --fg: #F1EBDF;
+    --fg-dim: rgba(241, 235, 223, 0.68);
+    --fg-faint: rgba(241, 235, 223, 0.42);
+    --amber: #D4A574;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
   body {
-    max-width: 720px; margin: 0 auto; padding: 40px 24px 80px;
-    background: #E85D45; color: #fff;
-    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
   }
-  a { color: #fff; }
-  h1 { font-weight: 800; font-size: 40px; letter-spacing: -0.03em; margin: 0 0 8px; }
-  h2 { font-weight: 700; font-size: 20px; margin: 36px 0 10px; letter-spacing: -0.01em; }
-  p { margin: 0 0 12px; color: rgba(255,255,255,0.86); }
-  ul { color: rgba(255,255,255,0.86); padding-left: 24px; margin: 0 0 12px; }
+  a { color: var(--amber); }
+  h1 {
+    font-weight: 800;
+    font-size: clamp(32px, 7vw, 44px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin: 0 0 12px;
+  }
+  h2 {
+    font-weight: 700;
+    font-size: clamp(17px, 3.6vw, 20px);
+    margin: 34px 0 10px;
+    letter-spacing: -0.015em;
+  }
+  p, ul { margin: 0 0 12px; color: var(--fg-dim); font-size: clamp(15px, 3.6vw, 16px); }
+  ul { padding-left: 22px; }
   li { margin-bottom: 6px; }
-  .meta { font-family: ui-monospace, "SF Mono", monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .back { display: inline-block; margin-top: 40px; font-weight: 700; padding: 12px 20px; background: #fff; color: #C7452F; text-decoration: none; }
+  code { font-family: ui-monospace, monospace; font-size: 13px; padding: 2px 6px; background: rgba(212,165,116,0.14); color: var(--amber); border-radius: 2px; }
+  .meta {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    margin-bottom: 24px;
+  }
+  .back {
+    display: inline-block;
+    margin-top: 44px;
+    padding: 14px 22px;
+    background: var(--amber);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  @media (min-width: 640px) {
+    body { padding: 44px 24px 100px; }
+  }
 </style>
 </head>
 <body>
-  <div class="meta">Last updated · 2026-09-11</div>
+  <div class="meta">Last updated · 2026-09-14</div>
   <h1>Privacy Policy</h1>
+
+  <h2>Data controller</h2>
+  <p>The data controller is <strong>Andrii Bobchuk</strong>, based in Warsaw, Poland. Contact: <a href="mailto:andriybobchuk@gmail.com">andriybobchuk@gmail.com</a>.</p>
 
   <h2>What we collect</h2>
   <ul>
     <li>The LinkedIn username or URL you submit</li>
-    <li>The public profile data returned about that URL by our data provider</li>
-    <li>Your email address, if you choose to give us one for delivery of the paid report</li>
-    <li>Basic technical logs (IP, user agent, timestamps) for security and abuse prevention</li>
+    <li>Public profile data returned about that URL by our data provider (headline, About, experience, skills, activity, publications, patents, and similar public fields)</li>
+    <li>Your email address, if you provide one for delivery of a paid report</li>
+    <li>Basic technical logs (IP, user agent, timestamps) for security and abuse prevention — retained 30 days</li>
     <li>Payment details are handled entirely by Stripe. We never see your card.</li>
   </ul>
 
   <h2>What we don't collect</h2>
-  <p>We do not collect your LinkedIn login credentials. We do not log into LinkedIn on your behalf. We do not use tracking pixels, third-party advertising cookies, or session replay tools.</p>
+  <p>We do not collect your LinkedIn login credentials. We do not log into LinkedIn on your behalf. We do not use tracking pixels, third-party advertising cookies, or session-replay tools.</p>
 
   <h2>Third-party subprocessors</h2>
   <ul>
     <li><strong>Apify</strong> — retrieves the public LinkedIn profile data. See <a href="https://apify.com/privacy-policy" target="_blank" rel="noopener">Apify's privacy policy</a>.</li>
-    <li><strong>Google (Gemini) / Anthropic (Claude)</strong> — generates the audit and rewrites. Profile data is sent to these providers for analysis. See <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Google's</a> and <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Anthropic's</a> policies.</li>
+    <li><strong>Google (Gemini)</strong> and/or <strong>Anthropic (Claude)</strong> — generate the audit and rewrites. Profile data is sent to whichever provider is configured, for the analysis request only. See <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Google's</a> and <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Anthropic's</a> policies.</li>
+    <li><strong>Netlify</strong> — hosts the site and the job store used to hand off analysis state. See <a href="https://www.netlify.com/privacy/" target="_blank" rel="noopener">Netlify's privacy policy</a>.</li>
     <li><strong>Stripe</strong> — payment processing. See <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's privacy policy</a>.</li>
   </ul>
 
   <h2>How long we keep it</h2>
-  <p>Public profile data is stored in memory during your audit and discarded within 24 hours unless you purchased a report, in which case we retain the audit for 90 days so you can re-access it. Email addresses are retained until you unsubscribe or request deletion.</p>
+  <p>Public profile data is stored in the job queue (Netlify Blobs) during your audit and discarded within 24 hours unless you purchase a report, in which case we retain the audit for 90 days so you can re-access it. Email addresses (paid customers) are retained until you unsubscribe or request deletion.</p>
 
   <h2>Cookies</h2>
-  <p>Our current build sets no cookies at all. When we add analytics, we will use only strictly-necessary and analytics cookies. You will be prompted to accept or reject non-essential cookies before any are set. Your choice is stored in <code>localStorage</code> and you can change it at any time via the "Cookies" link in our footer.</p>
+  <p>Our current build sets <strong>no cookies at all</strong>. If we add analytics later, we will use only strictly-necessary and analytics cookies and prompt you to accept or reject non-essential ones.</p>
 
-  <h2>Your rights (GDPR)</h2>
-  <p>If you are in the EU or UK, you have the right to access, correct, or delete your personal data, to withdraw consent for processing, to receive your data in a portable format, and to lodge a complaint with your national data protection authority (in Poland: UODO). Contact us to exercise any of these rights.</p>
-  <p>If you are the subject of a profile someone else analyzed and you want the record deleted, email us with the LinkedIn URL and we'll purge it within 30 days.</p>
-
-  <h2 id="ccpa">Your rights (CCPA — California residents)</h2>
-  <p>You have the right to know what personal information we collect, request deletion, opt out of any "sale" or "sharing" of your personal information, and not be discriminated against for exercising these rights.</p>
-  <p><strong>Do we sell or share your data?</strong> No. We do not sell your personal information and we do not share it for cross-context behavioral advertising. To formally register a "Do Not Sell / Share My Data" preference, email us at <a href="mailto:hello@roastmylinkedin.net">hello@roastmylinkedin.net</a> with the subject line "CCPA opt-out".</p>
+  <h2>Your rights under the GDPR</h2>
+  <p>If you are in the EU, UK, or another jurisdiction that recognizes similar rights, you have the right to access, correct, or delete your personal data; to withdraw consent for processing; to receive your data in a portable format; and to lodge a complaint with your national data protection authority (in Poland: <a href="https://uodo.gov.pl" target="_blank" rel="noopener">UODO</a>). Contact us to exercise any of these rights.</p>
+  <p>If you are the subject of a profile that someone else analyzed and you want the record deleted, email us with the LinkedIn URL and we will purge it within 30 days.</p>
 
   <h2>Contact</h2>
-  <p><a href="mailto:hello@roastmylinkedin.net">hello@roastmylinkedin.net</a></p>
+  <p><a href="mailto:andriybobchuk@gmail.com">andriybobchuk@gmail.com</a></p>
 
   <a class="back" href="/">← Back to the roast</a>
 </body>

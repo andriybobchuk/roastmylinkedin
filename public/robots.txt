@@ -3,6 +3,6 @@ Allow: /
 
 Disallow: /analyze
 Disallow: /analyze-status
-Disallow: /wireframe
+Disallow: /.netlify/
 
 Sitemap: https://roastmylinkedin.net/sitemap.xml

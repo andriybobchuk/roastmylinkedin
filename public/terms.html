@@ -4,52 +4,106 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terms of Service — Roast My LinkedIn</title>
+<meta name="theme-color" content="#17130F">
 <style>
+  :root {
+    --bg: #17130F;
+    --ink: #080605;
+    --fg: #F1EBDF;
+    --fg-dim: rgba(241, 235, 223, 0.68);
+    --fg-faint: rgba(241, 235, 223, 0.42);
+    --amber: #D4A574;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
   body {
-    max-width: 720px; margin: 0 auto; padding: 40px 24px 80px;
-    background: #E85D45; color: #fff;
-    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
   }
-  a { color: #fff; }
-  h1 { font-weight: 800; font-size: 40px; letter-spacing: -0.03em; margin: 0 0 8px; }
-  h2 { font-weight: 700; font-size: 20px; margin: 36px 0 10px; letter-spacing: -0.01em; }
-  p { margin: 0 0 12px; color: rgba(255,255,255,0.86); }
-  .meta { font-family: ui-monospace, "SF Mono", monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .back { display: inline-block; margin-top: 40px; font-weight: 700; padding: 12px 20px; background: #fff; color: #C7452F; text-decoration: none; }
+  a { color: var(--amber); }
+  h1 {
+    font-weight: 800;
+    font-size: clamp(32px, 7vw, 44px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin: 0 0 12px;
+  }
+  h2 {
+    font-weight: 700;
+    font-size: clamp(17px, 3.6vw, 20px);
+    margin: 34px 0 10px;
+    letter-spacing: -0.015em;
+  }
+  p, ul { margin: 0 0 12px; color: var(--fg-dim); font-size: clamp(15px, 3.6vw, 16px); }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .meta {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    margin-bottom: 24px;
+  }
+  .back {
+    display: inline-block;
+    margin-top: 44px;
+    padding: 14px 22px;
+    background: var(--amber);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  @media (min-width: 640px) {
+    body { padding: 44px 24px 100px; }
+  }
 </style>
 </head>
 <body>
-  <div class="meta">Last updated · 2026-09-11</div>
+  <div class="meta">Last updated · 2026-09-14</div>
   <h1>Terms of Service</h1>
 
-  <h2>1. What this is</h2>
-  <p>Roast My LinkedIn ("the Service") is an AI-generated audit tool that analyzes public LinkedIn profile data and returns a score, findings, and rewrite suggestions. It is provided as-is, with no guarantees about your job search outcomes.</p>
+  <h2>1. Operator</h2>
+  <p>Roast My LinkedIn is operated by <strong>Andrii Bobchuk</strong>, based in Warsaw, Poland. Reach us at <a href="mailto:andriybobchuk@gmail.com">andriybobchuk@gmail.com</a>.</p>
 
-  <h2>2. Who can use it</h2>
-  <p>You must be at least 16 years old. You may only submit a LinkedIn URL you own, or one that is publicly visible and you have a legitimate reason to analyze (yourself, a client, your team member with permission). Do not use the Service to analyze profiles for stalking, harassment, or discriminatory hiring practices.</p>
+  <h2>2. What this is</h2>
+  <p>An AI-generated audit tool that analyzes public LinkedIn profile data and returns a score, findings, and rewrite suggestions. It is provided as-is, with no guarantees about your job-search outcomes.</p>
 
-  <h2>3. LinkedIn's role</h2>
-  <p>LinkedIn is a trademark of LinkedIn Corporation. This Service is not affiliated with, endorsed by, or sponsored by LinkedIn. We access only publicly visible profile information via third-party data providers. If you object to your profile being analyzed via this Service, contact us and we will exclude it.</p>
+  <h2>3. Who can use it</h2>
+  <p>You must be at least 16 years old. You may submit a LinkedIn URL you own, or one that is publicly visible and you have a legitimate reason to analyze (yourself, a coaching client, a team member with permission). Do not use the Service to analyze profiles for stalking, harassment, discriminatory hiring, or any purpose prohibited by law.</p>
 
-  <h2>4. Payment and refunds</h2>
-  <p>Free audits are limited per session. Paid audits are one-time purchases delivered instantly. We offer a 30-day money-back guarantee: if you're not satisfied for any reason, email us and we'll refund you. No questions.</p>
+  <h2>4. LinkedIn's role</h2>
+  <p>LinkedIn is a trademark of LinkedIn Corporation. This Service is not affiliated with, endorsed by, or sponsored by LinkedIn. We access only publicly visible profile information via third-party data providers. If you object to your profile being analyzed via this Service, contact us and we will exclude it and delete any retained data.</p>
 
-  <h2>5. Content ownership</h2>
-  <p>The rewritten copy we generate is yours to use however you want. We do not retain rights to your rewritten headline, About section, or bullets. We may retain the raw scoring and analysis for product improvement, anonymized.</p>
+  <h2>5. Payment and refunds</h2>
+  <p>Paid audits are one-time purchases (79 zł, or 49 zł with promo code ROAST). Payment is processed by Stripe. We offer a <strong>30-day money-back guarantee</strong>: if you're not satisfied for any reason, email us and we refund you. No questions.</p>
+  <p>EU consumers additionally have a 14-day right of withdrawal under Polish and EU consumer law, unless you explicitly agree to immediate delivery of digital content and waive that right (standard for on-demand digital purchases).</p>
 
-  <h2>6. Accuracy disclaimer</h2>
+  <h2>6. Content ownership</h2>
+  <p>The rewritten copy we generate is <strong>yours</strong> to use however you want. We claim no rights to your rewritten headline, About section, or bullets. We may retain the raw scoring and analysis in anonymized form for product improvement.</p>
+
+  <h2>7. Accuracy disclaimer</h2>
   <p>Our scores and findings are generated by large language models. They are opinions, not facts. Do not rely on them as the sole basis for career decisions. We do not guarantee interviews, offers, salary changes, or any specific outcome.</p>
 
-  <h2>7. Limitation of liability</h2>
-  <p>To the fullest extent permitted by law, our total liability for any claim is limited to the amount you paid us in the last 12 months.</p>
+  <h2>8. Limitation of liability</h2>
+  <p>To the fullest extent permitted by Polish law, our total liability for any claim arising from your use of the Service is limited to the amount you paid us in the last 12 months (or 100 zł if you have not paid).</p>
 
-  <h2>8. Changes</h2>
-  <p>We may update these terms. Continued use after updates constitutes acceptance.</p>
+  <h2>9. Governing law</h2>
+  <p>These Terms are governed by the law of the Republic of Poland. Any dispute you cannot resolve with us directly may be brought before the competent Polish court where the operator resides, or through the EU Online Dispute Resolution platform at <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</p>
 
-  <h2>9. Contact</h2>
-  <p><a href="mailto:hello@roastmylinkedin.net">hello@roastmylinkedin.net</a></p>
+  <h2>10. Changes</h2>
+  <p>We may update these Terms. Continued use after updates constitutes acceptance. Material changes will be announced on this page with a new "Last updated" date.</p>
+
+  <h2>11. Contact</h2>
+  <p><a href="mailto:andriybobchuk@gmail.com">andriybobchuk@gmail.com</a></p>
 
   <a class="back" href="/">← Back to the roast</a>
 </body>

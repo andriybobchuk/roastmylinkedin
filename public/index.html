@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roast My LinkedIn — a brutally honest audit for engineers</title>
 <meta name="description" content="A harsh, AI-generated roast of your LinkedIn profile. Free. 30 seconds. No signup. Built for engineers.">
-<meta name="theme-color" content="#E85D45">
+<meta name="theme-color" content="#17130F">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
 
 <!-- Open Graph -->
@@ -22,18 +22,19 @@
 
 <style>
   :root {
-    --bg: #E85D45;
-    --bg-dark: #C7452F;
-    --bg-deep: #A93A28;
-    --ink: #141414;
-    --amber: #FFAB00;       /* spice — hot saffron */
-    --amber-hot: #FF6B00;   /* fire orange */
-    --fg: #FFFFFF;
-    --fg-dim: rgba(255, 255, 255, 0.72);
-    --fg-faint: rgba(255, 255, 255, 0.45);
-    --fg-ghost: rgba(255, 255, 255, 0.22);
-    --input-bg: rgba(255, 255, 255, 0.12);
-    --input-bg-focus: rgba(255, 255, 255, 0.22);
+    /* Premium "steak & whisky" palette — matte espresso + warm ivory + champagne gold */
+    --bg: #17130F;          /* matte espresso — reads black with warmth */
+    --bg-dark: #0B0806;     /* deeper for cards */
+    --bg-deep: #050403;
+    --ink: #080605;
+    --amber: #D4A574;       /* champagne / aged brass — the "expensive" note */
+    --amber-hot: #E0492B;   /* burnt sienna — for heat moments (verdict badge, hot fixes) */
+    --fg: #F1EBDF;          /* warm ivory */
+    --fg-dim: rgba(241, 235, 223, 0.68);
+    --fg-faint: rgba(241, 235, 223, 0.42);
+    --fg-ghost: rgba(241, 235, 223, 0.14);
+    --input-bg: rgba(241, 235, 223, 0.06);
+    --input-bg-focus: rgba(241, 235, 223, 0.14);
     --ease: cubic-bezier(0.85, 0, 0.15, 1);
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
     --sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Helvetica Neue", "Poppins", Arial, sans-serif;
@@ -350,19 +351,26 @@
     justify-content: center;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(60px) scale(0.98);
-    transition: opacity 700ms var(--ease), transform 700ms var(--ease);
+    transform: translateY(140px) scale(0.94);
+    filter: blur(6px);
+    transition:
+      opacity 820ms var(--ease),
+      transform 820ms var(--ease),
+      filter 820ms var(--ease);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
   .page.current {
     opacity: 1;
     transform: translateY(0) scale(1);
+    filter: blur(0);
     pointer-events: auto;
+    transition-delay: 90ms;
   }
   .page.past {
     opacity: 0;
-    transform: translateY(-60px) scale(0.98);
+    transform: translateY(-140px) scale(0.94);
+    filter: blur(6px);
   }
   .page.invert {
     background: var(--fg);
@@ -478,7 +486,7 @@
     overflow: hidden;
     margin: 0 auto 26px;
     border: 3px solid var(--fg);
-    box-shadow: 6px 6px 0 rgba(0,0,0,0.16);
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.6);
   }
   .subject-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .subject-name {
@@ -556,7 +564,7 @@
     padding: 26px 22px;
     background: var(--fg);
     color: var(--bg-dark);
-    box-shadow: 8px 8px 0 rgba(0,0,0,0.14);
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.55);
     margin-bottom: 28px;
   }
   @media (min-width: 640px) {
@@ -692,7 +700,7 @@
     color: var(--ink);
     padding: 4px 0;
     margin: 20px 0 28px;
-    box-shadow: 10px 10px 0 rgba(0,0,0,0.16);
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.6);
     border-left: 4px solid var(--amber);
   }
   .fix-row {
@@ -728,8 +736,8 @@
   }
   .fix-row.locked .fix-solution { color: var(--ink); opacity: 0.72; }
   .fix-row.locked .fix-solution::before { content: "🔒 "; margin-right: 4px; }
-  .fix-row.unlocked .fix-solution::before { content: "✓ "; color: #1e6b3a; margin-right: 4px; font-weight: 900; }
-  .fix-row.unlocked { background: rgba(30,107,58,0.06); }
+  .fix-row.unlocked .fix-solution::before { content: "✓ "; color: #4A7C59; margin-right: 4px; font-weight: 900; }
+  .fix-row.unlocked { background: rgba(74,124,89,0.09); }
 
   .fix-time {
     text-align: center;
@@ -796,7 +804,7 @@
     font-size: 20px;
     letter-spacing: 0.28em;
     line-height: 1;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.16);
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
   }
   .fix-promo .copy-btn { padding: 12px 16px; font-size: 12px; }
   .fix-cta {
@@ -864,7 +872,7 @@
     letter-spacing: -0.03em;
     line-height: 1;
     margin-bottom: 32px;
-    box-shadow: 8px 8px 0 rgba(0,0,0,0.16);
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.6);
     transform-origin: center;
   }
   .rank-body {
@@ -945,7 +953,7 @@
     background: var(--fg);
     color: var(--bg-dark);
     padding: 32px 26px 28px;
-    box-shadow: 10px 10px 0 rgba(0,0,0,0.18);
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.65);
     margin-top: 12px;
     max-width: 620px;
     position: relative;
@@ -979,7 +987,7 @@
   .worst-body {
     font-weight: 500;
     font-size: 16px;
-    color: rgba(199,69,47,0.85);
+    color: rgba(11,8,6,0.68);
     line-height: 1.5;
     max-width: 52ch;
   }
@@ -1053,7 +1061,7 @@
     background: var(--fg);
     color: var(--bg-dark);
     padding: 28px 24px;
-    box-shadow: 10px 10px 0 rgba(0,0,0,0.18);
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.65);
     font-weight: 600;
     font-size: clamp(17px, 2.4vw, 22px);
     line-height: 1.4;
@@ -1074,7 +1082,7 @@
     background: var(--fg);
     color: var(--bg-dark);
     padding: 20px 24px 12px;
-    box-shadow: 10px 10px 0 rgba(0,0,0,0.18);
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.65);
     border-left: 4px solid var(--amber);
   }
   .rw-bullet {
@@ -1082,7 +1090,7 @@
     grid-template-columns: 1fr auto;
     gap: 14px;
     padding: 16px 0;
-    border-top: 1px solid rgba(199,69,47,0.18);
+    border-top: 1px solid rgba(11,8,6,0.12);
     align-items: start;
   }
   .rw-bullet:first-child { border-top: none; padding-top: 6px; }
@@ -1103,7 +1111,7 @@
     white-space: nowrap;
   }
   .copy-btn:hover { background: var(--bg-dark); color: var(--fg); }
-  .copy-btn.copied { background: #1e6b3a; color: var(--fg); }
+  .copy-btn.copied { background: #4A7C59; color: var(--fg); }
   .copy-btn.hero-copy {
     display: inline-block;
     margin-top: 24px;
@@ -1177,7 +1185,7 @@
   }
   .tier {
     padding: 26px 22px 22px;
-    background: rgba(0,0,0,0.14);
+    background: rgba(0,0,0,0.55);
     border: 1px solid var(--fg-ghost);
     position: relative;
     display: flex; flex-direction: column;
@@ -1186,7 +1194,7 @@
     background: var(--fg); color: var(--ink);
     border-color: var(--amber);
     transform: rotate(-0.6deg);
-    box-shadow: 10px 10px 0 rgba(0,0,0,0.18);
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.65);
     z-index: 2;
     padding-top: 34px;
   }
@@ -1199,7 +1207,7 @@
     font-size: 10px; font-weight: 800;
     letter-spacing: 0.2em; text-transform: uppercase;
     padding: 6px 10px;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.16);
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.6);
   }
   .tier .t-name {
     font-weight: 800; font-size: 22px;
@@ -1238,7 +1246,7 @@
     border-left: 3px solid var(--amber);
   }
   .tier.best .t-hero {
-    background: rgba(255, 201, 58, 0.16);
+    background: rgba(212, 165, 116, 0.14);
     color: var(--ink);
     font-weight: 600;
   }
@@ -1655,22 +1663,12 @@
 </section>
 
 <!-- ============================================ -->
-<!-- WAITLIST                                      -->
+<!-- CHECKOUT REDIRECT                            -->
 <!-- ============================================ -->
-<section id="section-waitlist" class="stage hidden">
-  <h1 class="waitlist-headline"><span id="wl-tier">The Recipe</span> isn't open yet.</h1>
-  <p class="waitlist-sub">We're finishing the paid tier. Drop your email and we'll open your slot in 48 hours — early list locks in <s style="opacity:0.6;">79 zł</s> at <strong style="color: var(--amber);">39 zł</strong> for life.</p>
-  <form onsubmit="return submitWaitlist(event)" class="waitlist-form">
-    <input type="email" id="wl-email" placeholder="you@example.com" required>
-    <button type="submit">Save my spot</button>
-  </form>
-  <p class="waitlist-note">You'll get one email when it opens. Nothing else.</p>
-  <a class="back-link" onclick="show('section-report'); return false;">← Back to my report</a>
-</section>
-
-<section id="section-thanks" class="stage hidden">
-  <h1 class="waitlist-headline">You're on the list.</h1>
-  <p class="waitlist-sub">We'll email <strong id="th-email"></strong> when your slot opens with the early-list discount code locked in.</p>
+<section id="section-checkout" class="stage hidden">
+  <h1 class="waitlist-headline">Opening secure checkout&hellip;</h1>
+  <p class="waitlist-sub">You'll be redirected to Stripe. If nothing happens in 3 seconds, tap the button below.</p>
+  <a class="plain-btn" id="checkout-fallback" href="#" target="_blank" rel="noopener">Open checkout →</a>
   <a class="back-link" onclick="show('section-report'); return false;">← Back to my report</a>
 </section>
 
@@ -1681,7 +1679,7 @@
   <div class="footer-links">
     <a href="/terms">Terms</a>
     <a href="/privacy">Privacy</a>
-    <a href="mailto:hello@roastmylinkedin.net">Contact</a>
+    <a href="mailto:andriybobchuk@gmail.com">Contact</a>
   </div>
   <div class="disclaimer">Not affiliated with LinkedIn.</div>
 </footer>
@@ -1755,7 +1753,7 @@ function updateSkipVisibility() {
 // ================================================
 const SECTIONS = [
   'section-form', 'section-loading', 'section-error',
-  'section-report', 'section-waitlist', 'section-thanks'
+  'section-report', 'section-checkout'
 ];
 function show(id) {
   SECTIONS.forEach(s => document.getElementById(s).classList.add('hidden'));
@@ -1785,16 +1783,13 @@ function reset() {
 // LOADING
 // ================================================
 const LOADING_STAGES = [
-  { at: 0,     head: 'Reading it',   sub: 'Fetching your public LinkedIn data.' },
-  { at: 2500,  head: 'Reading it',   sub: 'Parsing headline, About, experience.' },
-  { at: 5500,  head: 'Judging it',   sub: 'Comparing you to engineers who land offers.' },
-  { at: 9000,  head: 'Judging it',   sub: 'Weighing keyword density and quantified impact.' },
-  { at: 13500, head: 'Judging it',   sub: 'Auditing your posts. Are they on-brand for the job?' },
-  { at: 18000, head: 'Rewriting it', sub: 'Drafting a headline that would actually work.' },
-  { at: 23000, head: 'Rewriting it', sub: 'Rewriting your bullets in STAR format.' },
-  { at: 28000, head: 'Almost done',  sub: 'Adding the salt.' },
+  { at: 0,     head: 'Reading it', sub: 'Fetching your public LinkedIn data.' },
+  { at: 2000,  head: 'Reading it', sub: 'Parsing headline, About, experience.' },
+  { at: 4500,  head: 'Judging it', sub: 'Comparing you to engineers who land offers.' },
+  { at: 7000,  head: 'Judging it', sub: 'Weighing keyword density and quantified impact.' },
+  { at: 10000, head: 'Almost done', sub: 'Formatting the verdict.' },
 ];
-const ESTIMATED_MS = 32000;   // aligned with faster prompt
+const ESTIMATED_MS = 12000;  // fast stage target; rewrites arrive after
 let loadingTimers = [], loadingRAF = null, loadingStart = 0;
 
 function startLoading() {
@@ -1848,17 +1843,35 @@ async function submitAudit(e) {
   mockBadge.classList.toggle('hidden', state.prod);
   show('section-loading');
   startLoading();
-  try {
-    const data = state.prod
-      ? await realAudit(username)
-      : await mockAudit(username);
+
+  // Called the moment the fast Gemini call lands — jumps user to the Verdict
+  // slide while rewrites finish cooking in the background.
+  let jumped = false;
+  const revealPartial = (partial) => {
+    if (jumped) return;
+    jumped = true;
     stopLoading();
     mockBadge.classList.add('hidden');
-    renderReport(data, !state.prod);
+    renderReport(partial, !state.prod);
     show('section-report');
     initPager();
+  };
+
+  try {
+    if (state.prod) {
+      const data = await realAudit(username, revealPartial);
+      // Rewrites now available — patch the report in place
+      renderReport(data, !state.prod);
+    } else {
+      const data = await mockAudit(username);
+      stopLoading();
+      mockBadge.classList.add('hidden');
+      renderReport(data, !state.prod);
+      show('section-report');
+      initPager();
+    }
   } catch (err) {
-    stopLoading();
+    if (!jumped) stopLoading();
     mockBadge.classList.add('hidden');
     document.getElementById('error-text').textContent = err.message;
     show('section-error');
@@ -1870,12 +1883,15 @@ async function submitAudit(e) {
 // Async job flow — kick off audit, poll status until done or error.
 // Works both on Netlify (background function + Blobs) and locally
 // (in-memory job store in server.js).
-async function realAudit(username) {
+// realAudit progressively resolves:
+//   { partial: {...}, done: false }   as soon as the fast stage lands (~8-12s)
+//   { result: {...}, done: true }     when rewrites are also ready (~15-25s)
+// The onPartial callback is fired the moment we have enough to render the Verdict slide.
+async function realAudit(username, onPartial) {
   const jobId = (crypto.randomUUID?.() || Math.random().toString(36).slice(2) + Date.now().toString(36))
     .replace(/[^a-zA-Z0-9-]/g, '')
     .slice(0, 40);
 
-  // Kick off (server returns 202 immediately, work runs in background)
   const startResp = await fetch('/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1886,28 +1902,35 @@ async function realAudit(username) {
     throw new Error(err.error || `HTTP ${startResp.status}`);
   }
 
-  // Poll for result. 2s cadence, max ~150s total.
-  const POLL_MS = 2000;
-  const MAX_ATTEMPTS = 75;
+  const POLL_MS = 1500;
+  const MAX_ATTEMPTS = 100;
   let unknownStreak = 0;
+  let partialFired = false;
+
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     await new Promise(r => setTimeout(r, POLL_MS));
     let state;
     try {
-      const resp = await fetch(`/analyze-status?id=${encodeURIComponent(jobId)}`, {
-        cache: 'no-store',
-      });
+      const resp = await fetch(`/analyze-status?id=${encodeURIComponent(jobId)}`, { cache: 'no-store' });
       if (!resp.ok) continue;
       state = await resp.json();
-    } catch {
-      continue; // transient network hiccup — keep polling
-    }
-    if (state.status === 'done') return state.result;
+    } catch { continue; }
+
     if (state.status === 'error') throw new Error(state.error || 'Analysis failed');
+
+    if (state.status === 'fast_done' && !partialFired && onPartial) {
+      partialFired = true;
+      // Give the client the verdict + findings; rewrites will land shortly.
+      onPartial({ profile: state.profile, audit: state.audit, timing_ms: state.timing_ms, provider: state.provider });
+    }
+
+    if (state.status === 'done') {
+      return { profile: state.profile, audit: state.audit, timing_ms: state.timing_ms, provider: state.provider };
+    }
+
     if (state.status === 'unknown') {
       unknownStreak++;
-      // Job may have been evicted or never started. Give it ~30s of unknown before giving up.
-      if (unknownStreak > 15) throw new Error('Job lost — please try again');
+      if (unknownStreak > 20) throw new Error('Job lost — please try again');
     } else {
       unknownStreak = 0;
     }
@@ -1987,21 +2010,22 @@ async function copyText(btn, key) {
 }
 
 // ================================================
-// TIER → WAITLIST
+// TIER → STRIPE CHECKOUT
 // ================================================
+// Swap this URL to your live Stripe Payment Link for The Recipe (79 zł / 49 zł with promo).
+// Buy Buttons work too; anything that returns a hosted checkout URL.
+const CHECKOUT_URL_BASE = 'https://buy.stripe.com/test_ROAST_REPLACE_ME';
+
 function clickTier(tier, price) {
   state.currentTier = tier;
   state.currentPrice = price;
-  document.getElementById('wl-tier').textContent = 'The Recipe';
-  show('section-waitlist');
-}
-function submitWaitlist(e) {
-  e.preventDefault();
-  const email = document.getElementById('wl-email').value.trim();
-  if (!email || !email.includes('@')) return false;
-  document.getElementById('th-email').textContent = email;
-  show('section-thanks');
-  return false;
+  // Attach the promoted price + tier as query params for downstream analytics/prefill
+  const url = `${CHECKOUT_URL_BASE}?tier=${encodeURIComponent(tier)}&price=${price}`;
+  const fallback = document.getElementById('checkout-fallback');
+  fallback.href = url;
+  show('section-checkout');
+  // Try opening in a new tab immediately
+  setTimeout(() => { window.open(url, '_blank', 'noopener'); }, 250);
 }
 
 // ================================================
@@ -2067,7 +2091,7 @@ function goToPage(idx) {
         if (i !== pager.current) p.classList.remove('current');
       });
       pager.transitioning = false;
-    }, 750);
+    }, 950);
   });
 }
 function nextPage() { goToPage(pager.current + 1); }
@@ -2099,7 +2123,7 @@ function updateNextVisibility() {
 document.addEventListener('wheel', (e) => {
   if (document.getElementById('section-report').classList.contains('hidden')) return;
   const now = Date.now();
-  if (now - pager.wheelDebounce < 900) return;
+  if (now - pager.wheelDebounce < 1100) return;
   if (Math.abs(e.deltaY) < 12) return;
   pager.wheelDebounce = now;
   if (e.deltaY > 0) nextPage(); else prevPage();

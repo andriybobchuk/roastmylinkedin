@@ -1,8 +1,6 @@
 # Netlify config for Roast My LinkedIn.
 #
-# Free-tier compatible: uses background function + polling (avoids the 10s sync timeout).
-#
-# Deploy: connect this repo in Netlify, first push auto-deploys.
+# Uses background function + polling (Free-tier compatible: avoids the 10s sync timeout).
 #
 # Env vars to set in Netlify UI (Site → Environment variables):
 #   APIFY_TOKEN
@@ -38,3 +36,15 @@
   from = "/*"
   to = "/index.html"
   status = 404
+
+# Kill infra-identifying headers where possible. Netlify still sets a few of
+# its own (server: Netlify), which cannot be removed on this plan without an
+# enterprise-tier reverse proxy. Best effort:
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "index, follow"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    X-Frame-Options = "DENY"
