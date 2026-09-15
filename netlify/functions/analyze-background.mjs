@@ -96,14 +96,20 @@ export const handler = async (event) => {
   const APIFY_TOKEN = process.env.APIFY_TOKEN;
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
   const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
   const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
-  const provider = ANTHROPIC_API_KEY ? 'anthropic' : 'gemini';
+  const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  // Provider label recorded on the finished job. Chain order for fast/rewrites
+  // is Groq → Gemini → Anthropic, so label from the first configured one.
+  const provider = GROQ_API_KEY ? 'groq' : GEMINI_API_KEY ? 'gemini' : 'anthropic';
   const opts = {
     anthropicKey: ANTHROPIC_API_KEY,
     geminiKey: GEMINI_API_KEY,
+    groqKey: GROQ_API_KEY,
     claudeModel: CLAUDE_MODEL,
     geminiModel: GEMINI_MODEL,
+    groqModel: GROQ_MODEL,
   };
 
   const jobs = getStore('audit-jobs');

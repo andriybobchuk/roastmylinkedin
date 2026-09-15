@@ -14,7 +14,7 @@
 //   STRIPE_WEBHOOK_SECRET    Signing secret from the webhook endpoint
 //   RESEND_API_KEY           For sending the delivery email
 //   APIFY_TOKEN              (already set; only needed if we re-fetch)
-//   GEMINI_API_KEY or ANTHROPIC_API_KEY   For the LLM stage
+//   GROQ_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY   For the LLM stage
 
 import Stripe from 'stripe';
 import { connectLambda, getStore } from '@netlify/blobs';
@@ -82,8 +82,10 @@ export const handler = async (event) => {
       recipe = await runRecipeStage(audit.profile, audit.audit, '', {
         anthropicKey: process.env.ANTHROPIC_API_KEY,
         geminiKey: process.env.GEMINI_API_KEY,
+        groqKey: process.env.GROQ_API_KEY,
         claudeModel: process.env.CLAUDE_MODEL,
         geminiModel: process.env.GEMINI_MODEL,
+        groqModel: process.env.GROQ_MODEL,
       });
     } catch (err) {
       recipeError = err.message;
