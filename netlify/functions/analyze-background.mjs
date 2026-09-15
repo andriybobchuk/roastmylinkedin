@@ -24,7 +24,7 @@ import {
 // Rate limit helpers
 // ------------------------------------------------------------------
 const RATE_WINDOW_MS = 60 * 60 * 1000;  // 1 hour
-const RATE_LIMIT_PER_IP = 5;             // audits per window per IP
+const RATE_LIMIT_PER_IP = 100;           // audits per window per IP — bumped for testing
 
 function extractClientIp(event) {
   const h = event.headers || {};
