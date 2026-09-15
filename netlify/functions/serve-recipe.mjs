@@ -60,7 +60,7 @@ function renderError(title, message) {
 ${baseStyles()}
 </head><body class="err">
 <div class="wrap">
-  <div class="brand"><a href="/" style="color:inherit;text-decoration:none">RML</a></div>
+  <a class="brand" href="/" aria-label="Roast My LinkedIn — home">RoastMyLinkedIn</a>
   <h1>${esc(title)}</h1>
   <p>${esc(message)}</p>
   <a class="cta" href="/">← Back to the roast</a>
@@ -91,7 +91,7 @@ ${baseStyles()}
 </head><body>
 <div class="wrap">
   <header class="top">
-    <a class="brand" href="/">RML</a>
+    <a class="brand" href="/" aria-label="Roast My LinkedIn — home">RoastMyLinkedIn</a>
     <span class="stamp">The Recipe · unlocked</span>
   </header>
 
@@ -218,7 +218,8 @@ body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSyst
 body.err{display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:24px}
 .wrap{max-width:760px;margin:0 auto;padding:20px 20px 80px}
 .top{display:flex;justify-content:space-between;align-items:center;padding:8px 0 24px;border-bottom:1px solid rgba(241,235,223,.14);margin-bottom:32px}
-.brand{background:var(--ink);color:var(--fg);padding:9px 12px 8px;font-weight:900;font-size:14px;letter-spacing:.04em;line-height:1;display:inline-block;transform:rotate(-2.5deg);text-decoration:none}
+.brand{background:var(--ink);color:var(--fg);padding:9px 12px 8px;font-weight:900;font-size:14px;letter-spacing:-.01em;line-height:1;display:inline-block;transform:rotate(-2.5deg);text-decoration:none;transition:transform .15s ease}
+.brand:hover{transform:rotate(-1deg) translateY(-1px)}
 .stamp{font-family:ui-monospace,'SF Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:800}
 h1{font-size:clamp(30px,6vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:14px}
 .hero .lede{font-size:16px;color:var(--fg-dim);max-width:44ch;margin-bottom:20px}

@@ -19,7 +19,7 @@
   body {
     max-width: 720px;
     margin: 0 auto;
-    padding: 32px 20px 80px;
+    padding: 88px 20px 80px;
     background: var(--bg);
     color: var(--fg);
     font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
@@ -63,11 +63,32 @@
     letter-spacing: -0.01em;
   }
   @media (min-width: 640px) {
-    body { padding: 44px 24px 100px; }
+    body { padding: 96px 24px 100px; }
   }
+  .brand-logo {
+    position: fixed;
+    top: 18px;
+    left: 20px;
+    background: var(--ink);
+    color: var(--fg);
+    padding: 11px 14px 10px;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    transform: rotate(-2.5deg);
+    transform-origin: left center;
+    text-decoration: none;
+    white-space: nowrap;
+    z-index: 100;
+    transition: transform 0.15s ease;
+  }
+  .brand-logo:hover { transform: rotate(-1deg) translateY(-1px); }
+  .brand-logo .brand-li { color: inherit; }
 </style>
 </head>
 <body>
+  <a class="brand-logo" href="/" aria-label="Roast My LinkedIn — home">RoastMy<span class="brand-li">LinkedIn</span></a>
   <div class="meta">Last updated · 2026-09-14</div>
   <h1>Terms of Service</h1>
 

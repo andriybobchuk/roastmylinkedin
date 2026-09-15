@@ -71,9 +71,30 @@
     letter-spacing: -0.005em;
   }
   .cta:hover { background: var(--fg); }
+  .brand-logo {
+    position: fixed;
+    top: 18px;
+    left: 20px;
+    background: var(--ink);
+    color: var(--fg);
+    padding: 11px 14px 10px;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    transform: rotate(-2.5deg);
+    transform-origin: left center;
+    text-decoration: none;
+    white-space: nowrap;
+    z-index: 100;
+    transition: transform 0.15s ease;
+  }
+  .brand-logo:hover { transform: rotate(-1deg) translateY(-1px); }
+  .brand-logo .brand-li { color: inherit; }
 </style>
 </head>
 <body>
+  <a class="brand-logo" href="/" aria-label="Roast My LinkedIn — home">RoastMy<span class="brand-li">LinkedIn</span></a>
   <div class="wrap">
     <h1>No worries. Payment didn't go through.</h1>
     <p class="sub">Your free roast is still yours. If you change your mind, the code below knocks 20 zł off at checkout.</p>

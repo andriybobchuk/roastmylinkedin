@@ -246,7 +246,11 @@
     transform-origin: left center;
     white-space: nowrap;
     user-select: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.15s ease;
   }
+  .brand-logo:hover { transform: rotate(-1deg) translateY(-1px); }
   .brand-logo .brand-li { color: inherit; }
   @media (min-width: 640px) {
     .brand-logo { font-size: 18px; padding: 12px 16px 11px; }
@@ -600,18 +604,19 @@
     background: var(--ink);
     color: var(--fg);
     border: none;
-    padding: 9px 12px 8px;
+    padding: 10px 13px 9px;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 900;
-    letter-spacing: 0.04em;
+    letter-spacing: -0.01em;
     line-height: 1;
     cursor: pointer;
     transform: rotate(-2.5deg);
     transform-origin: left center;
     display: inline-block;
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
   }
-  .pager-back:hover { background: var(--amber); color: var(--ink); }
+  .pager-back:hover { transform: rotate(-1deg) translateY(-1px); background: var(--amber); color: var(--ink); }
   .pager-mock {
     font-family: var(--mono);
     font-size: 10px; font-weight: 700;
@@ -1485,7 +1490,7 @@
 <!-- TOP BAR (only visible outside report)        -->
 <!-- ============================================ -->
 <header class="topbar" id="topbar">
-  <div class="brand-logo">RoastMy<span class="brand-li">LinkedIn</span></div>
+  <a class="brand-logo" href="/" onclick="handleBrandClick(event)" aria-label="Roast My LinkedIn — home">RoastMy<span class="brand-li">LinkedIn</span></a>
   <label class="prod-toggle" id="prod-toggle" onclick="togglePROD(event)">
     <span class="switch"></span>
     <span class="status" id="prod-status">PROD OFF</span>
@@ -1587,7 +1592,7 @@
 
   <!-- Pager top bar -->
   <div class="pager-topbar">
-    <button class="pager-back" onclick="reset()" aria-label="Back to home">RML</button>
+    <button class="pager-back" onclick="reset()" aria-label="Roast My LinkedIn — back to home">RoastMyLinkedIn</button>
     <div class="pager-mock hidden" id="pager-mock-lbl">MOCK MODE</div>
   </div>
 
@@ -1843,6 +1848,17 @@ function reset() {
   document.getElementById('submit-btn').disabled = false;
   show('section-form');
   setTimeout(() => document.getElementById('username').focus(), 60);
+}
+
+// Brand-click: if already on landing, don't hard-reload — reset back to
+// the hero state and scroll to top. Full navigation only if we came from
+// elsewhere (defensive, since this page is SPA-style).
+function handleBrandClick(ev) {
+  if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+    ev.preventDefault();
+    try { reset(); } catch (e) { /* form may not exist mid-transition */ }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
 
 // ================================================

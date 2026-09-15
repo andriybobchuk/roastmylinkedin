@@ -102,9 +102,30 @@
     text-transform: uppercase;
   }
   .foot a { color: var(--fg-dim); }
+  .brand-logo {
+    position: fixed;
+    top: 18px;
+    left: 20px;
+    background: var(--ink);
+    color: var(--fg);
+    padding: 11px 14px 10px;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    transform: rotate(-2.5deg);
+    transform-origin: left center;
+    text-decoration: none;
+    white-space: nowrap;
+    z-index: 100;
+    transition: transform 0.15s ease;
+  }
+  .brand-logo:hover { transform: rotate(-1deg) translateY(-1px); }
+  .brand-logo .brand-li { color: inherit; }
 </style>
 </head>
 <body>
+  <a class="brand-logo" href="/" aria-label="Roast My LinkedIn — home">RoastMy<span class="brand-li">LinkedIn</span></a>
   <div class="wrap">
     <div class="stamp">✓ Payment received</div>
     <h1>You're in. Welcome to The Recipe.</h1>
