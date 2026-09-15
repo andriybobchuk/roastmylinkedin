@@ -46,6 +46,15 @@
   status = 200
   force = true
 
+# POST /simulate-payment → dev-only shortcut. Gated by TEST_PAYMENT_TOKEN
+# env var + a token in the request body. Bypasses Stripe entirely so the
+# owner can test the recipe pipeline without real charges.
+[[redirects]]
+  from = "/simulate-payment"
+  to = "/.netlify/functions/simulate-payment"
+  status = 200
+  force = true
+
 # GET /recipe/<token> → serves the customer's unlocked Recipe.
 [[redirects]]
   from = "/recipe/*"

@@ -252,6 +252,26 @@
   }
   .brand-logo:hover { transform: rotate(-1deg) translateY(-1px); }
   .brand-logo .brand-li { color: inherit; }
+
+  /* Owner-only dev shortcuts. Hidden by default; body.dev-mode reveals them. */
+  .dev-only { display: none !important; }
+  body.dev-mode .dev-only { display: inline-block !important; }
+  .sim-pay-btn {
+    margin-left: 12px;
+    padding: 12px 18px;
+    background: transparent;
+    color: var(--fg-dim);
+    border: 1px dashed rgba(212, 165, 116, 0.55);
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .sim-pay-btn:hover { color: var(--amber); border-color: var(--amber); }
+  .sim-pay-btn:disabled { opacity: 0.5; cursor: wait; }
   @media (min-width: 640px) {
     .brand-logo { font-size: 18px; padding: 12px 16px 11px; }
   }
@@ -1722,6 +1742,7 @@
         </div>
 
         <button class="fix-cta anim d-4" onclick="clickTier('recipe-promo', 79)">Get every fix →</button>
+        <button class="dev-only sim-pay-btn" onclick="simulatePayment()" title="Owner-only shortcut: skip Stripe and generate the Recipe directly">I paid (dev) →</button>
       </div>
     </div>
 
@@ -2164,6 +2185,55 @@ async function copyText(btn, key) {
 //   4. Copy the URL from the dashboard (looks like https://buy.stripe.com/xxxx)
 //   5. Paste it below, replacing REPLACE_WITH_YOUR_STRIPE_PAYMENT_LINK
 const CHECKOUT_URL_BASE = 'https://buy.stripe.com/9B63cx62E45fg0a1Ti38400';
+
+// ================================================
+// DEV MODE — owner-only shortcut for testing the paid flow without Stripe.
+// Enable by visiting the site once with ?dev=<TEST_PAYMENT_TOKEN>. That
+// stores the token in localStorage and unlocks the "I paid (dev)" button
+// on the paywall. The button POSTs to /simulate-payment, which validates
+// the same token server-side against TEST_PAYMENT_TOKEN env var.
+// ================================================
+(function initDevMode() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get('dev');
+    if (fromUrl) {
+      localStorage.setItem('rml_dev_token', fromUrl);
+      // Clean the URL so the token doesn't linger in the address bar.
+      params.delete('dev');
+      const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+      window.history.replaceState(null, '', clean);
+    }
+    const token = localStorage.getItem('rml_dev_token');
+    if (token) document.body.classList.add('dev-mode');
+  } catch (e) { /* localStorage disabled — dev mode stays off */ }
+})();
+
+async function simulatePayment() {
+  const btn = document.querySelector('.sim-pay-btn');
+  const token = (() => { try { return localStorage.getItem('rml_dev_token'); } catch { return null; } })();
+  const jobId = state.lastJobId || (() => { try { return localStorage.getItem('rml_last_jobid'); } catch { return null; } })();
+  if (!token) { alert('Dev token missing. Re-visit with ?dev=<TEST_PAYMENT_TOKEN>.'); return; }
+  if (!jobId) { alert('No completed audit found in this session. Run an audit first.'); return; }
+  const orig = btn?.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = 'Simulating…'; }
+  try {
+    const resp = await fetch('/simulate-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId, token }),
+    });
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(`${resp.status}: ${text.slice(0, 200)}`);
+    }
+    const data = await resp.json();
+    window.location.href = `/success.html?session_id=${encodeURIComponent(data.sessionId)}`;
+  } catch (err) {
+    alert('Simulate failed: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = orig; }
+  }
+}
 
 function clickTier(tier, price) {
   state.currentTier = tier;
