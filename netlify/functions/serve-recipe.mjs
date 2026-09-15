@@ -95,6 +95,7 @@ function renderRecipe(r) {
 <meta name="theme-color" content="#17130F">
 <meta name="robots" content="noindex, nofollow">
 ${baseStyles()}
+<script src="/track.js" defer></script>
 </head><body>
 <div class="wrap" id="recipe-root">
   <header class="top">
@@ -148,6 +149,7 @@ async function copy(btn, id) {
 }
 
 function downloadPDF() {
+  if (window.rml) window.rml('pdf_download');
   // The page has a full @media print stylesheet that flips to a
   // light theme and hides chrome; the browser's print-to-PDF pipeline
   // (Save as PDF on Chrome/Safari/Firefox) is the destination.
@@ -159,6 +161,15 @@ function downloadPDF() {
   // Restore on the next tick so print dialog has already captured it.
   setTimeout(() => { document.title = origTitle; }, 500);
 }
+
+// Fire recipe_view once track.js is loaded (defer means it lands after
+// DOMContentLoaded). The recipeToken lets you join to the earlier session
+// that ran the audit — same customer, same funnel.
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if (window.rml) window.rml('recipe_view', { recipeToken: location.pathname.split('/').pop() });
+  }, 100);
+});
 </script>
 </body></html>`;
 }

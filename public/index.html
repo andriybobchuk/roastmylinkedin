@@ -20,6 +20,10 @@
      TLS handshake before the click, cutting perceived latency on checkout. -->
 <link rel="preconnect" href="https://buy.stripe.com" crossorigin>
 <link rel="dns-prefetch" href="https://buy.stripe.com">
+
+<!-- Cookie-less analytics client. Fires page_view + time_on_page automatically
+     and exposes window.rml(event, props) for CTA/paywall tracking. -->
+<script src="/track.js" defer></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23080605'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='SF Pro Display,-apple-system,Segoe UI,Helvetica,Arial,sans-serif' font-weight='900' font-size='24' fill='%23F1EBDF' letter-spacing='0.5'%3ERML%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23080605'/%3E%3Ctext x='90' y='118' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif' font-weight='900' font-size='68' fill='%23F1EBDF' letter-spacing='1'%3ERML%3C/text%3E%3C/svg%3E">
 
@@ -2027,6 +2031,7 @@ async function submitAudit(e) {
   const username = document.getElementById('username').value.trim();
   if (!username) { fireFormError(); return false; }
   document.getElementById('submit-btn').disabled = true;
+  if (window.rml) window.rml('audit_submit', { linkedin: username });
   show('section-loading');
   startLoading();
 
@@ -2040,12 +2045,14 @@ async function submitAudit(e) {
     renderReport(partial, false);
     show('section-report');
     initReportScroll();
+    if (window.rml) window.rml('audit_completed', { score: partial?.audit?.score ?? null, stage: 'fast' });
   };
 
   try {
     const data = await realAudit(username, revealPartial);
     // Rewrites now available — patch the report in place (user is already on report)
     renderReport(data, false);
+    if (window.rml) window.rml('audit_completed', { score: data?.audit?.score ?? null, stage: 'full' });
   } catch (err) {
     if (jumped) {
       // The user is already on the report with partial data (score + findings).
@@ -2191,6 +2198,7 @@ async function simulatePayment() {
   const jobId = state.lastJobId || (() => { try { return localStorage.getItem('rml_last_jobid'); } catch { return null; } })();
   if (!token) { alert('Dev token missing. Re-visit with ?dev=<TEST_PAYMENT_TOKEN>.'); return; }
   if (!jobId) { alert('No completed audit found in this session. Run an audit first.'); return; }
+  if (window.rml) window.rml('sim_payment_click', { jobId });
   const orig = btn?.textContent;
   if (btn) { btn.disabled = true; btn.textContent = 'Simulating…'; }
   try {
@@ -2232,6 +2240,7 @@ function clickTier(tier, price) {
   const url = `${CHECKOUT_URL_BASE}?${params.toString()}`;
   const fallback = document.getElementById('checkout-fallback');
   fallback.href = url;
+  if (window.rml) window.rml('checkout_click', { tier, price, jobId: jobId || null });
   show('section-checkout');
   setTimeout(() => { window.open(url, '_blank', 'noopener'); }, 250);
 }
@@ -2259,6 +2268,24 @@ function initReportScroll() {
   };
   window.addEventListener('scroll', scrollProgressHandler, { passive: true });
   scrollProgressHandler();
+
+  // Fire paywall_view once when the "Get every fix" CTA scrolls into view.
+  // IntersectionObserver auto-disconnects on first trigger.
+  const cta = document.querySelector('.fix-cta');
+  if (cta && 'IntersectionObserver' in window && window.rml) {
+    let fired = false;
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting && !fired) {
+          fired = true;
+          window.rml('paywall_view');
+          io.disconnect();
+          break;
+        }
+      }
+    }, { threshold: 0.4 });
+    io.observe(cta);
+  }
 }
 
 function syncReportObservers() {

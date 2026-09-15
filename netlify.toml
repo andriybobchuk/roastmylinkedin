@@ -55,6 +55,21 @@
   status = 200
   force = true
 
+# POST /track → analytics event ingest. Fired by /track.js from the client.
+[[redirects]]
+  from = "/track"
+  to = "/.netlify/functions/track"
+  status = 200
+  force = true
+
+# GET /admin/stats?token=<TEST_PAYMENT_TOKEN>&days=<N> → owner-only
+# analytics dashboard rendered server-side.
+[[redirects]]
+  from = "/admin/stats"
+  to = "/.netlify/functions/admin-stats"
+  status = 200
+  force = true
+
 # GET /recipe/<token> → serves the customer's unlocked Recipe.
 [[redirects]]
   from = "/recipe/*"
