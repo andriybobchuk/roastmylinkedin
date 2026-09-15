@@ -371,32 +371,6 @@
     .brand-logo { font-size: 18px; padding: 12px 16px 11px; }
   }
 
-  .prod-toggle {
-    display: flex; align-items: center; gap: 8px;
-    font-family: var(--mono);
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer; user-select: none;
-  }
-  .prod-toggle .status { color: var(--fg-dim); min-width: 66px; text-align: right; }
-  .prod-toggle.on .status { color: var(--fg); }
-  .prod-toggle .switch {
-    position: relative;
-    width: 40px; height: 20px;
-    background: transparent;
-    border: 2px solid var(--fg);
-    display: inline-block; flex-shrink: 0;
-  }
-  .prod-toggle .switch::after {
-    content: "";
-    position: absolute;
-    top: 2px; left: 2px;
-    width: 12px; height: 12px;
-    background: var(--fg);
-    transition: left 0.15s ease;
-  }
-  .prod-toggle.on .switch::after { left: 22px; }
 
   /* ================================================== */
   /* STAGES (form / loading / error / waitlist / thanks) */
@@ -661,28 +635,6 @@
     transition: width 0.4s linear;
     box-shadow: 0 0 12px var(--amber);
   }
-  .skip-btn {
-    position: absolute;
-    right: 0; bottom: -50px;
-    background: transparent;
-    color: var(--fg-dim);
-    border: 1px solid var(--fg-faint);
-    padding: 8px 14px;
-    font-family: var(--mono);
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    cursor: pointer;
-  }
-  .skip-btn:hover { color: var(--amber); border-color: var(--amber); }
-  .mock-badge {
-    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.35); color: var(--fg);
-    padding: 6px 12px;
-    font-family: var(--mono);
-    font-size: 10px; letter-spacing: 0.2em;
-    text-transform: uppercase; font-weight: 700;
-    z-index: 15;
-  }
 
   /* ------- Error ------- */
   .error-headline {
@@ -752,12 +704,6 @@
     transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
   }
   .pager-back:hover { transform: rotate(-1deg) translateY(-1px); background: var(--amber); color: var(--ink); }
-  .pager-mock {
-    font-family: var(--mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--amber);
-  }
 
   /* Continuous scroll — content decides height so short slides stay
      compact and phones don't paginate a huge blank canvas per section. */
@@ -1626,10 +1572,6 @@
 <!-- ============================================ -->
 <header class="topbar" id="topbar">
   <a class="brand-logo" href="/" onclick="handleBrandClick(event)" aria-label="Roast My LinkedIn — home">RoastMy<span class="brand-li">LinkedIn</span></a>
-  <label class="prod-toggle" id="prod-toggle" onclick="togglePROD(event)">
-    <span class="switch"></span>
-    <span class="status" id="prod-status">PROD OFF</span>
-  </label>
 </header>
 
 <!-- ============================================ -->
@@ -1717,11 +1659,8 @@
     <h1 class="loading-headline" id="loading-headline">Reading it</h1>
     <p class="loading-sub" id="loading-sub">Fetching your public LinkedIn data.</p>
     <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-    <button class="skip-btn hidden" id="skip-btn" onclick="skipLoading()">skip →</button>
   </div>
 </section>
-
-<div id="mock-badge" class="mock-badge hidden">Simulated · toggle PROD to run real</div>
 
 <!-- ============================================ -->
 <!-- ERROR                                        -->
@@ -1740,7 +1679,6 @@
   <!-- Pager top bar -->
   <div class="pager-topbar">
     <button class="pager-back" onclick="reset()" aria-label="Roast My LinkedIn — back to home">RoastMyLinkedIn</button>
-    <div class="pager-mock hidden" id="pager-mock-lbl">MOCK MODE</div>
   </div>
 
   <div class="pager" id="pager">
@@ -1942,29 +1880,9 @@
 // STATE
 // ================================================
 const state = {
-  prod: false,
   currentTier: null,
   currentPrice: 0,
-  mockResolve: null,
 };
-
-// ================================================
-// PROD TOGGLE
-// ================================================
-function togglePROD(e) {
-  if (e) e.preventDefault();
-  state.prod = !state.prod;
-  const el = document.getElementById('prod-toggle');
-  const status = document.getElementById('prod-status');
-  el.classList.toggle('on', state.prod);
-  status.textContent = state.prod ? 'PROD ON' : 'PROD OFF';
-  updateSkipVisibility();
-}
-function updateSkipVisibility() {
-  const skip = document.getElementById('skip-btn');
-  if (state.prod) skip.classList.add('hidden');
-  else skip.classList.remove('hidden');
-}
 
 // ================================================
 // SECTION NAV
@@ -2056,14 +1974,6 @@ function stopLoading() {
   if (loadingRAF) cancelAnimationFrame(loadingRAF);
   document.getElementById('progress-fill').style.width = '100%';
 }
-function skipLoading() {
-  if (state.mockResolve) {
-    const r = state.mockResolve;
-    state.mockResolve = null;
-    r(MOCK_RESPONSE);
-  }
-}
-
 // ================================================
 // SUBMIT
 // ================================================
@@ -2117,8 +2027,6 @@ async function submitAudit(e) {
   const username = document.getElementById('username').value.trim();
   if (!username) { fireFormError(); return false; }
   document.getElementById('submit-btn').disabled = true;
-  const mockBadge = document.getElementById('mock-badge');
-  mockBadge.classList.toggle('hidden', state.prod);
   show('section-loading');
   startLoading();
 
@@ -2129,27 +2037,16 @@ async function submitAudit(e) {
     if (jumped) return;
     jumped = true;
     stopLoading();
-    mockBadge.classList.add('hidden');
-    renderReport(partial, !state.prod);
+    renderReport(partial, false);
     show('section-report');
     initReportScroll();
   };
 
   try {
-    if (state.prod) {
-      const data = await realAudit(username, revealPartial);
-      // Rewrites now available — patch the report in place (user is already on report)
-      renderReport(data, !state.prod);
-    } else {
-      const data = await mockAudit(username);
-      stopLoading();
-      mockBadge.classList.add('hidden');
-      renderReport(data, !state.prod);
-      show('section-report');
-      initReportScroll();
-    }
+    const data = await realAudit(username, revealPartial);
+    // Rewrites now available — patch the report in place (user is already on report)
+    renderReport(data, false);
   } catch (err) {
-    mockBadge.classList.add('hidden');
     if (jumped) {
       // The user is already on the report with partial data (score + findings).
       // Don't blow that away with an error page — just log it. The rewrite
@@ -2229,54 +2126,6 @@ async function realAudit(username, onPartial) {
     }
   }
   throw new Error('Analysis timed out — please try again');
-}
-
-// ================================================
-// MOCK — sharper roast
-// ================================================
-const MOCK_RESPONSE = {
-  profile: {
-    fullname: "Andrii Bobchuk",
-    headline: "Senior Android Developer | Kotlin, KMP, Jetpack Compose, Coroutines, CI/CD, AIDL, MVI",
-    current_company: "Samsung Electronics",
-    location: "Warsaw, Mazowieckie, Poland",
-    picture: "https://media.licdn.com/dms/image/v2/D4D03AQF4fU_tmlPhDA/profile-displayphoto-crop_800_800/B4DaBDhYOWHgAU-/0/1787839219719?e=1790812800&v=beta&t=Jquklbc85ZVuoYPSNjuNAoiqnW9jCdcEiZE2wF88tPI",
-    follower_count: 4309,
-    years_experience: 6,
-  },
-  audit: {
-    score: 84,
-    role_detected: "Senior Android Engineer",
-    summary: "You have world-class receipts — Samsung, AOSP/automotive C++, a granted authentication patent, and a 50M+ download app — yet your profile reads like a Polish B2B tax blog. Strip away the accountant persona and lead with the low-level Android chops before recruiters bounce.",
-    benchmark: { percentile: "top 15%", reasoning: "Patent + AAOS/C++ HAL + Samsung is a stack most senior Android devs cannot fake — you just hide it behind acronym soup and tax posts." },
-    findings: [
-      { section: "Experience", severity: "good", title: "You know how to write ONE good bullet", description: "The Samsung bullets ship real metrics — 5-min Gradle drop, 25% AAOS latency cut. Great template. Now do it for the other eight that read like a Jira epic.", impact_points: 0 },
-      { section: "Featured", severity: "bad", title: "You look like a tax advisor, not an Android Architect", description: "All 5 pinned posts are about Polish B2B tax. Zero mention of your patent or 50M-download app. Swap them for the Medium articles and the KMP project.", impact_points: 5 },
-      { section: "Headline", severity: "bad", title: "Your headline reads like a build.gradle file", description: "AIDL, MVI, Coroutines — the same acronym pile every bootcamp grad also lists. Samsung, Patent, and AAOS never show up. That's malpractice for a top-15% engineer.", impact_points: 4 },
-      { section: "About", severity: "warn", title: "Your About sounds like an HR training deck", description: "'Value I deliver.' 'What I bring.' You're a senior IC with a patent, not a middle manager reading talking points. Cut the templates and lead with the patent.", impact_points: 3 },
-      { section: "Experience", severity: "warn", title: "You accidentally wrote a Scrum Master resume", description: "'Conducted progress meetings with clients.' Nobody got promoted to Staff for being good at status updates. Lead with what you shipped, not what you facilitated.", impact_points: 2 },
-    ],
-    rewrites: {
-      headline: "Senior Android Engineer @ Samsung · Patent-Holder · Kotlin, KMP, Jetpack Compose, AAOS/C++ · Ex-SoftServe",
-      about_first_paragraph: "Senior Android Engineer, 6+ years shipping high-scale mobile and embedded Android at Samsung, SoftServe, and Devlight. Patent-holder in electronic device authentication. Deep in Jetpack Compose, Kotlin Multiplatform, and Android Automotive (AAOS/C++ HAL). Delivered features to 50M+ users while cutting build and runtime bottlenecks measurably.",
-      top_bullets: [
-        "Led refactor of Samsung Game Optimizer Service — migrated legacy XML to Jetpack Compose, profiled and eliminated perf bottlenecks, expanded unit-test coverage to 80% with MockK/JUnit.",
-        "Shipped in-app shop features for Plato App (50M+ downloads, 4.5★): drove +12% engagement and +7% purchase conversion, and modularized Gradle to cut build cycles by ~5 min.",
-        "Engineered navigation middleware on Android Automotive OS (AAOS/AOSP), integrating C++ Vehicle HAL components to reduce infotainment response time 25% on a US EV OEM's IVI system.",
-      ],
-    },
-  },
-};
-function mockAudit(username) {
-  return new Promise(resolve => {
-    state.mockResolve = resolve;
-    setTimeout(() => {
-      if (state.mockResolve === resolve) {
-        state.mockResolve = null;
-        resolve(MOCK_RESPONSE);
-      }
-    }, ESTIMATED_MS);
-  });
 }
 
 // ================================================
@@ -2419,10 +2268,8 @@ function syncReportObservers() {
 // ================================================
 // RENDER REPORT
 // ================================================
-function renderReport(data, isMock) {
+function renderReport(data) {
   const { profile, audit } = data;
-
-  document.getElementById('pager-mock-lbl').classList.toggle('hidden', !isMock);
 
   // 01 Verdict — subject + score + rank + summary
   document.getElementById('r-name').textContent = profile.fullname || 'Unknown';

@@ -82,33 +82,43 @@ function renderRecipe(r) {
   const skillsSection = renderSkillsGap(recipe?.skills_gap);
   const coverSection = renderCoverLetter(recipe?.cover_letter);
 
+  const safeFilename = (first || 'Your').replace(/[^a-zA-Z0-9-]/g, '') || 'Your';
+
   return `<!doctype html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(first)}'s Recipe — Roast My LinkedIn</title>
 <meta name="theme-color" content="#17130F">
 <meta name="robots" content="noindex, nofollow">
 ${baseStyles()}
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head><body>
-<div class="wrap">
+<div class="wrap" id="recipe-root">
   <header class="top">
     <a class="brand" href="/" aria-label="Roast My LinkedIn — home">RoastMyLinkedIn</a>
-    <span class="stamp">The Recipe · unlocked</span>
+    <div class="top-actions">
+      <span class="stamp">The Recipe · unlocked</span>
+      <button class="pdf-btn" id="pdf-btn" onclick="downloadPDF()" aria-label="Download this Recipe as PDF">
+        <span class="pdf-btn-label">Download PDF</span>
+      </button>
+    </div>
   </header>
 
-  <section class="hero">
-    <h1>${esc(first)}, your full Recipe is here.</h1>
-    <p class="lede">Bookmark this URL. It's permanent, private, and always up to date.</p>
-    ${audit.score != null ? `<div class="score-row"><span class="score">${esc(audit.score)}</span><span class="outof">/ 100</span></div>` : ''}
-    ${audit.summary ? `<blockquote class="summary">${esc(audit.summary)}</blockquote>` : ''}
-  </section>
+  <div id="recipe-body">
+    <section class="hero">
+      <h1>${esc(first)}, your full Recipe is here.</h1>
+      <p class="lede">Bookmark this URL. It's permanent, private, and always up to date. Download the PDF for offline access.</p>
+      ${audit.score != null ? `<div class="score-row"><span class="score">${esc(audit.score)}</span><span class="outof">/ 100</span></div>` : ''}
+      ${audit.summary ? `<blockquote class="summary">${esc(audit.summary)}</blockquote>` : ''}
+    </section>
 
-  ${err ? `<section class="alert"><p><strong>Heads up:</strong> the extended Recipe hit an error while generating (<code>${esc(err)}</code>). Reply to your receipt email and I'll fix this manually within a day.</p></section>` : ''}
+    ${err ? `<section class="alert"><p><strong>Heads up:</strong> the extended Recipe hit an error while generating (<code>${esc(err)}</code>). Reply to your receipt email and I'll fix this manually within a day.</p></section>` : ''}
 
-  ${recipe ? bulletsSection : renderPending()}
-  ${recipe ? featuredSection : ''}
-  ${recipe ? recsSection : ''}
-  ${recipe ? skillsSection : ''}
-  ${recipe ? coverSection : ''}
+    ${recipe ? bulletsSection : renderPending()}
+    ${recipe ? featuredSection : ''}
+    ${recipe ? recsSection : ''}
+    ${recipe ? skillsSection : ''}
+    ${recipe ? coverSection : ''}
+  </div>
 
   <footer class="foot">
     <p>Roast My LinkedIn · Operated by Andrii Bobchuk, Warsaw.<br>
@@ -126,6 +136,44 @@ async function copy(btn, id) {
   btn.textContent = 'Copied ✓';
   btn.classList.add('copied');
   setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+}
+
+async function downloadPDF() {
+  const btn = document.getElementById('pdf-btn');
+  const label = btn.querySelector('.pdf-btn-label');
+  if (typeof html2pdf === 'undefined') {
+    label.textContent = 'PDF library still loading — try again in 2 seconds';
+    return;
+  }
+  const orig = label.textContent;
+  btn.disabled = true;
+  label.textContent = 'Preparing PDF…';
+
+  // Swap to a print/light theme for the PDF render so the file looks
+  // like a real document, not a screenshot of a dark webpage.
+  document.body.classList.add('pdf-mode');
+  // Give the browser a paint tick to apply the class before html2canvas
+  // reads computed styles.
+  await new Promise(r => setTimeout(r, 60));
+
+  try {
+    const src = document.getElementById('recipe-body');
+    await html2pdf().set({
+      margin: [14, 14, 18, 14],
+      filename: '${safeFilename}s-LinkedIn-Recipe.pdf',
+      image: { type: 'jpeg', quality: 0.96 },
+      html2canvas: { scale: 2, backgroundColor: '#FFFFFF', useCORS: true, logging: false, windowWidth: 900 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'], before: '.section' }
+    }).from(src).save();
+  } catch (e) {
+    console.error('[pdf] generation failed:', e);
+    alert('PDF generation failed. Try refreshing the page.');
+  } finally {
+    document.body.classList.remove('pdf-mode');
+    btn.disabled = false;
+    label.textContent = orig;
+  }
 }
 </script>
 </body></html>`;
@@ -217,10 +265,37 @@ function baseStyles() {
 body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Helvetica,Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
 body.err{display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:24px}
 .wrap{max-width:760px;margin:0 auto;padding:20px 20px 80px}
-.top{display:flex;justify-content:space-between;align-items:center;padding:8px 0 24px;border-bottom:1px solid rgba(241,235,223,.14);margin-bottom:32px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:8px 0 24px;border-bottom:1px solid rgba(241,235,223,.14);margin-bottom:32px;gap:12px;flex-wrap:wrap}
+.top-actions{display:flex;align-items:center;gap:14px}
 .brand{background:var(--ink);color:var(--fg);padding:9px 12px 8px;font-weight:900;font-size:14px;letter-spacing:-.01em;line-height:1;display:inline-block;transform:rotate(-2.5deg);text-decoration:none;transition:transform .15s ease}
 .brand:hover{transform:rotate(-1deg) translateY(-1px)}
 .stamp{font-family:ui-monospace,'SF Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:800}
+.pdf-btn{background:var(--amber);color:var(--ink);border:none;padding:10px 16px;font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:transform .15s ease,background .15s ease;white-space:nowrap}
+.pdf-btn:hover:not(:disabled){transform:translateY(-1px);background:var(--fg)}
+.pdf-btn:disabled{opacity:.6;cursor:wait}
+@media (max-width:520px){.top-actions{width:100%;justify-content:space-between}}
+
+/* --- PDF export mode: temporarily flatten to a printable light theme so
+     html2pdf produces a document that looks intentional on white paper. --- */
+body.pdf-mode{background:#FFFFFF!important;color:#0B0806!important}
+body.pdf-mode .wrap{max-width:none;padding:0}
+body.pdf-mode .top{border-bottom-color:#D4A574;padding-bottom:14px}
+body.pdf-mode .brand{background:#0B0806;color:#F1EBDF}
+body.pdf-mode .stamp{color:#8C6D3F}
+body.pdf-mode .pdf-btn{display:none}
+body.pdf-mode h1,body.pdf-mode h2,body.pdf-mode h3{color:#0B0806}
+body.pdf-mode .lede,body.pdf-mode .section-note,body.pdf-mode .bullets,body.pdf-mode .commentary{color:#3B3128}
+body.pdf-mode .outof{color:#8C6D3F}
+body.pdf-mode .summary{color:#3B3128;border-left-color:#D4A574}
+body.pdf-mode .section{border-top-color:#E4D5B8;page-break-inside:avoid;break-inside:avoid}
+body.pdf-mode .section-h .num{color:#8C6D3F}
+body.pdf-mode .role-block h3{color:#8C6D3F}
+body.pdf-mode .rewrite{background:#FBF7ED;color:#0B0806;box-shadow:none;border:1px solid #E4D5B8;page-break-inside:avoid;break-inside:avoid}
+body.pdf-mode .copy{display:none}
+body.pdf-mode .alert{background:#FDECE6;border-color:#E0492B;color:#0B0806}
+body.pdf-mode .alert code{background:#FFFFFF;color:#0B0806}
+body.pdf-mode .foot{color:#6B5C4A;border-top-color:#E4D5B8}
+body.pdf-mode .foot a{color:#8C6D3F}
 h1{font-size:clamp(30px,6vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:14px}
 .hero .lede{font-size:16px;color:var(--fg-dim);max-width:44ch;margin-bottom:20px}
 .score-row{display:inline-flex;align-items:baseline;gap:8px;margin-bottom:16px}
