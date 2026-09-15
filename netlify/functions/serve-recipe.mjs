@@ -95,7 +95,6 @@ function renderRecipe(r) {
 <meta name="theme-color" content="#17130F">
 <meta name="robots" content="noindex, nofollow">
 ${baseStyles()}
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head><body>
 <div class="wrap" id="recipe-root">
   <header class="top">
@@ -148,47 +147,17 @@ async function copy(btn, id) {
   setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
 }
 
-async function downloadPDF() {
-  const btn = document.getElementById('pdf-btn');
-  const label = btn.querySelector('.pdf-btn-label');
-  if (typeof html2pdf === 'undefined') {
-    label.textContent = 'PDF library still loading — try again in 2 seconds';
-    return;
-  }
-  const orig = label.textContent;
-  btn.disabled = true;
-  label.textContent = 'Preparing PDF…';
-
-  try {
-    const src = document.getElementById('recipe-body');
-    await html2pdf().set({
-      margin: [14, 14, 18, 14],
-      filename: '${safeFilename}s-LinkedIn-Recipe.pdf',
-      image: { type: 'jpeg', quality: 0.96 },
-      // The critical bit: html2canvas clones our target subtree into a
-      // detached iframe. body.pdf-mode selectors defined in our stylesheet
-      // won't match unless we also add that class INSIDE the clone. Do it
-      // in onclone so the light-theme override applies during rasterization.
-      html2canvas: {
-        scale: 2,
-        backgroundColor: '#FFFFFF',
-        useCORS: true,
-        logging: false,
-        windowWidth: 900,
-        onclone: (clonedDoc) => {
-          clonedDoc.body.classList.add('pdf-mode');
-        },
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'], before: '.section' }
-    }).from(src).save();
-  } catch (e) {
-    console.error('[pdf] generation failed:', e);
-    alert('PDF generation failed. Try refreshing the page.');
-  } finally {
-    btn.disabled = false;
-    label.textContent = orig;
-  }
+function downloadPDF() {
+  // The page has a full @media print stylesheet that flips to a
+  // light theme and hides chrome; the browser's print-to-PDF pipeline
+  // (Save as PDF on Chrome/Safari/Firefox) is the destination.
+  // Title override so the default filename in the print dialog isn't
+  // ugly. Reverted after the dialog closes.
+  const origTitle = document.title;
+  document.title = '${safeFilename}s-LinkedIn-Recipe';
+  window.print();
+  // Restore on the next tick so print dialog has already captured it.
+  setTimeout(() => { document.title = origTitle; }, 500);
 }
 </script>
 </body></html>`;
@@ -492,6 +461,70 @@ body.pdf-mode .kw-reason{color:#3B3128}
 body.pdf-mode .kw-fix strong{color:#8C6D3F}
 body.pdf-mode .vis-badge.on{background:#DCEDDC;color:#2F5F3F}
 body.pdf-mode .vis-badge.off{background:#F8D8CC;color:#7A2E1A}
+
+/* -----------------------------------------------------------------
+   PRINT / PDF export
+   The Download PDF button triggers window.print(). Users pick "Save
+   as PDF" as the destination and get a clean, native-rendered PDF.
+   This block flips the page to a light document theme, hides UI
+   chrome that has no place on paper, and drops proper page breaks.
+   ----------------------------------------------------------------- */
+@media print {
+  @page { size: A4; margin: 14mm 14mm 18mm 14mm; }
+  html, body { background: #FFFFFF !important; color: #0B0806 !important; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .wrap { max-width: none !important; padding: 0 !important; }
+  .top { border-bottom-color: #D4A574 !important; padding-bottom: 14px !important; }
+  .brand { background: #0B0806 !important; color: #F1EBDF !important; }
+  .stamp { color: #8C6D3F !important; }
+  .pdf-btn, .top-actions .pdf-btn { display: none !important; }
+  h1, h2, h3 { color: #0B0806 !important; page-break-after: avoid; break-after: avoid; }
+  .lede, .section-note, .bullets, .commentary, .variant-why, .kw-reason { color: #3B3128 !important; }
+  .outof { color: #8C6D3F !important; }
+  .summary { color: #3B3128 !important; border-left-color: #D4A574 !important; }
+  .section {
+    border-top-color: #E4D5B8 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    padding: 24px 0 !important;
+  }
+  .section-h .num, .role-block h3, .variant-angle, .sub-h { color: #8C6D3F !important; }
+  .rewrite {
+    background: #FBF7ED !important;
+    color: #0B0806 !important;
+    box-shadow: none !important;
+    border: 1px solid #E4D5B8 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .rewrite-text { color: #0B0806 !important; }
+  .copy { display: none !important; }
+  .alert { background: #FDECE6 !important; border-color: #E0492B !important; color: #0B0806 !important; }
+  .alert code { background: #FFFFFF !important; color: #0B0806 !important; }
+  .foot { color: #6B5C4A !important; border-top-color: #E4D5B8 !important; }
+  .foot a { color: #8C6D3F !important; }
+
+  /* Score breakdown */
+  .dim-bar { background: #E4D5B8 !important; }
+  .dim-bar-fill { background: #8C6D3F !important; }
+  .dim-name { color: #0B0806 !important; }
+  .dim-score { color: #8C6D3F !important; }
+  .dim-slash { color: #6B5C4A !important; }
+  .dim-commentary, .dim-fixes { color: #3B3128 !important; }
+  .dim { border-top-color: #E4D5B8 !important; page-break-inside: avoid; break-inside: avoid; }
+
+  /* Interview prep */
+  .iq { page-break-inside: avoid; break-inside: avoid; }
+  .iq-q { color: #0B0806 !important; }
+  .iq-grounded { color: #6B5C4A !important; }
+
+  /* Recruiter visibility */
+  .kw { border-top-color: #E4D5B8 !important; page-break-inside: avoid; break-inside: avoid; }
+  .kw-word, .kw-fix { color: #0B0806 !important; }
+  .kw-fix strong { color: #8C6D3F !important; }
+  .vis-badge.on { background: #DCEDDC !important; color: #2F5F3F !important; }
+  .vis-badge.off { background: #F8D8CC !important; color: #7A2E1A !important; }
+}
 .foot a{color:var(--fg-dim)}
 @media (min-width:720px){.wrap{padding:32px 24px 120px}h1{font-size:56px}.top{padding:16px 0 32px}}
 </style>`;
