@@ -15,6 +15,39 @@
 import { connectLambda, getStore } from '@netlify/blobs';
 import { runRecipeStage } from '../../lib/audit.mjs';
 
+// Even though this endpoint is token-gated, rate-limit per IP as belt-and-
+// suspenders — if the token ever leaks, one IP still can't burn through
+// the LLM budget faster than 10/hr.
+const SIM_RATE_WINDOW_MS = 60 * 60 * 1000;
+const SIM_RATE_LIMIT_PER_IP = 10;
+
+function extractClientIp(event) {
+  const h = event.headers || {};
+  const raw = h['x-nf-client-connection-ip']
+    || h['X-Nf-Client-Connection-Ip']
+    || (h['x-forwarded-for'] || h['X-Forwarded-For'] || '').split(',')[0]
+    || h['client-ip']
+    || '';
+  return String(raw).trim() || null;
+}
+
+async function checkSimRateLimit(ip) {
+  if (!ip) return { allowed: true };
+  const store = getStore('rate-limits');
+  const key = `sim:${ip}`;
+  const now = Date.now();
+  let state;
+  try { state = await store.get(key, { type: 'json' }); }
+  catch { return { allowed: true }; }
+  if (!state || !state.resetAt || state.resetAt < now) {
+    await store.setJSON(key, { count: 1, resetAt: now + SIM_RATE_WINDOW_MS });
+    return { allowed: true };
+  }
+  if (state.count >= SIM_RATE_LIMIT_PER_IP) return { allowed: false, resetAt: state.resetAt };
+  await store.setJSON(key, { count: state.count + 1, resetAt: state.resetAt });
+  return { allowed: true };
+}
+
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method not allowed' };
@@ -30,6 +63,9 @@ export const handler = async (event) => {
   if (!expected) return { statusCode: 503, body: 'Simulate disabled: TEST_PAYMENT_TOKEN not set' };
   if (String(body.token || '') !== expected) return { statusCode: 403, body: 'Bad token' };
 
+  const rate = await checkSimRateLimit(extractClientIp(event));
+  if (!rate.allowed) return { statusCode: 429, body: 'Rate limited (dev): 10/hour per IP.' };
+
   const jobId = String(body.jobId || '').trim();
   if (!jobId) return { statusCode: 400, body: 'Missing jobId' };
 
@@ -40,25 +76,33 @@ export const handler = async (event) => {
   if (!audit?.profile || !audit?.audit) {
     return { statusCode: 404, body: 'Audit not found or incomplete for that jobId' };
   }
+  if (audit.expiresAt && Date.now() > audit.expiresAt) {
+    return { statusCode: 410, body: 'Audit expired (7-day TTL). Run a fresh audit first.' };
+  }
 
   // Fabricate a session id shaped like Stripe's real ones so the same
   // reverse-lookup regex in /session-recipe accepts it.
   const sessionId = `cs_test_sim${Date.now().toString(36)}${Math.random().toString(36).slice(2, 14)}${Math.random().toString(36).slice(2, 14)}`;
 
+  const recipeOpts = {
+    anthropicKey: process.env.ANTHROPIC_API_KEY,
+    geminiKey: process.env.GEMINI_API_KEY,
+    groqKey: process.env.GROQ_API_KEY,
+    claudeModel: process.env.CLAUDE_MODEL,
+    geminiModel: process.env.GEMINI_MODEL,
+    groqModel: process.env.GROQ_MODEL,
+  };
   let recipe = null;
   let recipeError = null;
-  try {
-    recipe = await runRecipeStage(audit.profile, audit.audit, '', {
-      anthropicKey: process.env.ANTHROPIC_API_KEY,
-      geminiKey: process.env.GEMINI_API_KEY,
-      groqKey: process.env.GROQ_API_KEY,
-      claudeModel: process.env.CLAUDE_MODEL,
-      geminiModel: process.env.GEMINI_MODEL,
-      groqModel: process.env.GROQ_MODEL,
-    });
-  } catch (err) {
-    recipeError = err.message;
-    console.error('[simulate-payment] recipe generation failed:', err.message);
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      recipe = await runRecipeStage(audit.profile, audit.audit, '', recipeOpts);
+      break;
+    } catch (err) {
+      recipeError = err.message;
+      console.error(`[simulate-payment] recipe attempt ${attempt} failed:`, err.message);
+      if (attempt < 2) await new Promise(r => setTimeout(r, 5000));
+    }
   }
 
   const recipeToken = randomToken();

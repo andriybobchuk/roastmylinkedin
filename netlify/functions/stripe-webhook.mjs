@@ -67,30 +67,36 @@ export const handler = async (event) => {
   const jobs = getStore('audit-jobs');
   const recipes = getStore('recipes');
 
-  // 1) Try to fetch the original audit by jobId
+  // Idempotency: if Stripe retries the same event (network hiccup, our 5xx,
+  // etc), don't regenerate — that would waste ~$0.05 in LLM spend and email
+  // the customer twice. Reverse-lookup was written on first success.
+  try {
+    const existing = await recipes.get(`by-session:${session.id}`, { type: 'json' });
+    if (existing?.token) {
+      console.log(`[webhook] idempotency hit — session=${session.id} already processed as token=${existing.token}`);
+      return { statusCode: 200, body: 'already-processed' };
+    }
+  } catch { /* fall through — better to double-process than to fail */ }
+
+  // 1) Try to fetch the original audit by jobId (rejecting expired records)
   let audit = null;
   if (jobId) {
-    try { audit = await jobs.get(jobId, { type: 'json' }); }
+    try {
+      const raw = await jobs.get(jobId, { type: 'json' });
+      if (raw && (!raw.expiresAt || Date.now() <= raw.expiresAt)) audit = raw;
+      else if (raw) console.warn(`[webhook] audit expired for jobId=${jobId}`);
+    }
     catch (e) { console.warn('[webhook] failed to fetch audit:', e.message); }
   }
 
-  // 2) Generate the extended Recipe content, if we have the raw audit
+  // 2) Generate the extended Recipe content, if we have the raw audit.
+  //    Retry once on failure — recipe is the paid deliverable, worth the
+  //    extra spend if the first LLM call trips over a transient error.
   let recipe = null;
   let recipeError = null;
   if (audit?.profile && audit?.audit) {
-    try {
-      recipe = await runRecipeStage(audit.profile, audit.audit, '', {
-        anthropicKey: process.env.ANTHROPIC_API_KEY,
-        geminiKey: process.env.GEMINI_API_KEY,
-        groqKey: process.env.GROQ_API_KEY,
-        claudeModel: process.env.CLAUDE_MODEL,
-        geminiModel: process.env.GEMINI_MODEL,
-        groqModel: process.env.GROQ_MODEL,
-      });
-    } catch (err) {
-      recipeError = err.message;
-      console.error('[webhook] recipe generation failed:', err.message);
-    }
+    recipe = await runRecipeWithRetry(audit.profile, audit.audit);
+    if (!recipe) recipeError = 'All LLM providers failed after retry.';
   } else {
     console.warn('[webhook] audit not found or expired — sending fallback email');
   }
@@ -141,6 +147,30 @@ export const handler = async (event) => {
 // ------------------------------------------------------------------
 // Helpers
 // ------------------------------------------------------------------
+
+// Runs runRecipeStage with one retry on any failure. Recipe is the paid
+// deliverable, so the extra ~$0.005 spend on retry is worth the customer
+// not seeing an error banner they paid for.
+async function runRecipeWithRetry(profile, audit) {
+  const opts = {
+    anthropicKey: process.env.ANTHROPIC_API_KEY,
+    geminiKey: process.env.GEMINI_API_KEY,
+    groqKey: process.env.GROQ_API_KEY,
+    claudeModel: process.env.CLAUDE_MODEL,
+    geminiModel: process.env.GEMINI_MODEL,
+    groqModel: process.env.GROQ_MODEL,
+  };
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      return await runRecipeStage(profile, audit, '', opts);
+    } catch (err) {
+      console.error(`[webhook] recipe generation attempt ${attempt} failed:`, err.message);
+      if (attempt < 2) await new Promise(r => setTimeout(r, 5000));
+    }
+  }
+  return null;
+}
+
 function randomToken() {
   // 30-char base36 token (~150 bits of entropy) — unguessable, URL-safe.
   const bytes = crypto.getRandomValues(new Uint8Array(24));

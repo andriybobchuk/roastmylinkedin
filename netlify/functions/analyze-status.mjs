@@ -27,7 +27,7 @@ export const handler = async (event) => {
 
   try {
     const state = await getStore('audit-jobs').get(jobId, { type: 'json' });
-    if (!state) {
+    if (!state || (state.expiresAt && Date.now() > state.expiresAt)) {
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },

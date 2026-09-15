@@ -123,31 +123,189 @@
   .brand-logo:hover { transform: rotate(-1deg) translateY(-1px); }
   .brand-logo .brand-li { color: inherit; }
 
-  /* Recipe delivery box shown once webhook finishes */
+  /* Delivery card wrapper */
   .delivery {
     margin: 0 auto 32px;
-    max-width: 520px;
-    padding: 24px 22px;
-    background: rgba(212, 165, 116, 0.08);
-    border: 1px solid rgba(212, 165, 116, 0.3);
+    max-width: 560px;
     text-align: left;
   }
-  .delivery h2 {
-    font-size: 15px;
+
+  /* --- Progress state --- */
+  .progress-card {
+    padding: 28px 24px;
+    background: rgba(212, 165, 116, 0.06);
+    border: 1px solid rgba(212, 165, 116, 0.24);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .progress-card.fading { opacity: 0; transform: translateY(-6px); pointer-events: none; }
+  .progress-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+    gap: 12px;
+  }
+  .progress-status {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 0.01em;
-    margin-bottom: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    transition: opacity 0.3s ease;
+    line-height: 1.3;
+  }
+  .progress-status.swap { opacity: 0; }
+  .progress-elapsed {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 11px;
+    color: var(--fg-faint);
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+  }
+  .progress-track {
+    height: 3px;
+    background: rgba(241, 235, 223, 0.08);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  .progress-fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 0%;
+    background: var(--amber);
+    transition: width 0.5s ease;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 40px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.35), transparent);
+    animation: shimmer-slide 1.6s ease-in-out infinite;
+  }
+  @keyframes shimmer-slide {
+    0%   { transform: translateX(-40px); opacity: 0; }
+    50%  { opacity: 1; }
+    100% { transform: translateX(40px); opacity: 0; }
+  }
+
+  /* Skeleton previews of what's coming */
+  .skeletons {
+    display: grid;
+    gap: 10px;
+  }
+  .skeleton-row {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 0;
+    border-top: 1px solid rgba(241, 235, 223, 0.08);
+  }
+  .skeleton-row:first-child { border-top: none; padding-top: 0; }
+  .skeleton-icon {
+    width: 6px; height: 6px;
+    background: var(--amber);
+    border-radius: 50%;
+    justify-self: center;
+    opacity: 0.4;
+    animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+  .skeleton-row.active .skeleton-icon { opacity: 1; animation-duration: 0.8s; }
+  .skeleton-row.done .skeleton-icon { opacity: 1; animation: none; }
+  .skeleton-row.done .skeleton-icon::after {
+    content: '✓';
+    position: absolute;
+    color: var(--amber);
+    font-weight: 900;
+    font-size: 14px;
+    margin-left: -4px;
+    margin-top: -8px;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity: 0.35; transform: scale(1); }
+    50%     { opacity: 1;    transform: scale(1.3); }
+  }
+  .skeleton-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .skeleton-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--fg-dim);
+    letter-spacing: -0.005em;
+  }
+  .skeleton-row.done .skeleton-label { color: var(--fg); }
+  .skeleton-bar {
+    height: 5px;
+    background: linear-gradient(
+      90deg,
+      rgba(241, 235, 223, 0.06) 0%,
+      rgba(241, 235, 223, 0.14) 50%,
+      rgba(241, 235, 223, 0.06) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer-bar 1.6s linear infinite;
+    max-width: 80%;
+  }
+  .skeleton-bar.short { max-width: 45%; }
+  .skeleton-row.done .skeleton-bar { animation: none; background: rgba(212, 165, 116, 0.18); }
+  @keyframes shimmer-bar {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* --- Ready state --- */
+  .ready-card {
+    padding: 28px 24px;
+    background: linear-gradient(180deg, rgba(212, 165, 116, 0.14), rgba(212, 165, 116, 0.06));
+    border: 1px solid var(--amber);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    display: none;
+  }
+  .ready-card.reveal { opacity: 1; transform: translateY(0); display: block; }
+  .ready-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--amber);
+    color: var(--ink);
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .ready-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+  .ready-card h2 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
     color: var(--fg);
   }
-  .delivery p {
+  .ready-card .ready-note {
     font-size: 13px;
     color: var(--fg-dim);
+    margin-bottom: 18px;
     line-height: 1.5;
-    margin-bottom: 14px;
   }
   .link-row {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: stretch;
     margin-bottom: 14px;
   }
@@ -168,8 +326,8 @@
     color: var(--ink);
     border: none;
     font-weight: 800;
-    font-size: 12px;
-    letter-spacing: 0.06em;
+    font-size: 11px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     cursor: pointer;
     white-space: nowrap;
@@ -179,30 +337,45 @@
   .link-row .copy-btn.copied { background: var(--amber); }
   .open-btn {
     display: inline-block;
-    padding: 14px 22px;
+    padding: 16px 24px;
     background: var(--amber);
     color: var(--ink);
     text-decoration: none;
     font-weight: 800;
-    font-size: 14px;
+    font-size: 15px;
     letter-spacing: -0.005em;
+    transition: transform 0.15s ease;
   }
-  .open-btn:hover { background: var(--fg); }
-  .delivery-pending {
-    color: var(--fg-dim);
+  .open-btn:hover { background: var(--fg); transform: translateY(-1px); }
+  .ready-tip {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--fg-faint);
+    letter-spacing: 0;
+  }
+  .ready-tip a { color: var(--fg-dim); }
+
+  /* --- Error state (recipe generation failed or polling stuck) --- */
+  .error-card {
+    padding: 24px 22px;
+    background: rgba(224, 73, 43, 0.08);
+    border: 1px solid rgba(224, 73, 43, 0.35);
+    display: none;
+  }
+  .error-card.show { display: block; }
+  .error-card h2 {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--fg);
+    margin-bottom: 10px;
+  }
+  .error-card p {
     font-size: 13px;
-    font-style: italic;
+    color: var(--fg-dim);
+    line-height: 1.5;
+    margin-bottom: 10px;
   }
-  .delivery-pending .dots::after {
-    content: '.';
-    animation: dots 1.2s steps(3, end) infinite;
-  }
-  @keyframes dots {
-    0%   { content: '.'; }
-    33%  { content: '..'; }
-    66%  { content: '...'; }
-    100% { content: '.'; }
-  }
+  .error-card a { color: var(--amber); }
 </style>
 </head>
 <body>
@@ -213,17 +386,66 @@
     <p class="sub">Your unique Recipe link is being generated below. We're also emailing it to you — bookmark it, it's permanent.</p>
 
     <div class="delivery" id="delivery">
-      <h2 id="delivery-title">Preparing your Recipe<span class="dots"></span></h2>
-      <p class="delivery-pending" id="delivery-msg">
-        Cooking the full audit — usually 30-60 seconds. Your link and open button appear here as soon as it's ready.
-      </p>
-      <div id="delivery-ready" style="display:none">
-        <p>Your permanent Recipe URL — save it somewhere, this is the only place it lives:</p>
+      <div class="progress-card" id="progress-card">
+        <div class="progress-head">
+          <span class="progress-status" id="progress-status">Booting the oven</span>
+          <span class="progress-elapsed" id="progress-elapsed">0:00</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="skeletons" id="skeletons">
+          <div class="skeleton-row active" data-stage="0">
+            <span class="skeleton-icon"></span>
+            <div class="skeleton-content">
+              <span class="skeleton-label">Every experience bullet, rewritten in STAR</span>
+              <span class="skeleton-bar"></span>
+            </div>
+          </div>
+          <div class="skeleton-row" data-stage="1">
+            <span class="skeleton-icon"></span>
+            <div class="skeleton-content">
+              <span class="skeleton-label">Five Featured post drafts to pin</span>
+              <span class="skeleton-bar short"></span>
+            </div>
+          </div>
+          <div class="skeleton-row" data-stage="2">
+            <span class="skeleton-icon"></span>
+            <div class="skeleton-content">
+              <span class="skeleton-label">Recommendation-request templates</span>
+              <span class="skeleton-bar"></span>
+            </div>
+          </div>
+          <div class="skeleton-row" data-stage="3">
+            <span class="skeleton-icon"></span>
+            <div class="skeleton-content">
+              <span class="skeleton-label">Skills gap analysis + learning path</span>
+              <span class="skeleton-bar short"></span>
+            </div>
+          </div>
+          <div class="skeleton-row" data-stage="4">
+            <span class="skeleton-icon"></span>
+            <div class="skeleton-content">
+              <span class="skeleton-label">Cover letter template</span>
+              <span class="skeleton-bar"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ready-card" id="ready-card">
+        <div class="ready-badge">Recipe ready</div>
+        <h2>Everything's cooked and waiting.</h2>
+        <p class="ready-note">Your permanent, private URL — bookmark it, this is the only place it lives.</p>
         <div class="link-row">
           <input type="text" id="recipe-url" readonly />
           <button class="copy-btn" id="copy-btn" onclick="copyLink()" aria-label="Copy link">Copy</button>
         </div>
         <a class="open-btn" id="open-btn" href="#">Open your Recipe →</a>
+        <p class="ready-tip">Also sent to your email as a backup. Bookmark this URL — no login required.</p>
+      </div>
+
+      <div class="error-card" id="error-card">
+        <h2 id="error-title">Something went wrong while generating your Recipe.</h2>
+        <p id="error-msg">Your payment went through fine. Reply to your Stripe receipt or email <a href="mailto:andriybobchuk@gmail.com">andriybobchuk@gmail.com</a> — I'll fix this manually within a day and send your link.</p>
       </div>
     </div>
 
@@ -239,27 +461,96 @@
   </div>
 
 <script>
+// ==================================================================
+// Success page controller — orchestrates:
+//   1. Real polling of /session-recipe every 3s
+//   2. Progress bar that eases from 0 -> 95% over ~ETA_MS (jumps to
+//      100% on completion or falls back to 95% max until then)
+//   3. Rotating status labels + advancing skeleton stages that give
+//      the user something to read while the LLM cooks
+//   4. Ready reveal: fade progress card out, fade ready card in
+//   5. Error states for both "recipe generation failed" (200 with
+//      ready:false) and "polling timed out" (~4.5 min budget)
+// ==================================================================
 (function() {
+  const $ = id => document.getElementById(id);
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('session_id');
-  const delivery = document.getElementById('delivery');
-  const title = document.getElementById('delivery-title');
-  const msg = document.getElementById('delivery-msg');
-  const ready = document.getElementById('delivery-ready');
-  const urlInput = document.getElementById('recipe-url');
-  const openBtn = document.getElementById('open-btn');
+  const delivery = $('delivery');
 
-  if (!sessionId) {
-    // Direct visitor with no session — hide the poller entirely so we don't
-    // spin on nothing. Email will still land per the checklist below.
-    delivery.style.display = 'none';
-    return;
+  // Sanity guard: if we somehow land here without a session_id, hide the
+  // whole delivery area — email path will still work.
+  if (!sessionId) { delivery.style.display = 'none'; return; }
+
+  // --- Progress model -------------------------------------------------
+  // ETA is the expected end-to-end webhook time on a warm path
+  // (~45s for Stripe fire + recipe LLM + Blobs write). Bar fills 0->95
+  // linearly across ETA, then holds until the poll returns ready.
+  const ETA_MS = 45000;
+  const MAX_ATTEMPTS = 90;               // 90 * 3s = 4.5 min hard stop
+  const POLL_INTERVAL_MS = 3000;
+  const startedAt = Date.now();
+  let attempts = 0;
+  let completed = false;
+
+  // --- Stage narration -----------------------------------------------
+  // Rotating status labels + which skeleton row to mark "active".
+  const STAGES = [
+    { at: 0,     label: 'Booting the oven',                     skeleton: 0 },
+    { at: 3000,  label: 'Reading your profile',                 skeleton: 0 },
+    { at: 8000,  label: 'Writing every bullet in STAR format',  skeleton: 0 },
+    { at: 18000, label: 'Drafting Featured post ideas',         skeleton: 1 },
+    { at: 26000, label: 'Templating recommendation asks',       skeleton: 2 },
+    { at: 33000, label: 'Mapping your skills gap',              skeleton: 3 },
+    { at: 40000, label: 'Polishing the cover letter',           skeleton: 4 },
+    { at: 55000, label: 'Almost there',                         skeleton: 4 },
+    { at: 80000, label: 'Taking a bit longer than usual',       skeleton: 4 },
+  ];
+  let currentStageIdx = -1;
+
+  function tick() {
+    if (completed) return;
+    const elapsed = Date.now() - startedAt;
+
+    // Progress bar: linear 0 -> 95% across ETA, then hold at 95%.
+    const pct = Math.min(95, (elapsed / ETA_MS) * 95);
+    $('progress-fill').style.width = pct.toFixed(1) + '%';
+
+    // Elapsed timer mm:ss.
+    const totalSec = Math.floor(elapsed / 1000);
+    const mm = Math.floor(totalSec / 60);
+    const ss = totalSec % 60;
+    $('progress-elapsed').textContent = mm + ':' + String(ss).padStart(2, '0');
+
+    // Stage narration — swap label with fade if it's changed.
+    let nextIdx = 0;
+    for (let i = 0; i < STAGES.length; i++) {
+      if (STAGES[i].at <= elapsed) nextIdx = i;
+    }
+    if (nextIdx !== currentStageIdx) {
+      currentStageIdx = nextIdx;
+      const stage = STAGES[nextIdx];
+      const statusEl = $('progress-status');
+      statusEl.classList.add('swap');
+      setTimeout(() => {
+        statusEl.textContent = stage.label;
+        statusEl.classList.remove('swap');
+      }, 220);
+      // Advance skeleton rows: mark all up to `skeleton` as done, mark
+      // that one active, leave the rest inactive.
+      document.querySelectorAll('.skeleton-row').forEach((row, i) => {
+        row.classList.remove('active', 'done');
+        if (i < stage.skeleton) row.classList.add('done');
+        else if (i === stage.skeleton) row.classList.add('active');
+      });
+    }
+
+    requestAnimationFrame(() => setTimeout(tick, 250));
   }
 
-  const MAX_ATTEMPTS = 90;   // ~4.5 minutes at 3s cadence — enough for the LLM
-  let attempts = 0;
-
+  // --- Poll loop -----------------------------------------------------
   async function poll() {
+    if (completed) return;
     attempts++;
     try {
       const resp = await fetch(`/session-recipe?session_id=${encodeURIComponent(sessionId)}`, {
@@ -267,28 +558,65 @@
       });
       if (resp.status === 200) {
         const data = await resp.json();
-        if (data.token) return showReady(data.token);
+        if (data.token && data.ready === true) return showReady(data.token);
+        // Token exists but recipe generation failed — bail out with error.
+        if (data.token && data.ready === false) return showError('generation');
       }
-    } catch (e) { /* ignore transient errors */ }
+    } catch (e) { /* transient network — try again */ }
 
-    if (attempts >= MAX_ATTEMPTS) return showStuck();
-    setTimeout(poll, 3000);
+    if (attempts >= MAX_ATTEMPTS) return showError('timeout');
+    setTimeout(poll, POLL_INTERVAL_MS);
   }
 
+  // --- Terminal states -----------------------------------------------
   function showReady(token) {
+    completed = true;
+    // Snap progress to 100 + mark every skeleton done so the transition
+    // feels earned.
+    $('progress-fill').style.width = '100%';
+    document.querySelectorAll('.skeleton-row').forEach(r => {
+      r.classList.remove('active');
+      r.classList.add('done');
+    });
+    const statusEl = $('progress-status');
+    statusEl.classList.add('swap');
+    setTimeout(() => { statusEl.textContent = 'Ready'; statusEl.classList.remove('swap'); }, 220);
+
+    // Populate ready card
     const link = `${window.location.origin}/recipe/${token}`;
-    urlInput.value = link;
-    openBtn.href = link;
-    title.textContent = 'Your Recipe is ready.';
-    msg.style.display = 'none';
-    ready.style.display = 'block';
+    $('recipe-url').value = link;
+    $('open-btn').href = link;
+
+    // Crossfade after a short beat so the 100% is visible.
+    setTimeout(() => {
+      $('progress-card').classList.add('fading');
+      setTimeout(() => {
+        $('progress-card').style.display = 'none';
+        $('ready-card').classList.add('reveal');
+      }, 400);
+    }, 700);
   }
 
-  function showStuck() {
-    title.textContent = 'Still cooking — email will land shortly.';
-    msg.innerHTML = 'This is taking longer than usual. Your Recipe link will still arrive by email within a few minutes. If it doesn\'t, reply to your Stripe receipt or email andriybobchuk@gmail.com and I\'ll fix it manually.';
+  function showError(kind) {
+    completed = true;
+    $('progress-card').classList.add('fading');
+    setTimeout(() => {
+      $('progress-card').style.display = 'none';
+      const card = $('error-card');
+      const title = $('error-title');
+      const msg = $('error-msg');
+      if (kind === 'timeout') {
+        title.textContent = "Still cooking — email will land shortly.";
+        msg.innerHTML = "Recipe generation is taking longer than usual. Your link will still arrive by email within a few minutes. If it doesn't, email <a href=\"mailto:andriybobchuk@gmail.com\">andriybobchuk@gmail.com</a> and I'll fix it manually.";
+      } else {
+        title.textContent = "Recipe generation hit an error.";
+        msg.innerHTML = "Your payment went through fine and is safe. Reply to your Stripe receipt or email <a href=\"mailto:andriybobchuk@gmail.com\">andriybobchuk@gmail.com</a> — I'll regenerate manually and send your link within a day.";
+      }
+      card.classList.add('show');
+    }, 400);
   }
 
+  tick();
   poll();
 })();
 

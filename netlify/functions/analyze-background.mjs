@@ -114,7 +114,9 @@ export const handler = async (event) => {
 
   const jobs = getStore('audit-jobs');
   const t0 = Date.now();
-  await jobs.setJSON(jobId, { status: 'pending', createdAt: t0 });
+  const JOB_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+  const jobExpiresAt = t0 + JOB_TTL_MS;
+  await jobs.setJSON(jobId, { status: 'pending', createdAt: t0, expiresAt: jobExpiresAt });
 
   try {
     // 1. Scrape profile via Apify
@@ -126,6 +128,7 @@ export const handler = async (event) => {
       status: 'scrape_done',
       profile,
       createdAt: t0,
+      expiresAt: jobExpiresAt,
       timing_ms: { scrape: tScrape },
     });
 
@@ -162,12 +165,16 @@ export const handler = async (event) => {
       audit: { ...fast, rewrites },
       timing_ms: { scrape: tScrape, llm: tTotal - tScrape, total: tTotal },
       provider,
+      createdAt: t0,
+      expiresAt: jobExpiresAt,
       completedAt: Date.now(),
     });
   } catch (err) {
     await jobs.setJSON(jobId, {
       status: 'error',
       error: err?.message || 'Unknown error',
+      createdAt: t0,
+      expiresAt: jobExpiresAt,
       completedAt: Date.now(),
     });
   }
