@@ -99,7 +99,7 @@ export const handler = async (event) => {
   const GROQ_API_KEY = process.env.GROQ_API_KEY;
   const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
   const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
-  const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  const GROQ_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
   // Provider label recorded on the finished job. Chain order for fast/rewrites
   // is Groq → Gemini → Anthropic, so label from the first configured one.
   const provider = GROQ_API_KEY ? 'groq' : GEMINI_API_KEY ? 'gemini' : 'anthropic';
