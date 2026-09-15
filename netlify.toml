@@ -38,6 +38,14 @@
   status = 200
   force = true
 
+# GET /session-recipe?session_id=cs_... → success.html polls this to fetch
+# the recipe token as soon as the webhook has finished processing.
+[[redirects]]
+  from = "/session-recipe"
+  to = "/.netlify/functions/session-recipe"
+  status = 200
+  force = true
+
 # GET /recipe/<token> → serves the customer's unlocked Recipe.
 [[redirects]]
   from = "/recipe/*"

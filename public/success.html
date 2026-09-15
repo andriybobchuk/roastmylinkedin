@@ -122,6 +122,87 @@
   }
   .brand-logo:hover { transform: rotate(-1deg) translateY(-1px); }
   .brand-logo .brand-li { color: inherit; }
+
+  /* Recipe delivery box shown once webhook finishes */
+  .delivery {
+    margin: 0 auto 32px;
+    max-width: 520px;
+    padding: 24px 22px;
+    background: rgba(212, 165, 116, 0.08);
+    border: 1px solid rgba(212, 165, 116, 0.3);
+    text-align: left;
+  }
+  .delivery h2 {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    margin-bottom: 12px;
+    color: var(--fg);
+  }
+  .delivery p {
+    font-size: 13px;
+    color: var(--fg-dim);
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .link-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    margin-bottom: 14px;
+  }
+  .link-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    background: var(--ink);
+    color: var(--fg);
+    border: 1px solid rgba(241, 235, 223, 0.14);
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+  .link-row .copy-btn {
+    padding: 12px 16px;
+    background: var(--fg);
+    color: var(--ink);
+    border: none;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+  }
+  .link-row .copy-btn:hover { background: var(--amber); }
+  .link-row .copy-btn.copied { background: var(--amber); }
+  .open-btn {
+    display: inline-block;
+    padding: 14px 22px;
+    background: var(--amber);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: -0.005em;
+  }
+  .open-btn:hover { background: var(--fg); }
+  .delivery-pending {
+    color: var(--fg-dim);
+    font-size: 13px;
+    font-style: italic;
+  }
+  .delivery-pending .dots::after {
+    content: '.';
+    animation: dots 1.2s steps(3, end) infinite;
+  }
+  @keyframes dots {
+    0%   { content: '.'; }
+    33%  { content: '..'; }
+    66%  { content: '...'; }
+    100% { content: '.'; }
+  }
 </style>
 </head>
 <body>
@@ -129,11 +210,26 @@
   <div class="wrap">
     <div class="stamp">✓ Payment received</div>
     <h1>You're in. Welcome to The Recipe.</h1>
-    <p class="sub">Your receipt is on its way to the email you gave Stripe. The full audit + rewrites land in the next inbox message.</p>
+    <p class="sub">Your unique Recipe link is being generated below. We're also emailing it to you — bookmark it, it's permanent.</p>
+
+    <div class="delivery" id="delivery">
+      <h2 id="delivery-title">Preparing your Recipe<span class="dots"></span></h2>
+      <p class="delivery-pending" id="delivery-msg">
+        Cooking the full audit — usually 30-60 seconds. Your link and open button appear here as soon as it's ready.
+      </p>
+      <div id="delivery-ready" style="display:none">
+        <p>Your permanent Recipe URL — save it somewhere, this is the only place it lives:</p>
+        <div class="link-row">
+          <input type="text" id="recipe-url" readonly />
+          <button class="copy-btn" id="copy-btn" onclick="copyLink()" aria-label="Copy link">Copy</button>
+        </div>
+        <a class="open-btn" id="open-btn" href="#">Open your Recipe →</a>
+      </div>
+    </div>
 
     <ul class="checklist">
       <li>Receipt from Stripe — check your inbox now.</li>
-      <li>Full audit PDF + all rewrites — delivered within a few minutes.</li>
+      <li>Recipe email with your link — also on its way to the inbox you gave Stripe.</li>
       <li>Your unique re-audit link — good for unlimited re-scores until you hit 90+.</li>
     </ul>
 
@@ -141,5 +237,72 @@
 
     <div class="foot">Questions? <a href="mailto:andriybobchuk@gmail.com">andriybobchuk@gmail.com</a></div>
   </div>
+
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get('session_id');
+  const delivery = document.getElementById('delivery');
+  const title = document.getElementById('delivery-title');
+  const msg = document.getElementById('delivery-msg');
+  const ready = document.getElementById('delivery-ready');
+  const urlInput = document.getElementById('recipe-url');
+  const openBtn = document.getElementById('open-btn');
+
+  if (!sessionId) {
+    // Direct visitor with no session — hide the poller entirely so we don't
+    // spin on nothing. Email will still land per the checklist below.
+    delivery.style.display = 'none';
+    return;
+  }
+
+  const MAX_ATTEMPTS = 90;   // ~4.5 minutes at 3s cadence — enough for the LLM
+  let attempts = 0;
+
+  async function poll() {
+    attempts++;
+    try {
+      const resp = await fetch(`/session-recipe?session_id=${encodeURIComponent(sessionId)}`, {
+        cache: 'no-store',
+      });
+      if (resp.status === 200) {
+        const data = await resp.json();
+        if (data.token) return showReady(data.token);
+      }
+    } catch (e) { /* ignore transient errors */ }
+
+    if (attempts >= MAX_ATTEMPTS) return showStuck();
+    setTimeout(poll, 3000);
+  }
+
+  function showReady(token) {
+    const link = `${window.location.origin}/recipe/${token}`;
+    urlInput.value = link;
+    openBtn.href = link;
+    title.textContent = 'Your Recipe is ready.';
+    msg.style.display = 'none';
+    ready.style.display = 'block';
+  }
+
+  function showStuck() {
+    title.textContent = 'Still cooking — email will land shortly.';
+    msg.innerHTML = 'This is taking longer than usual. Your Recipe link will still arrive by email within a few minutes. If it doesn\'t, reply to your Stripe receipt or email andriybobchuk@gmail.com and I\'ll fix it manually.';
+  }
+
+  poll();
+})();
+
+function copyLink() {
+  const inp = document.getElementById('recipe-url');
+  inp.select();
+  inp.setSelectionRange(0, inp.value.length);
+  navigator.clipboard.writeText(inp.value).catch(() => document.execCommand('copy'));
+  const btn = document.getElementById('copy-btn');
+  const orig = btn.textContent;
+  btn.textContent = 'Copied ✓';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+}
+</script>
 </body>
 </html>

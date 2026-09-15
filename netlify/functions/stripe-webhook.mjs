@@ -112,6 +112,10 @@ export const handler = async (event) => {
   };
   try {
     await recipes.setJSON(token, record);
+    // Reverse-lookup entry: success.html reads ?session_id={CHECKOUT_SESSION_ID}
+    // from the URL and polls /session-recipe to get the token as soon as this
+    // webhook finishes. Avoids emailing the customer if the tab is still open.
+    await recipes.setJSON(`by-session:${session.id}`, { token, ready: !!recipe, createdAt: Date.now() });
   } catch (err) {
     console.error('[webhook] failed to persist recipe:', err.message);
     return { statusCode: 500, body: 'persistence-failed' };
