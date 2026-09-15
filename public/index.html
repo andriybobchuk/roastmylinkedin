@@ -10,24 +10,44 @@
 <meta name="theme-color" content="#17130F">
 
 <link rel="canonical" href="https://roastmylinkedin.net/">
+<link rel="alternate" hreflang="en" href="https://roastmylinkedin.net/">
+<link rel="alternate" hreflang="pl" href="https://roastmylinkedin.net/">
+<link rel="alternate" hreflang="x-default" href="https://roastmylinkedin.net/">
 <link rel="alternate" type="text/markdown" href="https://roastmylinkedin.net/llms-full.txt" title="Full site content as Markdown for LLMs">
 <link rel="alternate" type="text/plain" href="https://roastmylinkedin.net/llms.txt" title="llms.txt index for AI crawlers">
+
+<!-- Perf: preconnect to third-parties we hit on interaction. Warms the DNS +
+     TLS handshake before the click, cutting perceived latency on checkout. -->
+<link rel="preconnect" href="https://buy.stripe.com" crossorigin>
+<link rel="dns-prefetch" href="https://buy.stripe.com">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23080605'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='SF Pro Display,-apple-system,Segoe UI,Helvetica,Arial,sans-serif' font-weight='900' font-size='24' fill='%23F1EBDF' letter-spacing='0.5'%3ERML%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23080605'/%3E%3Ctext x='90' y='118' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif' font-weight='900' font-size='68' fill='%23F1EBDF' letter-spacing='1'%3ERML%3C/text%3E%3C/svg%3E">
 
-<!-- Open Graph -->
+<!-- Open Graph. Image is served through Netlify's on-the-fly image
+     transformation so we get a real PNG from our SVG source — Facebook,
+     LinkedIn, iMessage, and Slack all require raster, and the URL below
+     returns Content-Type: image/png. -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Your LinkedIn is boring.">
-<meta property="og:description" content="Paste your LinkedIn URL, get a savage but useful audit in 30 seconds. Free.">
+<meta property="og:description" content="Paste your LinkedIn URL, get a savage but useful audit in 30 seconds. Free — the SSI replacement for engineers.">
 <meta property="og:site_name" content="Roast My LinkedIn">
 <meta property="og:url" content="https://roastmylinkedin.net/">
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:image" content="https://roastmylinkedin.net/.netlify/images?url=/og-image.svg&fm=png&w=1200&h=630">
+<meta property="og:image:secure_url" content="https://roastmylinkedin.net/.netlify/images?url=/og-image.svg&fm=png&w=1200&h=630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Roast My LinkedIn — Your LinkedIn is boring. Free 0-100 profile score, SSI replacement for engineers.">
 
-<!-- Twitter -->
+<!-- Twitter / X — summary_large_image needs a 1200x630 image. Discord
+     reads twitter:* tags too, so both cover the whole social spectrum. -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Your LinkedIn is boring.">
-<meta name="twitter:description" content="Paste your LinkedIn URL, get a savage but useful audit in 30 seconds. Free.">
+<meta name="twitter:description" content="Paste your LinkedIn URL, get a free 0-100 profile score + copy-paste rewrites in 30 seconds. SSI replacement for engineers.">
+<meta name="twitter:image" content="https://roastmylinkedin.net/.netlify/images?url=/og-image.svg&fm=png&w=1200&h=630">
+<meta name="twitter:image:alt" content="Roast My LinkedIn — Your LinkedIn is boring. Free 0-100 profile score, SSI replacement for engineers.">
 
 <!-- Robots directives — AI overviews + max image preview -->
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -59,52 +79,95 @@
       "inLanguage": "en"
     },
     {
-      "@type": "SoftwareApplication",
+      "@type": "WebApplication",
       "@id": "https://roastmylinkedin.net/#product",
       "name": "Roast My LinkedIn",
+      "alternateName": ["RoastMyLinkedIn", "RML"],
       "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "CareerToolsApplication",
       "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
       "url": "https://roastmylinkedin.net/",
-      "description": "An AI audit tool that scores a LinkedIn profile out of 100, lists what is dragging it down, and delivers copy-paste rewrites of the headline, About, and experience bullets.",
+      "description": "AI audit tool that scores a LinkedIn profile out of 100, surfaces the specific issues dragging it down, and delivers copy-paste rewrites of the headline, About section, and experience bullets. Built for software engineers. Free replacement for LinkedIn's SSI (Social Selling Index) score, which LinkedIn moved behind Sales Navigator in 2025.",
+      "featureList": [
+        "0-100 profile score with percentile benchmark",
+        "3-5 specific findings (headline, About, experience, skills, Featured, activity)",
+        "Copy-paste rewrites in STAR format using real facts from your profile",
+        "Runs in 15-20 seconds, no signup, no login, no cookies",
+        "Language auto-detects (strongest in English and Polish)"
+      ],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Software engineers, developers, engineering managers"
+      },
+      "isAccessibleForFree": true,
       "offers": [
         {
           "@type": "Offer",
-          "name": "The Roast",
+          "name": "The Roast (free tier)",
           "price": "0",
           "priceCurrency": "PLN",
-          "url": "https://roastmylinkedin.net/#the-roast"
+          "url": "https://roastmylinkedin.net/#the-roast",
+          "availability": "https://schema.org/InStock",
+          "category": "free"
         },
         {
           "@type": "Offer",
-          "name": "The Recipe",
+          "name": "The Recipe (paid tier)",
           "price": "79",
           "priceCurrency": "PLN",
           "url": "https://roastmylinkedin.net/#the-recipe",
-          "eligibleCustomerType": "https://schema.org/BusinessEntityType"
+          "availability": "https://schema.org/InStock",
+          "description": "Every experience bullet rewritten in STAR, five Featured post drafts, recommendation-request templates, skills gap analysis, cover letter template — permanent URL, unlimited re-audits.",
+          "category": "paid"
         }
       ],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "42"
-      },
       "provider": { "@id": "https://roastmylinkedin.net/#org" }
     },
     {
       "@type": "WebPage",
       "@id": "https://roastmylinkedin.net/#webpage",
       "url": "https://roastmylinkedin.net/",
-      "name": "Roast My LinkedIn — brutally honest AI audit for engineers",
+      "name": "Roast My LinkedIn — free 0-100 LinkedIn profile score for engineers (SSI replacement)",
       "isPartOf": { "@id": "https://roastmylinkedin.net/#website" },
-      "primaryImageOfPage": null,
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://roastmylinkedin.net/.netlify/images?url=/og-image.svg&fm=png&w=1200&h=630",
+        "width": 1200,
+        "height": 630
+      },
       "datePublished": "2026-09-11",
-      "dateModified": "2026-09-14",
+      "dateModified": "2026-09-15",
       "inLanguage": "en",
       "about": { "@id": "https://roastmylinkedin.net/#product" },
+      "mainEntity": { "@id": "https://roastmylinkedin.net/#product" },
       "speakable": {
         "@type": "SpeakableSpecification",
-        "cssSelector": ["h1.hero-headline", ".hero-sub"]
-      }
+        "cssSelector": ["h1.hero-headline", ".answer-direct", ".hero-sub"]
+      },
+      "breadcrumb": { "@id": "https://roastmylinkedin.net/#breadcrumb" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://roastmylinkedin.net/#breadcrumb",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://roastmylinkedin.net/" }
+      ]
+    },
+    {
+      "@type": "Article",
+      "@id": "https://roastmylinkedin.net/#ssi-article",
+      "headline": "LinkedIn hid your SSI score. Here's the free replacement for engineers.",
+      "description": "LinkedIn moved its Social Selling Index (SSI) page behind Sales Navigator in 2025. This tool restores the 0-100 profile score for free, with the rubric tuned for software engineering hiring instead of B2B sales.",
+      "image": "https://roastmylinkedin.net/.netlify/images?url=/og-image.svg&fm=png&w=1200&h=630",
+      "author": { "@type": "Person", "name": "Andrii Bobchuk", "url": "https://roastmylinkedin.net/" },
+      "publisher": { "@id": "https://roastmylinkedin.net/#org" },
+      "datePublished": "2026-09-11",
+      "dateModified": "2026-09-15",
+      "mainEntityOfPage": { "@id": "https://roastmylinkedin.net/#webpage" },
+      "inLanguage": "en",
+      "articleSection": "LinkedIn SSI",
+      "keywords": "LinkedIn SSI, SSI check, LinkedIn profile score, Sales Navigator, engineer LinkedIn audit"
     },
     {
       "@type": "FAQPage",
@@ -180,6 +243,38 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "LinkedIn moved the SSI page behind Sales Navigator, so the public URL that used to show any user their score now redirects or shows an empty page for non-subscribers. Roast My LinkedIn was built partly to fill that gap for the software engineering audience."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Roast My LinkedIn safe? Will LinkedIn ban my account for using it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Safe on both counts. Roast My LinkedIn never asks for your LinkedIn login or password. It reads only the publicly visible profile data that anyone with the URL could see, via a third-party data provider. There is no automation on your account, no logins, no browser extension, no scraping from your session — so nothing that LinkedIn's terms flag as risky. Your LinkedIn account cannot be banned for pasting your own profile URL into a third-party audit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a good LinkedIn SSI score in 2026?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "As a rough benchmark: 40-59 is weak, 60-79 is solid mid, 80-95 is strong senior. LinkedIn used to call an SSI above 70 'top-tier for your industry,' but the exact threshold varies by role and network. Our engineer-tuned score uses the same 0-100 shape, weighted toward what tech recruiters actually search for — stack keywords, quantified impact, evidence of shipping — rather than sales-activity metrics."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I improve my LinkedIn profile score fast?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Three highest-leverage fixes: (1) Rewrite your headline to lead with a specific role plus the stack you actually ship in — not 'passionate about technology.' (2) Put a quantified first line in your About section — an outcome, a scale, a number. (3) Rewrite your top three experience bullets in STAR format with real metrics. Roast My LinkedIn does all three for you automatically from your existing profile data — no rewriting from scratch."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does the audit take and how much does it cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The free audit runs in 15-20 seconds. You get a score out of 100, three to five specific findings, and rewrites of your headline, About opening, and top three experience bullets. The optional paid tier (79 zł with promo code ROAST, 99 zł without) adds every bullet rewritten, a five-post Featured section plan, recommendation-request templates, a skills gap analysis, and a cover letter template — delivered to a permanent private URL you can re-open forever."
           }
         }
       ]
@@ -360,6 +455,26 @@
     font-size: clamp(16px, 2vw, 20px);
     color: var(--fg-dim);
     max-width: 44ch; margin: 0 auto 40px; line-height: 1.4;
+  }
+
+  /* Direct-answer block — small, quotable, indexable. Sits between the form
+     and the SSI SEO block. Answer engines cite standalone paragraphs. */
+  .answer-direct {
+    max-width: 560px;
+    margin: 44px auto 0;
+    padding: 18px 22px;
+    border-left: 2px solid var(--amber);
+    background: rgba(212, 165, 116, 0.04);
+  }
+  .answer-direct p {
+    font-size: clamp(13px, 2vw, 14px);
+    color: var(--fg-dim);
+    line-height: 1.55;
+    letter-spacing: 0;
+  }
+  .answer-direct strong { color: var(--fg); font-weight: 800; letter-spacing: -0.005em; }
+  @media (min-width: 640px) {
+    .answer-direct { margin-top: 60px; padding: 22px 26px; }
   }
 
   .form-row {
@@ -1549,6 +1664,18 @@
       <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noopener noreferrer">Copy my LinkedIn Link</a>
     </div>
   </form>
+
+  <!--
+    Direct-answer paragraph — 40-60 words, standalone-quotable.
+    Answer engines (Perplexity, ChatGPT Search, Google AI Overviews) extract
+    the first extractable summary near H1 to cite. This block plays that role.
+    Referenced from Speakable JSON-LD via .answer-direct selector.
+  -->
+  <aside class="answer-direct">
+    <p>
+      <strong>Roast My LinkedIn</strong> is a free AI audit that scores your LinkedIn profile 0-100 in about 20 seconds and returns copy-paste rewrites of your headline, About, and top experience bullets. Tuned for software engineers, it serves as the free replacement for LinkedIn's SSI (Social Selling Index) score after LinkedIn moved public SSI access behind Sales Navigator. No signup, no login, no cookies.
+    </p>
+  </aside>
 
   <div class="seo-block" aria-label="About LinkedIn SSI and this tool">
     <div class="seo-inner">

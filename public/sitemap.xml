@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://roastmylinkedin.net/</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://roastmylinkedin.net/"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://roastmylinkedin.net/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://roastmylinkedin.net/"/>
     <xhtml:link rel="alternate" type="text/markdown" href="https://roastmylinkedin.net/llms-full.txt"/>
+    <image:image>
+      <image:loc>https://roastmylinkedin.net/.netlify/images?url=/og-image.svg&amp;fm=png&amp;w=1200&amp;h=630</image:loc>
+      <image:title>Roast My LinkedIn — Your LinkedIn is boring.</image:title>
+      <image:caption>Free 0-100 LinkedIn profile score and SSI replacement for software engineers.</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://roastmylinkedin.net/terms</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://roastmylinkedin.net/privacy</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://roastmylinkedin.net/llms.txt</loc>
-    <lastmod>2026-09-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
   </url>
 </urlset>
