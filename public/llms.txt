@@ -8,7 +8,7 @@ Operator: Andrii Bobchuk (Warsaw, Poland). Contact: andriybobchuk@gmail.com. Las
 
 - Free tier ("The Roast"): score, findings, and 3 rewrites — no signup.
 - Paid tier ("The Recipe"): 79 zł with promo code ROAST (99 zł without). One-time purchase. Includes every experience bullet rewritten in STAR format, Featured section strategy, recommendation-request templates, skills gap analysis, and downloadable PDF report.
-- 30-day interviews-or-refund guarantee.
+- 30-day money-back if you're not happy with what you got.
 - Audit runs in ~15-20 seconds. No LinkedIn login is required; the tool reads only publicly visible profile data.
 - Not affiliated with LinkedIn Corporation.
 

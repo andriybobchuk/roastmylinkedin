@@ -1074,8 +1074,8 @@
     letter-spacing: -0.015em;
     border-left: 4px solid var(--amber);
   }
-  .rw-card.tilt-l { transform: rotate(-0.5deg); }
-  .rw-card.tilt-r { transform: rotate(0.5deg); }
+  /* Tilts removed — they read as jittery on mobile scroll */
+  .rw-card.tilt-l, .rw-card.tilt-r { transform: none; }
   .rw-note {
     margin-top: 20px;
     font-family: var(--mono);
@@ -1551,7 +1551,7 @@
           </div>
         </div>
         <p class="math-summary anim d-5">
-          Every week you're not optimized is <strong>~800 zł</strong> in salary you're delaying. The Recipe pays for itself in the first two hours of a job you actually want.
+          Close it, and recruiters find you instead of the other way round.
         </p>
       </div>
     </div>
@@ -1577,7 +1577,7 @@
         </div>
 
         <button class="fix-cta anim d-4" onclick="clickTier('recipe-promo', 79)">Get every fix →</button>
-        <p class="fix-guarantee anim d-5">30-day interviews-or-refund guarantee</p>
+        <p class="fix-guarantee anim d-5">Not happy? Email me within 30 days for a refund.</p>
       </div>
     </div>
 
@@ -1785,6 +1785,9 @@ function fireFormError() {
 // Map internal error messages to short user-facing copy.
 function friendlyErrorMessage(raw) {
   const s = String(raw).toLowerCase();
+  if (/rate_limited|too many audits/.test(s)) {
+    return "You've run a few audits in a row — take an hour and come back.";
+  }
   if (/non-json|json.*parse|unexpected token/.test(s)) {
     return "The AI hiccuped mid-sentence. This usually clears in a few seconds — try again.";
   }
@@ -2020,6 +2023,8 @@ function clickTier(tier, price) {
 
   const params = new URLSearchParams();
   if (jobId) params.set('client_reference_id', jobId);
+  // Stripe Payment Links auto-apply this code if the link allows promotions.
+  params.set('prefilled_promo_code', 'ROAST');
   params.set('tier', tier);
   params.set('price', String(price));
 

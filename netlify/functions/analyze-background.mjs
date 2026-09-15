@@ -20,6 +20,43 @@ import {
   parseUsername,
 } from '../../lib/audit.mjs';
 
+// ------------------------------------------------------------------
+// Rate limit helpers
+// ------------------------------------------------------------------
+const RATE_WINDOW_MS = 60 * 60 * 1000;  // 1 hour
+const RATE_LIMIT_PER_IP = 5;             // audits per window per IP
+
+function extractClientIp(event) {
+  const h = event.headers || {};
+  // Netlify's canonical header first, then the standard proxy chain.
+  const raw = h['x-nf-client-connection-ip']
+    || h['X-Nf-Client-Connection-Ip']
+    || (h['x-forwarded-for'] || h['X-Forwarded-For'] || '').split(',')[0]
+    || h['client-ip']
+    || '';
+  return String(raw).trim() || null;
+}
+
+async function checkRateLimit(ip) {
+  if (!ip) return { allowed: true };   // unknown IP → don't punish, log elsewhere
+  const store = getStore('rate-limits');
+  const key = `ip:${ip}`;
+  const now = Date.now();
+  let state;
+  try { state = await store.get(key, { type: 'json' }); }
+  catch { return { allowed: true }; }  // storage hiccup → fail open
+
+  if (!state || !state.resetAt || state.resetAt < now) {
+    await store.setJSON(key, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return { allowed: true };
+  }
+  if (state.count >= RATE_LIMIT_PER_IP) {
+    return { allowed: false, resetAt: state.resetAt };
+  }
+  await store.setJSON(key, { count: state.count + 1, resetAt: state.resetAt });
+  return { allowed: true };
+}
+
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method not allowed' };
@@ -37,6 +74,24 @@ export const handler = async (event) => {
 
   if (!jobId || !/^[a-zA-Z0-9-]{8,64}$/.test(jobId)) return { statusCode: 400, body: 'Bad jobId' };
   if (!username) return { statusCode: 400, body: 'Bad username' };
+
+  // ------------------------------------------------------------------
+  // Rate limit — protects Apify/LLM spend from a single client burning
+  // through our budget. Keyed by client IP. 5 audits per hour per IP.
+  // ------------------------------------------------------------------
+  const clientIp = extractClientIp(event);
+  const rate = await checkRateLimit(clientIp);
+  if (!rate.allowed) {
+    // Background functions return 202 to the client no matter what, so we
+    // signal via Blobs — the client will poll analyze-status and see the
+    // rate-limit message.
+    await getStore('audit-jobs').setJSON(jobId, {
+      status: 'error',
+      error: 'RATE_LIMITED: Too many audits from your network in the last hour. Please try again later.',
+      completedAt: Date.now(),
+    });
+    return { statusCode: 200, body: 'rate-limited' };
+  }
 
   const APIFY_TOKEN = process.env.APIFY_TOKEN;
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
