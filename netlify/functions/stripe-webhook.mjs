@@ -150,6 +150,12 @@ function randomToken() {
 async function sendResendEmail({ to, subject, html }) {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error('RESEND_API_KEY not configured');
+  // Default to Resend's shared verified domain so emails send even before
+  // roastmylinkedin.net DKIM/SPF are set up. Once the domain is verified in
+  // Resend, set RESEND_FROM=Andrii @ Roast My LinkedIn <hello@roastmylinkedin.net>
+  // in Netlify env vars and the branded sender takes over automatically.
+  const from = process.env.RESEND_FROM || 'Roast My LinkedIn <onboarding@resend.dev>';
+  const replyTo = process.env.RESEND_REPLY_TO || 'andriybobchuk@gmail.com';
   const resp = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -157,8 +163,9 @@ async function sendResendEmail({ to, subject, html }) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Andrii @ Roast My LinkedIn <hello@roastmylinkedin.net>',
+      from,
       to: [to],
+      reply_to: replyTo,
       subject,
       html,
     }),
