@@ -76,6 +76,11 @@ function renderRecipe(r) {
   const name = profile.fullname || 'Your';
   const first = (name.split(' ')[0]) || 'Your';
 
+  const scoreBreakdownSection = renderScoreBreakdown(recipe?.score_breakdown);
+  const headlineVariantsSection = renderHeadlineVariants(recipe?.headline_variants);
+  const aboutFullSection = renderAboutFull(recipe?.about_full_rewrite);
+  const interviewPrepSection = renderInterviewPrep(recipe?.interview_prep);
+  const recruiterVisibilitySection = renderRecruiterVisibility(recipe?.recruiter_visibility);
   const bulletsSection = renderAllBullets(recipe?.all_bullets_rewritten);
   const featuredSection = renderFeaturedPosts(recipe?.featured_posts);
   const recsSection = renderRecommendationRequests(recipe?.recommendation_requests);
@@ -113,7 +118,12 @@ ${baseStyles()}
 
     ${err ? `<section class="alert"><p><strong>Heads up:</strong> the extended Recipe hit an error while generating (<code>${esc(err)}</code>). Reply to your receipt email and I'll fix this manually within a day.</p></section>` : ''}
 
-    ${recipe ? bulletsSection : renderPending()}
+    ${recipe ? scoreBreakdownSection : renderPending()}
+    ${recipe ? headlineVariantsSection : ''}
+    ${recipe ? aboutFullSection : ''}
+    ${recipe ? interviewPrepSection : ''}
+    ${recipe ? recruiterVisibilitySection : ''}
+    ${recipe ? bulletsSection : ''}
     ${recipe ? featuredSection : ''}
     ${recipe ? recsSection : ''}
     ${recipe ? skillsSection : ''}
@@ -149,20 +159,26 @@ async function downloadPDF() {
   btn.disabled = true;
   label.textContent = 'Preparing PDF…';
 
-  // Swap to a print/light theme for the PDF render so the file looks
-  // like a real document, not a screenshot of a dark webpage.
-  document.body.classList.add('pdf-mode');
-  // Give the browser a paint tick to apply the class before html2canvas
-  // reads computed styles.
-  await new Promise(r => setTimeout(r, 60));
-
   try {
     const src = document.getElementById('recipe-body');
     await html2pdf().set({
       margin: [14, 14, 18, 14],
       filename: '${safeFilename}s-LinkedIn-Recipe.pdf',
       image: { type: 'jpeg', quality: 0.96 },
-      html2canvas: { scale: 2, backgroundColor: '#FFFFFF', useCORS: true, logging: false, windowWidth: 900 },
+      // The critical bit: html2canvas clones our target subtree into a
+      // detached iframe. body.pdf-mode selectors defined in our stylesheet
+      // won't match unless we also add that class INSIDE the clone. Do it
+      // in onclone so the light-theme override applies during rasterization.
+      html2canvas: {
+        scale: 2,
+        backgroundColor: '#FFFFFF',
+        useCORS: true,
+        logging: false,
+        windowWidth: 900,
+        onclone: (clonedDoc) => {
+          clonedDoc.body.classList.add('pdf-mode');
+        },
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['css', 'legacy'], before: '.section' }
     }).from(src).save();
@@ -170,7 +186,6 @@ async function downloadPDF() {
     console.error('[pdf] generation failed:', e);
     alert('PDF generation failed. Try refreshing the page.');
   } finally {
-    document.body.classList.remove('pdf-mode');
     btn.disabled = false;
     label.textContent = orig;
   }
@@ -196,7 +211,7 @@ function renderAllBullets(byRole) {
     return `<div class="role-block"><h3>${esc(r.role || 'Role')}</h3>${rows}</div>`;
   }).join('');
   return `<section class="section">
-    <div class="section-h"><span class="num">01</span><span class="title">Every bullet, rewritten</span></div>
+    <div class="section-h"><span class="num">06</span><span class="title">Every bullet, rewritten</span></div>
     <p class="section-note">STAR format. Real facts only. Paste into LinkedIn's edit view.</p>
     ${items}
   </section>`;
@@ -212,7 +227,7 @@ function renderFeaturedPosts(posts) {
     </div>`;
   }).join('');
   return `<section class="section">
-    <div class="section-h"><span class="num">02</span><span class="title">Five Featured post drafts</span></div>
+    <div class="section-h"><span class="num">07</span><span class="title">Five Featured post drafts</span></div>
     <p class="section-note">Pin these to your Featured section. Space them ~5-7 days apart. Recruiters read chronologically top-down.</p>
     ${items}
   </section>`;
@@ -228,7 +243,7 @@ function renderRecommendationRequests(reqs) {
     </div>`;
   }).join('');
   return `<section class="section">
-    <div class="section-h"><span class="num">03</span><span class="title">Recommendation-request templates</span></div>
+    <div class="section-h"><span class="num">08</span><span class="title">Recommendation-request templates</span></div>
     <p class="section-note">Send from your personal email, not LinkedIn's default template. Response rate is 3-4× higher.</p>
     ${items}
   </section>`;
@@ -239,7 +254,7 @@ function renderSkillsGap(gap) {
   const missing = Array.isArray(gap.missing_skills) ? gap.missing_skills.map(s => `<li>${esc(s)}</li>`).join('') : '';
   const path = Array.isArray(gap.learning_path) ? gap.learning_path.map(s => `<li>${esc(s)}</li>`).join('') : '';
   return `<section class="section">
-    <div class="section-h"><span class="num">04</span><span class="title">Skills gap for your target role</span></div>
+    <div class="section-h"><span class="num">09</span><span class="title">Skills gap for your target role</span></div>
     ${gap.commentary ? `<p class="commentary">${esc(gap.commentary)}</p>` : ''}
     ${missing ? `<h3>Missing skills</h3><ul class="bullets">${missing}</ul>` : ''}
     ${path ? `<h3>Learning path</h3><ol class="bullets">${path}</ol>` : ''}
@@ -252,9 +267,106 @@ function renderCoverLetter(cl) {
   const body = [cl.opening_paragraph, cl.middle_paragraph, cl.closing_paragraph]
     .filter(Boolean).map(esc).join('\n\n');
   return `<section class="section">
-    <div class="section-h"><span class="num">05</span><span class="title">Cover letter template</span></div>
+    <div class="section-h"><span class="num">10</span><span class="title">Cover letter template</span></div>
     ${cl.notes ? `<p class="section-note">${esc(cl.notes)}</p>` : ''}
     <div class="rewrite"><div class="rewrite-text" id="${id}">${body}</div><button class="copy" onclick="copy(this,'${id}')">Copy</button></div>
+  </section>`;
+}
+
+// ---- New Tier-1 sections ------------------------------------------
+
+function renderScoreBreakdown(sb) {
+  if (!sb || !Array.isArray(sb.dimensions) || !sb.dimensions.length) return '';
+  const rows = sb.dimensions.map(d => {
+    const score = Math.max(0, Math.min(100, Number(d.score) || 0));
+    const fixes = Array.isArray(d.fixes) ? d.fixes.map(f => `<li>${esc(f)}</li>`).join('') : '';
+    return `<div class="dim">
+      <div class="dim-head">
+        <span class="dim-name">${esc(d.name || '')}</span>
+        <span class="dim-score">${score}<span class="dim-slash">/100</span></span>
+      </div>
+      <div class="dim-bar"><div class="dim-bar-fill" style="width:${score}%"></div></div>
+      ${d.commentary ? `<p class="dim-commentary">${esc(d.commentary)}</p>` : ''}
+      ${fixes ? `<ul class="dim-fixes">${fixes}</ul>` : ''}
+    </div>`;
+  }).join('');
+  return `<section class="section">
+    <div class="section-h"><span class="num">01</span><span class="title">Score breakdown across six axes</span></div>
+    <p class="section-note">Where your overall number actually comes from. Fix the low ones — they compound fastest.</p>
+    <div class="dim-grid">${rows}</div>
+  </section>`;
+}
+
+function renderHeadlineVariants(variants) {
+  if (!Array.isArray(variants) || !variants.length) return '';
+  const items = variants.map((v, i) => {
+    const id = `hv-${i}`;
+    return `<div class="variant">
+      <div class="variant-angle">${esc(v.angle || 'Variant ' + (i + 1))}</div>
+      <div class="rewrite"><div class="rewrite-text" id="${id}">${esc(v.text || '')}</div><button class="copy" onclick="copy(this,'${id}')">Copy</button></div>
+      ${v.why ? `<p class="variant-why">${esc(v.why)}</p>` : ''}
+    </div>`;
+  }).join('');
+  return `<section class="section">
+    <div class="section-h"><span class="num">02</span><span class="title">Five headline variants to A/B</span></div>
+    <p class="section-note">Different frames for different rooms. Rotate them monthly and watch which one gets the most InMail.</p>
+    ${items}
+  </section>`;
+}
+
+function renderAboutFull(af) {
+  if (!af) return '';
+  const id = 'about-full';
+  const main = [af.opening_paragraph, af.middle_paragraph, af.closing_paragraph]
+    .filter(Boolean).map(esc).join('\n\n');
+  const alts = Array.isArray(af.alternative_openings) ? af.alternative_openings : [];
+  const altItems = alts.map((a, i) => {
+    const aid = `about-alt-${i}`;
+    return `<div class="rewrite"><div class="rewrite-text" id="${aid}">${esc(a)}</div><button class="copy" onclick="copy(this,'${aid}')">Copy</button></div>`;
+  }).join('');
+  return `<section class="section">
+    <div class="section-h"><span class="num">03</span><span class="title">Full About section — three-paragraph rewrite</span></div>
+    <p class="section-note">Replace your entire About with this. Then A/B the opening against the alternates below.</p>
+    <div class="rewrite"><div class="rewrite-text" id="${id}">${main}</div><button class="copy" onclick="copy(this,'${id}')">Copy</button></div>
+    ${alts.length ? `<h3 class="sub-h">Alternative openings</h3>${altItems}` : ''}
+  </section>`;
+}
+
+function renderInterviewPrep(prep) {
+  if (!Array.isArray(prep) || !prep.length) return '';
+  const items = prep.map((q, i) => {
+    const id = `iq-${i}`;
+    return `<div class="iq">
+      <div class="iq-q">Q${i + 1}. ${esc(q.question || '')}</div>
+      <div class="rewrite"><div class="rewrite-text" id="${id}">${esc(q.answer || '')}</div><button class="copy" onclick="copy(this,'${id}')">Copy</button></div>
+      ${q.grounded_in ? `<p class="iq-grounded">Grounded in: ${esc(q.grounded_in)}</p>` : ''}
+    </div>`;
+  }).join('');
+  return `<section class="section">
+    <div class="section-h"><span class="num">04</span><span class="title">Interview-prep bank — ten STAR answers</span></div>
+    <p class="section-note">Behavioral prompts pre-answered using your real projects. Read out loud twice each and they're yours.</p>
+    ${items}
+  </section>`;
+}
+
+function renderRecruiterVisibility(rv) {
+  if (!rv || !Array.isArray(rv.keywords) || !rv.keywords.length) return '';
+  const rows = rv.keywords.map(k => {
+    const badge = k.currently_visible
+      ? `<span class="vis-badge on">Surfaces</span>`
+      : `<span class="vis-badge off">Misses</span>`;
+    return `<div class="kw">
+      <div class="kw-head"><span class="kw-word">${esc(k.keyword || '')}</span>${badge}</div>
+      ${k.reasoning ? `<p class="kw-reason">${esc(k.reasoning)}</p>` : ''}
+      ${k.fix ? `<p class="kw-fix"><strong>Fix:</strong> ${esc(k.fix)}</p>` : ''}
+    </div>`;
+  }).join('');
+  const top = Array.isArray(rv.top_missing_keywords) ? rv.top_missing_keywords : [];
+  return `<section class="section">
+    <div class="section-h"><span class="num">05</span><span class="title">Recruiter search visibility</span></div>
+    <p class="section-note">What a recruiter types into LinkedIn search and whether your profile surfaces. The keyword additions below plug the misses.</p>
+    ${rows}
+    ${top.length ? `<h3 class="sub-h">Top missing keywords to add</h3><ul class="bullets">${top.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
   </section>`;
 }
 
@@ -323,6 +435,63 @@ h1{font-size:clamp(30px,6vw,44px);font-weight:800;letter-spacing:-.03em;line-hei
 .commentary{font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg-dim);max-width:52ch;margin-bottom:20px}
 .cta{display:inline-block;padding:14px 22px;background:var(--amber);color:var(--ink);text-decoration:none;font-weight:800;margin-top:18px}
 .foot{margin-top:60px;padding-top:28px;border-top:1px solid rgba(241,235,223,.14);font-size:12px;color:var(--fg-faint);text-align:center}
+
+/* ---- Score breakdown ---- */
+.dim-grid{display:grid;gap:22px;margin-top:8px}
+.dim{padding:18px 0;border-top:1px solid rgba(241,235,223,.08)}
+.dim:first-child{border-top:none;padding-top:0}
+.dim-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.dim-name{font-size:15px;font-weight:800;letter-spacing:-.005em}
+.dim-score{font-family:ui-monospace,'SF Mono',monospace;font-weight:900;font-size:20px;color:var(--amber)}
+.dim-slash{color:var(--fg-faint);font-weight:700;font-size:12px;letter-spacing:.15em}
+.dim-bar{height:4px;background:rgba(241,235,223,.08);position:relative;margin-bottom:12px;overflow:hidden}
+.dim-bar-fill{position:absolute;top:0;left:0;bottom:0;background:var(--amber)}
+.dim-commentary{font-size:14px;color:var(--fg-dim);line-height:1.5;margin-bottom:8px;max-width:60ch}
+.dim-fixes{padding-left:20px;color:var(--fg-dim);font-size:13px;line-height:1.5}
+.dim-fixes li{margin-bottom:4px}
+body.pdf-mode .dim-bar{background:#E4D5B8}
+body.pdf-mode .dim-bar-fill{background:#8C6D3F}
+body.pdf-mode .dim-name{color:#0B0806}
+body.pdf-mode .dim-score{color:#8C6D3F}
+body.pdf-mode .dim-slash{color:#6B5C4A}
+body.pdf-mode .dim-commentary,body.pdf-mode .dim-fixes{color:#3B3128}
+body.pdf-mode .dim{border-top-color:#E4D5B8}
+
+/* ---- Headline variants ---- */
+.variant{margin-bottom:22px}
+.variant-angle{font-family:ui-monospace,'SF Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.variant-why{font-size:13px;color:var(--fg-dim);margin-top:8px;line-height:1.5;font-style:italic;max-width:60ch}
+body.pdf-mode .variant-angle{color:#8C6D3F}
+body.pdf-mode .variant-why{color:#6B5C4A}
+
+/* ---- About full rewrite ---- */
+.sub-h{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin:26px 0 10px}
+body.pdf-mode .sub-h{color:#8C6D3F}
+
+/* ---- Interview prep ---- */
+.iq{margin-bottom:24px}
+.iq-q{font-size:16px;font-weight:800;color:var(--fg);margin-bottom:10px;line-height:1.4}
+.iq-grounded{font-size:12px;color:var(--fg-faint);margin-top:8px;font-family:ui-monospace,'SF Mono',monospace;letter-spacing:.06em}
+body.pdf-mode .iq-q{color:#0B0806}
+body.pdf-mode .iq-grounded{color:#6B5C4A}
+
+/* ---- Recruiter visibility ---- */
+.kw{padding:14px 0;border-top:1px solid rgba(241,235,223,.08)}
+.kw:first-of-type{border-top:none;padding-top:0}
+.kw-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+.kw-word{font-family:ui-monospace,'SF Mono',monospace;font-size:14px;font-weight:800;color:var(--fg)}
+.vis-badge{font-family:ui-monospace,'SF Mono',monospace;font-size:10px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;padding:4px 10px;flex-shrink:0}
+.vis-badge.on{background:rgba(74,124,89,.24);color:#8DDDA3}
+.vis-badge.off{background:rgba(224,73,43,.2);color:#F0A78D}
+.kw-reason{font-size:13px;color:var(--fg-dim);line-height:1.5;margin-bottom:4px;max-width:60ch}
+.kw-fix{font-size:13px;color:var(--fg);line-height:1.5;max-width:60ch}
+.kw-fix strong{color:var(--amber);letter-spacing:.06em;font-family:ui-monospace,monospace;font-size:11px;text-transform:uppercase}
+body.pdf-mode .kw{border-top-color:#E4D5B8}
+body.pdf-mode .kw-word,body.pdf-mode .kw-fix{color:#0B0806}
+body.pdf-mode .kw-reason{color:#3B3128}
+body.pdf-mode .kw-fix strong{color:#8C6D3F}
+body.pdf-mode .vis-badge.on{background:#DCEDDC;color:#2F5F3F}
+body.pdf-mode .vis-badge.off{background:#F8D8CC;color:#7A2E1A}
 .foot a{color:var(--fg-dim)}
 @media (min-width:720px){.wrap{padding:32px 24px 120px}h1{font-size:56px}.top{padding:16px 0 32px}}
 </style>`;
