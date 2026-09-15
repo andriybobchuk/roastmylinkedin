@@ -3,7 +3,7 @@
 Source: https://roastmylinkedin.net/
 Operator: Andrii Bobchuk, Warsaw, Poland
 Contact: andriybobchuk@gmail.com
-Last updated: 2026-09-14
+Last updated: 2026-09-15
 
 ---
 
@@ -11,7 +11,7 @@ Last updated: 2026-09-14
 
 **Headline:** Your LinkedIn is boring.
 
-**Description:** A brutally honest, AI-generated audit of a LinkedIn profile for software engineers. Paste a LinkedIn URL or username, get a score out of 100 and copy-paste rewrites in about twenty seconds. Free tier available. No signup.
+**Description:** A free 0-100 audit of a LinkedIn profile for software engineers. Serves as the unofficial replacement for LinkedIn's SSI (Social Selling Index) check since LinkedIn moved public SSI access behind Sales Navigator. Paste a LinkedIn URL or username, get a score, findings, and copy-paste rewrites in about twenty seconds. No signup.
 
 **How it works:**
 1. Paste a LinkedIn URL or username on the landing page.
@@ -25,7 +25,29 @@ Last updated: 2026-09-14
 **Pricing:**
 
 - The Roast — Free forever. Score, findings, three rewrites. No signup.
-- The Recipe — 79 zł with promo code ROAST (99 zł without). One-time purchase, no subscription. Adds: every experience bullet rewritten in STAR format, Featured section strategy with five post drafts to pin, recommendation-request templates that get replies, skills gap analysis for the target role, downloadable PDF report, unlimited re-audits until the score hits 90 or above. 30-day money-back if you're not happy.
+- The Recipe — 79 zł with promo code ROAST (99 zł without). One-time purchase, no subscription. Adds: every experience bullet rewritten in STAR format, Featured section strategy with five post drafts to pin, recommendation-request templates that get replies, skills gap analysis for the target role, downloadable PDF report, unlimited re-audits until the score hits 90 or above.
+
+---
+
+## Free LinkedIn profile score / SSI replacement
+
+LinkedIn's Social Selling Index (SSI) score, historically visible at linkedin.com/sales/ssi, is no longer publicly accessible. The page now requires a Sales Navigator subscription. That leaves everyone without one — including most software engineers — unable to see their own 0-100 profile number.
+
+Roast My LinkedIn is designed to fill that gap for the engineering audience:
+
+- Similar shape: a 0-100 score (not the SSI number itself; LinkedIn does not license it).
+- Same "is my profile strong enough?" question.
+- Free, no subscription, no login, no cookies.
+- Rubric tuned to what tech recruiters actually search — stack keywords, quantified impact, evidence of shipping, seniority signals — instead of the sales activity metrics SSI weighted.
+
+Common queries this tool answers:
+
+- How do I check my LinkedIn SSI score in 2026 for free?
+- LinkedIn SSI page removed / missing / not working
+- Where did the LinkedIn SSI page go?
+- Free replacement for LinkedIn SSI check
+- LinkedIn profile score without Sales Navigator
+- Engineer-focused LinkedIn profile audit
 
 ---
 
@@ -35,7 +57,7 @@ Last updated: 2026-09-14
 - The service is provided as-is. No guarantee of specific job-search outcomes.
 - Users must be 16 or older.
 - LinkedIn is a trademark of LinkedIn Corporation. This service is not affiliated with, endorsed by, or sponsored by LinkedIn. It reads only publicly visible profile information via a third-party data provider.
-- Paid audits are one-time purchases processed by Stripe. 30-day money-back guarantee. EU consumers also have a 14-day right of withdrawal for standard digital purchases.
+- Paid audits are one-time purchases processed by Stripe. EU consumers have a 14-day right of withdrawal for standard digital purchases; refunds are handled case by case per the Terms.
 - The rewritten copy generated for the user belongs to the user. The operator may retain anonymized aggregate scoring data for product improvement.
 - Governed by Polish law. Disputes may be brought before Polish courts or the EU Online Dispute Resolution platform.
 - Full terms: https://roastmylinkedin.net/terms
@@ -63,6 +85,15 @@ Paste a LinkedIn URL or username. The tool fetches the public profile, runs it t
 ### Is it free?
 The Roast tier is free forever — score, findings, and three rewrites. The Recipe tier unlocks every bullet rewritten in STAR format, a Featured section strategy, recommendation-request templates, and a skills gap analysis for 79 zł with promo code ROAST (99 zł without).
 
+### Is this a replacement for LinkedIn's SSI score?
+For engineers, yes. LinkedIn hid public SSI access behind Sales Navigator, so most people cannot see their SSI anymore. This tool gives a similar 0-100 score for free, tuned for software engineering hiring rather than sales.
+
+### Where did my LinkedIn SSI page go?
+LinkedIn moved the SSI page behind Sales Navigator. Non-subscribers cannot access it. Roast My LinkedIn was built partly to fill that gap.
+
+### What is the LinkedIn SSI score?
+SSI stands for Social Selling Index — LinkedIn's own 0-100 scoring of a profile across four dimensions (professional brand, right people, insights, relationships). It started as a sales metric but became a de facto profile-strength number for everyone.
+
 ### Do you store my LinkedIn data?
 Public profile data is held in a job queue during the audit and discarded within 24 hours unless you buy The Recipe, in which case the audit is kept for 90 days so you can re-open it. No login credentials are ever collected.
 
@@ -77,9 +108,6 @@ The audit matches the input profile's language automatically. Currently stronges
 
 ### How long does it take?
 About 15 to 20 seconds end to end. The verdict lands first; the rewrites arrive a few seconds later.
-
-### Do you offer refunds?
-Yes — 30 days, no questions. Email andriybobchuk@gmail.com.
 
 ---
 

@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Roast My LinkedIn — brutally honest AI audit for engineers</title>
-<meta name="description" content="Paste your LinkedIn URL, get a savage but useful audit in 30 seconds. Score, findings, and copy-paste rewrites for engineers. Free.">
-<meta name="keywords" content="linkedin audit, linkedin roast, linkedin optimizer for engineers, linkedin profile score, rewrite linkedin headline, linkedin about generator, developer linkedin, engineer resume linkedin, kotlin android linkedin, staff engineer linkedin">
+<title>Roast My LinkedIn — free LinkedIn profile score + SSI-style audit for engineers</title>
+<meta name="description" content="Paste your LinkedIn URL, get a free 0-100 profile score and copy-paste rewrites in 30 seconds. The free replacement for LinkedIn's SSI check — built for software engineers.">
+<meta name="keywords" content="linkedin ssi, linkedin ssi check, linkedin ssi score, check linkedin ssi free, linkedin ssi replacement, linkedin social selling index, linkedin profile score free, linkedin audit, linkedin optimizer for engineers, rewrite linkedin headline, linkedin about generator, developer linkedin, engineer linkedin score, staff engineer linkedin, senior engineer linkedin audit">
 <meta name="author" content="Andrii Bobchuk">
 <meta name="theme-color" content="#17130F">
 
@@ -148,6 +148,38 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "The prompt is tuned for software engineers. We roast buzzword-heavy headlines, keyword-list About sections, and Jira-flavored bullets, then rewrite them in STAR format using the person's real companies, technologies, and numbers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this a free replacement for LinkedIn's SSI score?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes for engineers. LinkedIn quietly removed public access to its SSI (Social Selling Index) page, and the number is now only visible to Sales Navigator subscribers. Roast My LinkedIn gives you a similar 0-100 profile score for free, tuned for software engineering hiring instead of sales. You do not need a subscription, an account, or a login."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How can I check my LinkedIn SSI score in 2026 without paying?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The old public SSI page at linkedin.com/sales/ssi no longer shows your score to non-Sales Navigator users. As a free alternative, paste your profile URL into Roast My LinkedIn and you will get a 0-100 profile score plus specific findings, comparable in spirit to what SSI used to give you."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a LinkedIn SSI score?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "SSI stands for Social Selling Index. LinkedIn's own metric, originally for sales reps, rated a profile 0-100 across four dimensions (professional brand, right people, insights, relationships). It has become a de facto shorthand for 'is my profile strong?' even outside sales. Our score is not SSI itself but serves the same purpose for engineers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where did LinkedIn's SSI page go?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "LinkedIn moved the SSI page behind Sales Navigator, so the public URL that used to show any user their score now redirects or shows an empty page for non-subscribers. Roast My LinkedIn was built partly to fill that gap for the software engineering audience."
           }
         }
       ]
@@ -366,6 +398,84 @@
   }
   .find-helper a:hover { color: var(--fg); border-bottom-color: var(--fg); }
   .find-helper a::after { content: " ↗"; }
+
+  /* Below-fold SEO content block. Muted so it doesn't compete with the
+     hero, but real substantive prose that Google + AI search can index. */
+  .seo-block {
+    margin: 100px auto 0;
+    max-width: 720px;
+    padding: 48px 20px 20px;
+    border-top: 1px solid var(--fg-ghost);
+    color: var(--fg-dim);
+    text-align: left;
+  }
+  .seo-block .seo-inner { max-width: 620px; margin: 0 auto; }
+  .seo-block .seo-kicker {
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 20px;
+  }
+  .seo-block h2 {
+    font-weight: 800;
+    font-size: clamp(26px, 5vw, 38px);
+    line-height: 1.1; letter-spacing: -0.025em;
+    color: var(--fg);
+    margin-bottom: 22px;
+    max-width: 24ch;
+  }
+  .seo-block h3 {
+    font-weight: 700;
+    font-size: clamp(17px, 2.4vw, 20px);
+    letter-spacing: -0.015em;
+    color: var(--fg);
+    margin: 32px 0 10px;
+  }
+  .seo-block p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    max-width: 62ch;
+  }
+  .seo-block .mono {
+    font-family: var(--mono);
+    font-size: 0.92em;
+    color: var(--amber);
+    background: rgba(212, 165, 116, 0.08);
+    padding: 1px 6px;
+    border-radius: 2px;
+  }
+  .seo-block .seo-list {
+    padding-left: 22px;
+    margin-bottom: 12px;
+    max-width: 60ch;
+  }
+  .seo-block .seo-list li {
+    font-size: 15px;
+    line-height: 1.55;
+    margin-bottom: 6px;
+  }
+  .seo-block .seo-cta {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--fg-ghost);
+  }
+  .seo-block .seo-cta a {
+    display: inline-block;
+    padding: 12px 20px;
+    background: transparent;
+    color: var(--amber);
+    text-decoration: none;
+    border: 1px solid var(--amber);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.005em;
+  }
+  .seo-block .seo-cta a:hover { background: var(--amber); color: var(--ink); }
+  @media (min-width: 720px) {
+    .seo-block { padding: 60px 24px 40px; margin-top: 140px; }
+  }
 
   /* ------- Loading ------- */
   .loading-wrap { width: 100%; max-width: 620px; position: relative; text-align: center; }
@@ -1414,6 +1524,36 @@
       <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noopener noreferrer">Copy my LinkedIn Link</a>
     </div>
   </form>
+
+  <div class="seo-block" aria-label="About LinkedIn SSI and this tool">
+    <div class="seo-inner">
+      <div class="seo-kicker">The free LinkedIn SSI alternative</div>
+      <h2>LinkedIn hid your SSI score. This is the free replacement.</h2>
+
+      <p>For years anyone could open <span class="mono">linkedin.com/sales/ssi</span> and see their Social Selling Index — a 0-100 number across four dimensions: professional brand, right people, insights, and relationships. That page has quietly moved behind Sales Navigator. If you are not paying LinkedIn's sales subscription, you cannot check your SSI score anymore.</p>
+
+      <h3>What was the LinkedIn SSI score good for?</h3>
+      <p>SSI started as a sales-team metric but became shorthand for "is my LinkedIn strong enough?" across roles. Engineers used it to sanity-check profile changes. Recruiters used it as a rough correlate of activity. Career coaches referenced it. The removal left a hole.</p>
+
+      <h3>Why we built Roast My LinkedIn</h3>
+      <p>This tool is not the SSI number itself — LinkedIn does not license it. It is an independent, engineer-tuned score that fills the same slot: paste your public profile URL, get a 0-100 result in about thirty seconds, plus specific findings and copy-paste rewrites for headline, About section, and experience bullets. Free tier, no signup, no cookies.</p>
+
+      <h3>How to check your LinkedIn profile score for free (post-SSI)</h3>
+      <ol class="seo-list">
+        <li>Copy your LinkedIn profile URL (the page at <span class="mono">linkedin.com/in/&lt;you&gt;</span>).</li>
+        <li>Paste it into the field at the top of this page.</li>
+        <li>Wait ~30 seconds. You get a 0-100 score, a percentile band, and the specific things dragging your profile down.</li>
+        <li>Copy the rewrites into your LinkedIn edit view.</li>
+      </ol>
+
+      <h3>What's different for engineers</h3>
+      <p>The original SSI weighted signals that made sense for sales reps — outbound activity, breadth of connections, sales-flavored posts. That is the wrong scoring rubric for software engineers looking for their next senior, staff, or principal role. Our score cares about stack keywords recruiters actually search, quantified impact in your experience bullets, evidence of shipping (patents, publications, open-source), and whether your Featured section reinforces the target role or contradicts it. Same 0-100 shape, tuned to what tech hiring managers weight.</p>
+
+      <div class="seo-cta">
+        <a href="#top" onclick="document.getElementById('username').focus(); return false;">Check your score now →</a>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ============================================ -->
@@ -1577,7 +1717,6 @@
         </div>
 
         <button class="fix-cta anim d-4" onclick="clickTier('recipe-promo', 79)">Get every fix →</button>
-        <p class="fix-guarantee anim d-5">Not happy? Email me within 30 days for a refund.</p>
       </div>
     </div>
 

@@ -1,16 +1,32 @@
 # Roast My LinkedIn
 
-> A brutally honest, AI-generated audit of a LinkedIn profile. Scores it out of 100, lists exactly what is dragging it down, and delivers copy-paste rewrites of the headline, About section, and top experience bullets. Tuned for software engineers.
+> A free 0-100 audit of a LinkedIn profile for software engineers. The unofficial replacement for LinkedIn's SSI (Social Selling Index) check since LinkedIn moved public SSI access behind Sales Navigator. Paste a profile URL and get a score, findings, and copy-paste rewrites in about thirty seconds.
 
-Operator: Andrii Bobchuk (Warsaw, Poland). Contact: andriybobchuk@gmail.com. Last updated: 2026-09-14.
+Operator: Andrii Bobchuk (Warsaw, Poland). Contact: andriybobchuk@gmail.com. Last updated: 2026-09-15.
 
 ## Key facts
 
-- Free tier ("The Roast"): score, findings, and 3 rewrites — no signup.
+- Free tier ("The Roast"): score, findings, and 3 rewrites — no signup, no cookies.
 - Paid tier ("The Recipe"): 79 zł with promo code ROAST (99 zł without). One-time purchase. Includes every experience bullet rewritten in STAR format, Featured section strategy, recommendation-request templates, skills gap analysis, and downloadable PDF report.
-- 30-day money-back if you're not happy with what you got.
-- Audit runs in ~15-20 seconds. No LinkedIn login is required; the tool reads only publicly visible profile data.
-- Not affiliated with LinkedIn Corporation.
+- Audit runs in about 15-20 seconds. No LinkedIn login required; the tool reads only publicly visible profile data.
+- Not affiliated with LinkedIn Corporation. LinkedIn is a trademark of LinkedIn Corporation.
+
+## Free LinkedIn profile score / SSI check alternative
+
+LinkedIn's Social Selling Index (SSI) page at linkedin.com/sales/ssi is no longer visible to non-Sales-Navigator users. This tool fills the gap for the software engineering audience:
+
+- Similar shape (0-100 score) — not the SSI number itself, an independent engineer-tuned score.
+- Same "is my profile strong enough" purpose.
+- Free, no subscription, no login.
+- Rubric weights what tech recruiters actually search for (stack keywords, quantified impact, evidence of shipping) instead of sales activity metrics.
+
+Common search phrasings this tool answers:
+
+- "How do I check my LinkedIn SSI score for free in 2026?"
+- "LinkedIn SSI page not working / not showing / removed"
+- "Free replacement for LinkedIn SSI"
+- "LinkedIn profile score without Sales Navigator"
+- "Engineer LinkedIn profile audit"
 
 ## What the audit checks
 
@@ -36,4 +52,3 @@ Software engineers looking for a new role: mid, senior, staff, principal. Fronte
 
 - [Full site as Markdown](https://roastmylinkedin.net/llms-full.txt)
 - [Sitemap](https://roastmylinkedin.net/sitemap.xml)
-- [RSS feed] — not yet published
