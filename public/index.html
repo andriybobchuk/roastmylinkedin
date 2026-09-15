@@ -1037,6 +1037,154 @@
     color: var(--fg-faint);
   }
 
+  /* --- Score Breakdown (six-axis panel) --- */
+  .dims-grid {
+    display: grid;
+    gap: 20px;
+    max-width: 640px;
+    margin: 24px auto 0;
+    text-align: left;
+  }
+  .dim-row {
+    padding: 14px 0;
+    border-top: 1px solid var(--fg-ghost);
+  }
+  .dim-row:first-child { border-top: none; padding-top: 4px; }
+  .dim-row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    gap: 12px;
+  }
+  .dim-row-name { font-size: 15px; font-weight: 800; letter-spacing: -0.005em; }
+  .dim-row-score {
+    font-family: var(--mono);
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--amber);
+    white-space: nowrap;
+  }
+  .dim-row-score .u { color: var(--fg-faint); font-weight: 700; font-size: 11px; letter-spacing: 0.14em; margin-left: 4px; }
+  .dim-row-bar {
+    height: 4px;
+    background: rgba(241, 235, 223, 0.08);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .dim-row-fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    background: linear-gradient(90deg, var(--amber), #E4B98A);
+    transition: width 0.6s var(--ease-out);
+  }
+  .dim-row-c {
+    font-size: 13px;
+    color: var(--fg-dim);
+    line-height: 1.5;
+    max-width: 58ch;
+  }
+
+  /* --- Premium Preview cards --- */
+  .preview-card {
+    max-width: 640px;
+    margin: 16px auto 0;
+    padding: 22px 22px 20px;
+    background: rgba(212, 165, 116, 0.06);
+    border: 1px solid rgba(212, 165, 116, 0.28);
+    text-align: left;
+    position: relative;
+  }
+  .preview-lock {
+    position: absolute;
+    top: 12px; right: 14px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--amber);
+    padding: 4px 8px;
+    background: rgba(212, 165, 116, 0.14);
+  }
+  .preview-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 10px;
+  }
+  .preview-headline {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    margin-bottom: 14px;
+    line-height: 1.25;
+  }
+  .preview-answer {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fg-dim);
+    margin-bottom: 14px;
+    position: relative;
+    max-height: 6.5em;
+    overflow: hidden;
+  }
+  .preview-answer::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, rgba(20, 16, 12, 0.94));
+    pointer-events: none;
+  }
+  .preview-fade { color: var(--amber); font-weight: 700; }
+  .preview-recruiter-rows { display: grid; gap: 10px; margin-bottom: 14px; }
+  .preview-kw {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.25);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .preview-kw-name { color: var(--fg); font-weight: 700; letter-spacing: 0; }
+  .preview-kw-badge {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+  }
+  .preview-kw-badge.on  { background: rgba(74,124,89,.24);  color: #8DDDA3; }
+  .preview-kw-badge.off { background: rgba(224,73,43,.2);   color: #F0A78D; }
+  .preview-angles { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .preview-angle {
+    padding: 6px 12px;
+    background: rgba(241, 235, 223, 0.06);
+    border: 1px solid rgba(241, 235, 223, 0.14);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
+    filter: blur(0);
+  }
+  .preview-angle.blur { filter: blur(3px); user-select: none; }
+  .preview-hint {
+    font-size: 12px;
+    color: var(--fg-faint);
+    font-style: italic;
+    line-height: 1.5;
+    padding-top: 10px;
+    border-top: 1px solid rgba(241, 235, 223, 0.08);
+  }
+  .fix-cta.compact { margin-top: 24px; padding: 14px 22px; font-size: 14px; }
+
   /* --- Page: score --- */
   .p-score { text-align: center; justify-content: center; }
   .p-score .page-num { color: var(--amber-hot); justify-content: center; }
@@ -1713,10 +1861,20 @@
       </div>
     </div>
 
-    <!-- 02 · Biggest Problem -->
-    <div class="page" data-page="1" id="page-worst">
+    <!-- 02 · Score Breakdown — the six axes your overall score is made of -->
+    <div class="page" data-page="1" id="page-breakdown">
       <div class="page-inner">
-        <div class="page-num anim"><span class="num">02</span><span class="lbl">RED FLAG</span></div>
+        <div class="page-num anim"><span class="num">02</span><span class="lbl">WHERE YOUR SCORE COMES FROM</span></div>
+        <h2 class="page-h anim d-1">Six axes, one honest read.</h2>
+        <p class="page-sub anim d-2">These are independent signals — an overall 84 can still hide a 30 on Recommendations. Read the low ones first.</p>
+        <div class="dims-grid anim d-3" id="r-dims"></div>
+      </div>
+    </div>
+
+    <!-- 03 · Biggest Problem -->
+    <div class="page" data-page="2" id="page-worst">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">03</span><span class="lbl">RED FLAG</span></div>
         <h2 class="page-h anim d-1">Your biggest problem.</h2>
         <div class="worst-card anim d-2">
           <div class="worst-tag" id="r-worst-tag">—</div>
@@ -1727,19 +1885,19 @@
       </div>
     </div>
 
-    <!-- 03 · Cuts -->
-    <div class="page" data-page="2" id="page-cuts">
+    <!-- 04 · Cuts -->
+    <div class="page" data-page="3" id="page-cuts">
       <div class="page-inner">
-        <div class="page-num anim"><span class="num">03</span><span class="lbl">SMALLER CUTS</span></div>
+        <div class="page-num anim"><span class="num">04</span><span class="lbl">SMALLER CUTS</span></div>
         <h2 class="page-h anim d-1">Other cuts.</h2>
         <div class="cuts-list anim d-2" id="r-cuts"></div>
       </div>
     </div>
 
-    <!-- 04 · Fix Headline -->
-    <div class="page" data-page="3" id="page-rw-headline">
+    <!-- 05 · Fix Headline -->
+    <div class="page" data-page="4" id="page-rw-headline">
       <div class="page-inner">
-        <div class="page-num anim"><span class="num">04</span><span class="lbl">FIX 01 · HEADLINE</span></div>
+        <div class="page-num anim"><span class="num">05</span><span class="lbl">FIX 01 · HEADLINE</span></div>
         <h2 class="page-h anim d-1">Your new headline.</h2>
         <div class="rw-old anim d-2" id="r-old-headline">—</div>
         <div class="rw-card tilt-l anim slam"><span id="r-rw-headline">—</span></div>
@@ -1747,29 +1905,66 @@
       </div>
     </div>
 
-    <!-- 05 · Fix About -->
-    <div class="page" data-page="4" id="page-rw-about">
+    <!-- 06 · Fix About -->
+    <div class="page" data-page="5" id="page-rw-about">
       <div class="page-inner">
-        <div class="page-num anim"><span class="num">05</span><span class="lbl">FIX 02 · ABOUT</span></div>
+        <div class="page-num anim"><span class="num">06</span><span class="lbl">FIX 02 · ABOUT</span></div>
         <h2 class="page-h anim d-1">Your new About.</h2>
         <div class="rw-card tilt-r anim slam"><span id="r-rw-about">—</span></div>
         <button class="copy-btn hero-copy anim d-3" onclick="copyText(this, 'rw-about')">Copy</button>
       </div>
     </div>
 
-    <!-- 06 · Fix Bullets -->
-    <div class="page" data-page="5" id="page-rw-bullets">
+    <!-- 07 · Fix Bullets -->
+    <div class="page" data-page="6" id="page-rw-bullets">
       <div class="page-inner">
-        <div class="page-num anim"><span class="num">06</span><span class="lbl">FIX 03 · BULLETS</span></div>
+        <div class="page-num anim"><span class="num">07</span><span class="lbl">FIX 03 · BULLETS</span></div>
         <h2 class="page-h anim d-1">Your new bullets.</h2>
         <div class="rw-bullets anim slam" id="r-rw-bullets"></div>
       </div>
     </div>
 
-    <!-- 07 · Math -->
-    <div class="page p-math" data-page="6">
+    <!-- 08 · Premium Preview — coolest Recipe features, partially revealed -->
+    <div class="page" data-page="7" id="page-preview">
       <div class="page-inner">
-        <div class="page-num anim"><span class="num">07</span><span class="lbl">WHAT'S YOURS TO GAIN</span></div>
+        <div class="page-num anim"><span class="num">08</span><span class="lbl">PREVIEW · WHAT THE RECIPE UNLOCKS</span></div>
+        <h2 class="page-h anim d-1">The Recipe unlocks the good stuff.</h2>
+        <p class="page-sub anim d-2">A peek at three of the ten sections you get. Not a demo &mdash; these are generated from <em>your</em> profile.</p>
+
+        <div class="preview-card anim d-3" id="prev-interview">
+          <div class="preview-lock">Locked · 10 answers total</div>
+          <div class="preview-tag">Interview Prep Bank</div>
+          <div class="preview-headline" id="prev-iq-q">—</div>
+          <div class="preview-answer">
+            <span id="prev-iq-a">—</span><span class="preview-fade"> …&nbsp;</span>
+          </div>
+          <div class="preview-hint">Full STAR answer + 9 more behaviorals, each grounded in your real projects.</div>
+        </div>
+
+        <div class="preview-card anim d-4" id="prev-recruiter">
+          <div class="preview-lock">Locked · 6 keywords + fixes</div>
+          <div class="preview-tag">Recruiter Search Visibility</div>
+          <div class="preview-headline">Do recruiters actually find you?</div>
+          <div class="preview-recruiter-rows" id="prev-recruiter-rows"></div>
+          <div class="preview-hint">Full 6-keyword report plus the exact text edit that plugs each miss.</div>
+        </div>
+
+        <div class="preview-card anim d-5" id="prev-headlines">
+          <div class="preview-lock">Locked · 5 variants to A/B</div>
+          <div class="preview-tag">Headline Variants</div>
+          <div class="preview-headline">Five angles. Rotate monthly.</div>
+          <div class="preview-angles" id="prev-headline-angles"></div>
+          <div class="preview-hint">Actual headline texts for each angle + the "why" behind them, ready to paste.</div>
+        </div>
+
+        <button class="fix-cta compact anim d-6" onclick="clickTier('recipe-promo', 79)">Unlock everything &rarr;</button>
+      </div>
+    </div>
+
+    <!-- 09 · Math -->
+    <div class="page p-math" data-page="8">
+      <div class="page-inner">
+        <div class="page-num anim"><span class="num">09</span><span class="lbl">WHAT'S YOURS TO GAIN</span></div>
         <h2 class="page-h anim d-1">The gap you can close in a week.</h2>
         <div class="math-hero">
           <div class="math-col anim d-2">
@@ -1790,10 +1985,10 @@
       </div>
     </div>
 
-    <!-- 08 · Value Table (new paywall style) -->
-    <div class="page p-value" data-page="7" id="page-value">
+    <!-- 10 · Value Table (paywall) -->
+    <div class="page p-value" data-page="9" id="page-value">
       <div class="page-inner">
-        <div class="page-num anim"><span class="num">08</span><span class="lbl">YOUR FIX KIT</span></div>
+        <div class="page-num anim"><span class="num">10</span><span class="lbl">YOUR FIX KIT</span></div>
         <h2 class="page-h anim d-1">Unlock every fix.</h2>
 
         <div class="fix-table anim d-2" id="r-fix-table"></div>
@@ -2319,7 +2514,32 @@ function renderReport(data) {
 
   document.getElementById('r-summary').textContent = audit.summary || '';
 
-  // 06 Worst
+  // 02 Score Breakdown — six axes
+  const dimsEl = document.getElementById('r-dims');
+  if (dimsEl) {
+    dimsEl.innerHTML = '';
+    const dims = (audit.score_breakdown && Array.isArray(audit.score_breakdown.dimensions))
+      ? audit.score_breakdown.dimensions : [];
+    dims.forEach(d => {
+      const s = Math.max(0, Math.min(100, Number(d.score) || 0));
+      const row = document.createElement('div');
+      row.className = 'dim-row';
+      row.innerHTML = `
+        <div class="dim-row-head">
+          <span class="dim-row-name"></span>
+          <span class="dim-row-score">${s}<span class="u">/100</span></span>
+        </div>
+        <div class="dim-row-bar"><div class="dim-row-fill" style="width:${s}%"></div></div>
+        <div class="dim-row-c"></div>
+      `;
+      row.querySelector('.dim-row-name').textContent = d.name || '';
+      row.querySelector('.dim-row-c').textContent = d.commentary || '';
+      dimsEl.appendChild(row);
+    });
+    document.getElementById('page-breakdown').style.display = dims.length ? '' : 'none';
+  }
+
+  // 03 Worst
   const nonGood = (audit.findings || []).filter(f => f.severity !== 'good');
   const worst = nonGood.slice().sort((a,b) => (b.impact_points||0) - (a.impact_points||0))[0];
   if (worst) {
@@ -2380,6 +2600,47 @@ function renderReport(data) {
   });
   document.getElementById('page-rw-bullets').style.display = bullets.length ? '' : 'none';
 
+  // 08 Premium Preview — populate from premium_teasers if present
+  const teasers = r.premium_teasers || {};
+  const previewEl = document.getElementById('page-preview');
+  if (previewEl) {
+    let hasAny = false;
+
+    if (teasers.interview_preview?.question) {
+      document.getElementById('prev-iq-q').textContent = teasers.interview_preview.question;
+      document.getElementById('prev-iq-a').textContent = teasers.interview_preview.answer_start || '';
+      hasAny = true;
+    }
+
+    const rvRowsEl = document.getElementById('prev-recruiter-rows');
+    rvRowsEl.innerHTML = '';
+    const kws = Array.isArray(teasers.recruiter_preview) ? teasers.recruiter_preview : [];
+    kws.forEach(k => {
+      const row = document.createElement('div');
+      row.className = 'preview-kw';
+      const badgeCls = k.currently_visible ? 'preview-kw-badge on' : 'preview-kw-badge off';
+      const badgeText = k.currently_visible ? 'Surfaces' : 'Misses';
+      row.innerHTML = `<span class="preview-kw-name"></span><span class="${badgeCls}">${badgeText}</span>`;
+      row.querySelector('.preview-kw-name').textContent = k.keyword || '';
+      rvRowsEl.appendChild(row);
+    });
+    if (kws.length) hasAny = true;
+
+    const angleWrapEl = document.getElementById('prev-headline-angles');
+    angleWrapEl.innerHTML = '';
+    const angles = Array.isArray(teasers.headline_angles) ? teasers.headline_angles : [];
+    angles.forEach((a, i) => {
+      const span = document.createElement('span');
+      // Blur every other after the first two, teasing the rest.
+      span.className = 'preview-angle' + (i >= 2 ? ' blur' : '');
+      span.textContent = a;
+      angleWrapEl.appendChild(span);
+    });
+    if (angles.length) hasAny = true;
+
+    previewEl.style.display = hasAny ? '' : 'none';
+  }
+
   // Math — dynamic
   const score = audit.score || 0;
   const target = Math.max(90, score + 8);
@@ -2398,11 +2659,18 @@ function renderReport(data) {
   });
 
   const rows = [
-    { flaw: bySection.headline?.title || 'Generic headline',           fix: 'Rewritten',       unlocked: true },
-    { flaw: bySection.about?.title    || 'Weak About paragraph',       fix: 'Rewritten',       unlocked: true },
-    { flaw: 'Every experience bullet',                                  fix: 'STAR-rewritten',  unlocked: false },
-    { flaw: bySection.featured?.title || 'Featured section',            fix: '5 post drafts',   unlocked: false },
-    { flaw: 'Recommendation templates + skills gap + PDF report',       fix: 'Included',        unlocked: false },
+    { flaw: 'Overall score + 6-axis breakdown',                         fix: 'You have it',              unlocked: true },
+    { flaw: bySection.headline?.title || 'Generic headline',            fix: '1 rewrite',                unlocked: true },
+    { flaw: bySection.about?.title    || 'Weak About paragraph',        fix: '1 rewrite',                unlocked: true },
+    { flaw: 'Concrete fixes for every low axis',                        fix: '3 per axis',               unlocked: false },
+    { flaw: '10 behavioral interview answers · your real projects',     fix: 'STAR-formatted',           unlocked: false },
+    { flaw: 'Recruiter search visibility — do they find you?',          fix: '6 keywords + fixes',       unlocked: false },
+    { flaw: 'Five headline variants to A/B',                            fix: 'Different angles',         unlocked: false },
+    { flaw: 'Full 3-paragraph About rewrite + 2 alt openings',          fix: 'Complete rewrite',         unlocked: false },
+    { flaw: 'Every experience bullet',                                  fix: 'STAR-rewritten',           unlocked: false },
+    { flaw: bySection.featured?.title || 'Featured section',            fix: '5 post drafts',            unlocked: false },
+    { flaw: 'Recommendation templates + skills gap + cover letter',     fix: 'Included',                 unlocked: false },
+    { flaw: 'PDF download · re-open forever at private URL',            fix: 'Yours',                    unlocked: false },
   ];
 
   rows.forEach(row => {

@@ -23,12 +23,12 @@ function esc(s) {
 function isoDay(d) { return d.toISOString().slice(0, 10); }
 function shiftDays(d, delta) { const x = new Date(d); x.setUTCDate(x.getUTCDate() + delta); return x; }
 
-async function loadEventsRange(days) {
+async function loadEventsRange(endDay, days) {
   const store = getStore('analytics');
-  const today = new Date();
+  const end = new Date(endDay + 'T00:00:00Z');
   const events = [];
   for (let i = 0; i < days; i++) {
-    const day = isoDay(shiftDays(today, -i));
+    const day = isoDay(shiftDays(end, -i));
     let listing;
     try { listing = await store.list({ prefix: `events/${day}/` }); }
     catch { continue; }
@@ -38,6 +38,19 @@ async function loadEventsRange(days) {
     for (const ev of batch) { if (ev) events.push(ev); }
   }
   return events;
+}
+
+async function clearDay(day) {
+  const store = getStore('analytics');
+  let listing;
+  try { listing = await store.list({ prefix: `events/${day}/` }); }
+  catch { return { deleted: 0, error: 'list-failed' }; }
+  const blobs = listing?.blobs || [];
+  let deleted = 0;
+  await Promise.all(blobs.map(async b => {
+    try { await store.delete(b.key); deleted++; } catch { /* skip */ }
+  }));
+  return { deleted };
 }
 
 // ------- aggregation -------
@@ -94,23 +107,26 @@ function topN(map, n) {
 }
 
 // ------- render -------
-function renderPage({ days, events, sessions, funnel, kpis, utms, refs, countries, linkedins }) {
+function renderPage({ days, endDay, clearReport, events, sessions, funnel, kpis, utms, refs, countries, linkedins }) {
   const totalSessions = sessions.size;
-  const funnelMax = funnel[0]?.count || 1;
+  const funnelMax = funnel[0]?.count || 0;
 
   const funnelRows = funnel.map((step, i) => {
     const pct = totalSessions ? Math.round((step.count / totalSessions) * 100) : 0;
-    const width = funnelMax ? Math.max(2, (step.count / funnelMax) * 100) : 0;
+    // No minimum floor — a 0-count step shows an empty bar, honestly. And
+    // widths are relative to the top of the funnel so the bars taper.
+    const width = funnelMax > 0 ? (step.count / funnelMax) * 100 : 0;
     const dropRate = i > 0 && funnel[i - 1].count
       ? Math.round(((funnel[i - 1].count - step.count) / funnel[i - 1].count) * 100)
       : 0;
+    const dropCount = i > 0 ? Math.max(0, funnel[i-1].count - step.count) : 0;
     return `<div class="fn-row">
       <div class="fn-head">
         <span class="fn-name">${esc(step.name)}</span>
         <span class="fn-nums"><span class="fn-count">${step.count}</span><span class="fn-pct">${pct}%</span></span>
       </div>
-      <div class="fn-track"><div class="fn-fill" style="width:${width}%"></div></div>
-      ${i > 0 && funnel[i-1].count > step.count ? `<div class="fn-drop">↓ ${dropRate}% drop from previous step (${funnel[i-1].count - step.count} sessions)</div>` : ''}
+      <div class="fn-track"><div class="fn-fill" style="width:${width.toFixed(2)}%"></div></div>
+      ${i > 0 && dropCount > 0 ? `<div class="fn-drop">↓ ${dropRate}% drop from previous step (${dropCount} sessions)</div>` : ''}
     </div>`;
   }).join('');
 
@@ -150,15 +166,25 @@ function renderPage({ days, events, sessions, funnel, kpis, utms, refs, countrie
   .kpi-sub{font-size:11px;color:var(--fg-faint);margin-top:2px;font-family:ui-monospace,monospace;letter-spacing:.06em}
   section{margin-bottom:52px}
   h2{font-size:18px;font-weight:800;letter-spacing:-.01em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(241,235,223,.14)}
-  .fn-row{margin-bottom:18px}
-  .fn-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .fn-row{margin-bottom:22px}
+  .fn-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
   .fn-name{font-size:14px;font-weight:700}
   .fn-nums{display:flex;gap:12px;align-items:baseline}
-  .fn-count{font-family:ui-monospace,monospace;font-weight:900;font-size:18px;color:var(--amber)}
+  .fn-count{font-family:ui-monospace,monospace;font-weight:900;font-size:20px;color:var(--amber)}
   .fn-pct{font-family:ui-monospace,monospace;font-size:11px;color:var(--fg-faint);letter-spacing:.1em}
-  .fn-track{height:8px;background:rgba(241,235,223,.05);position:relative;overflow:hidden}
-  .fn-fill{position:absolute;top:0;left:0;bottom:0;background:linear-gradient(90deg,var(--amber),#E4B98A);transition:width .5s ease}
-  .fn-drop{font-family:ui-monospace,monospace;font-size:10px;color:var(--err);letter-spacing:.08em;margin-top:6px;padding-left:8px}
+  /* Center-aligned track + fill so bars taper symmetrically like a real
+     funnel/voronka. Taller than before (22px) so they read as chunky bars. */
+  .fn-track{height:22px;background:rgba(241,235,223,.04);position:relative;overflow:hidden;display:flex;justify-content:center;align-items:stretch;border:1px solid rgba(241,235,223,.05)}
+  .fn-fill{height:100%;background:linear-gradient(90deg,#B48D5F,var(--amber),#E4B98A);transition:width .5s ease;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15)}
+  .fn-drop{font-family:ui-monospace,monospace;font-size:10px;color:var(--err);letter-spacing:.08em;margin-top:8px;padding-left:8px}
+  .day-form{display:inline-flex;gap:6px;align-items:center;margin-left:16px}
+  .day-form input[type=date]{background:transparent;border:1px solid rgba(241,235,223,.14);color:var(--fg);padding:8px 12px;font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.06em;color-scheme:dark}
+  .day-form button{padding:8px 14px;background:transparent;border:1px solid rgba(241,235,223,.14);color:var(--fg-dim);font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;cursor:pointer}
+  .day-form button:hover{background:var(--amber);color:var(--ink);border-color:var(--amber)}
+  .danger-btn{padding:8px 14px;background:transparent;border:1px solid rgba(224,73,43,.5);color:#F0A78D;font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;cursor:pointer;margin-left:12px;text-decoration:none;display:inline-block}
+  .danger-btn:hover{background:var(--err);color:var(--fg);border-color:var(--err)}
+  .cleared{padding:12px 16px;background:rgba(74,124,89,.14);border:1px solid var(--ok);color:#8DDDA3;font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.06em;margin-bottom:24px}
+  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:32px}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
   @media (max-width:700px){.grid-2{grid-template-columns:1fr}}
   table{width:100%;border-collapse:collapse;font-size:13px}
@@ -176,13 +202,26 @@ function renderPage({ days, events, sessions, funnel, kpis, utms, refs, countrie
 </head><body>
 <div class="wrap">
   <h1>Roast · Admin stats</h1>
-  <div class="sub">Owner-only. Data window: last ${days} day${days === 1 ? '' : 's'} · rendered ${esc(new Date().toISOString().slice(0, 19).replace('T', ' '))}Z</div>
+  <div class="sub">Owner-only. Window: <strong>${days}</strong> day${days === 1 ? '' : 's'} ending <strong>${esc(endDay)}</strong> · rendered ${esc(new Date().toISOString().slice(0, 19).replace('T', ' '))}Z</div>
 
-  <div class="range">
-    <a href="?token=${encodeURIComponent(process.env.TEST_PAYMENT_TOKEN)}&days=1"  class="${days === 1 ? 'active' : ''}">1d</a>
-    <a href="?token=${encodeURIComponent(process.env.TEST_PAYMENT_TOKEN)}&days=7"  class="${days === 7 ? 'active' : ''}">7d</a>
-    <a href="?token=${encodeURIComponent(process.env.TEST_PAYMENT_TOKEN)}&days=30" class="${days === 30 ? 'active' : ''}">30d</a>
-    <a href="?token=${encodeURIComponent(process.env.TEST_PAYMENT_TOKEN)}&days=90" class="${days === 90 ? 'active' : ''}">90d</a>
+  ${clearReport ? `<div class="cleared">✓ Cleared ${clearReport.deleted} event${clearReport.deleted === 1 ? '' : 's'} from that day.</div>` : ''}
+
+  <div class="toolbar">
+    <div class="range">
+      <a href="?token=${encodeURIComponent(process.env.TEST_PAYMENT_TOKEN)}&days=1&end=${endDay}"  class="${days === 1 ? 'active' : ''}">1d</a>
+      <a href="?token=${encodeURIComponent(process.env.TEST_PAYMENT_TOKEN)}&days=7&end=${endDay}"  class="${days === 7 ? 'active' : ''}">7d</a>
+      <a href="?token=${encodeURIComponent(process.env.TEST_PAYMENT_TOKEN)}&days=30&end=${endDay}" class="${days === 30 ? 'active' : ''}">30d</a>
+      <a href="?token=${encodeURIComponent(process.env.TEST_PAYMENT_TOKEN)}&days=90&end=${endDay}" class="${days === 90 ? 'active' : ''}">90d</a>
+    </div>
+
+    <form class="day-form" method="get" action="/admin/stats">
+      <input type="hidden" name="token" value="${esc(process.env.TEST_PAYMENT_TOKEN)}">
+      <input type="hidden" name="days" value="${days}">
+      <input type="date" name="end" value="${esc(endDay)}" max="${esc(isoDay(new Date()))}">
+      <button type="submit">Load</button>
+    </form>
+
+    ${days === 1 ? `<a class="danger-btn" href="?token=${encodeURIComponent(process.env.TEST_PAYMENT_TOKEN)}&days=1&end=${endDay}&clear=${endDay}" onclick="return confirm('Delete every event from ${endDay}? This cannot be undone.')">Clear ${esc(endDay)}</a>` : ''}
   </div>
 
   <div class="kpi-row">
@@ -251,7 +290,19 @@ export const handler = async (event) => {
   let days = parseInt(event.queryStringParameters?.days, 10);
   if (!Number.isFinite(days) || days < 1 || days > 90) days = 7;
 
-  const events = await loadEventsRange(days);
+  // Anchor day for the window (end date). Defaults to today.
+  const dayParam = String(event.queryStringParameters?.end || event.queryStringParameters?.day || '').trim();
+  const validDay = /^\d{4}-\d{2}-\d{2}$/.test(dayParam) ? dayParam : isoDay(new Date());
+
+  // Destructive: clear one day's events. Only honored when the query
+  // explicitly asks and the day is a valid ISO date.
+  let clearReport = null;
+  const clearParam = String(event.queryStringParameters?.clear || '').trim();
+  if (clearParam && /^\d{4}-\d{2}-\d{2}$/.test(clearParam)) {
+    clearReport = await clearDay(clearParam);
+  }
+
+  const events = await loadEventsRange(validDay, days);
   const sessions = buildSessions(events);
   const funnel = buildFunnel(sessions);
 
@@ -328,6 +379,8 @@ export const handler = async (event) => {
 
   const html = renderPage({
     days,
+    endDay: validDay,
+    clearReport,
     events,
     sessions,
     funnel,
